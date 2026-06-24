@@ -1,0 +1,5 @@
+.agents/
+.env
+.claude/
+.aider-desk/
+skills-lock.json
