@@ -1,0 +1,269 @@
+% !TeX program = pdflatex
+% !BIB program = biber
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage{array}
+\usepackage{microtype}
+\usepackage[backend=biber, style=ieee, sorting=none]{biblatex}
+\addbibresource{references.bib}
+
+% Note: digits are illegal in \hyphenation, so Qwen3-4B is handled via \mbox in text
+\hyphenation{Py-ramidKV Snap-KV Turbo-Quant py-nvml Krus-kal-Wal-lis non-pa-ra-met-ric Deep-Seek au-to-AWQ}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{Holistic Optimization of Small Language Models for\\Energy-Efficient Edge Inference:\\An Empirical Ablation Study}
+
+\author{
+  \IEEEauthorblockN{Md. Sadik Shahriar}
+  \IEEEauthorblockN{\small ID: 2023-2-60-103}
+  \IEEEauthorblockA{
+    \textit{Department of Computer Science and Engineering}\\
+    \textit{East West University}\\
+    Dhaka, Bangladesh \\
+    shahriarsadik@gmail.com
+  }
+  \and
+  \IEEEauthorblockN{Nipa Mridha}
+  \IEEEauthorblockN{\small ID: 2022-3-60-254}
+  \IEEEauthorblockA{
+    \textit{Department of Computer Science and Engineering}\\
+    \textit{East West University}\\
+    Dhaka, Bangladesh \\
+    mridhanipa886@gmail.com
+  }
+  \and
+  \IEEEauthorblockN{Tanha Humaira}
+  \IEEEauthorblockN{\small ID: 2022-3-60-262}
+  \IEEEauthorblockA{
+    \textit{Department of Computer Science and Engineering}\\
+    \textit{East West University}\\
+    Dhaka, Bangladesh \\
+    chandnihumaira373@gmail.com
+  }
+}
+
+
+
+\maketitle
+
+\begin{abstract}
+The energy cost of running AI models is a growing problem. Even Small Language Models (SLMs, under 7 billion parameters) face a key bottleneck: the Key-Value (KV) cache that grows during text generation consumes a lot of GPU memory and power. Three compression techniques exist to fix this --- weight quantization (AWQ), token eviction (PyramidKV/SnapKV), and KV cache quantization (TurboQuant) --- but no one has tested what happens when all three are used together on an SLM while actually measuring GPU power. Also, the energy cost of the model's built-in ``thinking mode'' under compression has never been studied. This paper proposes a study that runs Qwen3-4B on an NVIDIA T4 GPU using five different compression setups at three context lengths. A smaller subset also tests the thinking mode under compression. The expected result is the first dataset showing how compound SLM compression affects energy, memory, and accuracy together, which can help developers make better decisions when deploying AI on edge devices.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Green AI, energy-efficient inference, KV cache compression, weight quantization, AWQ, TurboQuant, PyramidKV, small language models, edge deployment
+\end{IEEEkeywords}
+
+
+% ============================================================
+\section{Introduction}
+% ============================================================
+
+Training a single large NLP model can emit as much CO\textsubscript{2} as five cars over their lifetimes \cite{strubell_energy_2019}, and as AI deployment has scaled to billions of daily queries, inference now dominates that carbon footprint \cite{patterson_carbon_nodate}.
+
+A central reason for inference's energy cost is the Key-Value (KV) cache inside transformer models. When a model generates text, it stores key and value tensors for every previous token so it does not have to recalculate them. This cache gets bigger with every new token, and at long context lengths (8K--128K tokens), it becomes the biggest consumer of GPU memory and power \cite{liu_kivi_2023}.
+
+Small Language Models (SLMs), those with fewer than 7 billion parameters, are a better option for saving energy. They need fewer computations per token and can run on cheaper hardware without needing cloud servers \cite{husom_sustainable_2025}. But SLMs still have the KV cache problem, especially when users ask them to handle long inputs.
+
+The research community has developed three main techniques to fix this: weight quantization, token eviction, and KV cache quantization. These techniques are usually studied separately. No published work has measured what happens when all three are combined on a single SLM while tracking real GPU power draw.
+
+This study tries to fill that gap. The scenario is simple: a developer needs to run \mbox{Qwen3-4B} on a single NVIDIA T4 GPU (16 GB VRAM, 70W power limit) and wants to know which combination of compression techniques saves the most energy without breaking the model's accuracy. There is also a secondary question: \mbox{Qwen3-4B} has a built-in ``thinking mode'' that generates long internal reasoning chains. Does this reasoning still work well under compression, and how much extra energy does it use?
+
+
+% ============================================================
+\section{Background}
+% ============================================================
+
+To understand this study, it helps to know about transformer KV caches, the three compression strategies, and the Qwen3-4B model.
+
+\textbf{KV Cache Growth}: Transformers store key and value tensors for all previous tokens to avoid recalculating them. This cache grows as $O(n \times L \times d)$, where $n$ is context length, $L$ is the number of layers, and $d$ is head size. At 8K tokens with 36 layers, the cache can take several gigabytes of GPU memory \cite{li_snapkv_nodate}.
+
+\textbf{Weight Quantization}: AWQ \cite{lin_awq_2025} (MLSys 2024 Best Paper) reduces model weight precision from 16-bit to 4-bit by identifying which weights matter most (using activation magnitudes) and protecting them, then compressing everything else. This shrinks model memory by about 4$\times$ and makes inference 3$\times$ faster without retraining. For Qwen3-4B specifically, AWQ has been shown to outperform other 4-bit methods like GPTQ (66.0\% vs.\ 65.8\% average accuracy) \cite{zheng_empirical_2026}.
+
+\textbf{Token Eviction}: This approach removes tokens from the KV cache that are not getting much attention. H2O \cite{zhang_h2o_nodate} showed that just 20\% of tokens receive most of the attention. SnapKV \cite{li_snapkv_nodate} (NeurIPS 2024) improved on this by using the last 32 tokens as a ``window'' to predict which older tokens will matter, achieving 3.6$\times$ faster inference. PyramidKV \cite{cai_pyramidkv_2025} (COLM 2025) goes further: it noticed that early layers in a transformer spread attention broadly, while later layers focus on just a few tokens. By giving more cache space to early layers and less to later ones, it achieves 5--15\% better retrieval accuracy than SnapKV at the same memory budget.
+
+\textbf{KV Cache Quantization}: TurboQuant \cite{zandieh_turboquant_2025} (ICLR 2026) compresses the surviving KV cache tokens by applying a random rotation to make the values more uniform, then quantizing to about 3.5 bits. It does not need any training data and achieves near-lossless quality. A theoretical study \cite{salfati_quantization_2026} also confirmed that this quantization approach is better than low-rank methods, especially for models like Qwen3-4B that use Grouped Query Attention (GQA) with fewer KV heads.
+
+\textbf{Qwen3-4B}: This is a 4.0-billion-parameter model with 36 transformer layers, GQA (32 query heads and 8 KV heads), QK-Norm, and a 32K native context window \cite{yang_qwen3_2025}. It has a built-in thinking mode where the model reasons internally for 2,000--8,000 tokens before giving its final answer. Official AWQ 4-bit weights are available on HuggingFace.
+
+
+% ============================================================
+\section{Problem Statement}
+% ============================================================
+
+\sloppy
+The problem this research addresses is the lack of real measurements on what happens to energy, memory, and accuracy when weight quantization (AWQ), token eviction (PyramidKV/SnapKV), and KV cache quantization (TurboQuant) are all used together on a small language model with a built-in thinking mode, running on a T4 GPU.
+\fussy
+
+Right now, if a developer wants to deploy Qwen3-4B efficiently, there is no published data to guide the decision. Should they use AWQ alone? AWQ with token eviction? All three together? Without actual GPU power measurements, it is impossible to know. The thinking mode makes this even harder: it can generate thousands of extra tokens internally, which likely increases energy a lot, but no one has measured this under different compression setups. Existing work studies each technique in isolation: TurboQuant \cite{zandieh_turboquant_2025} focuses purely on KV cache quantization theory, SLMQuant \cite{wang_slmquant_2025} benchmarks weight quantization on sub-7B models, and the Qwen3 quantization study \cite{zheng_empirical_2026} evaluates standalone post-training quantization schemes. None of them combine all three compression axes, and none measure real hardware energy consumption.
+
+\subsection{Aim}
+
+The aim of this research is to empirically measure the energy, memory, and accuracy trade-offs of combining AWQ, PyramidKV, and TurboQuant on \mbox{Qwen3-4B}, with and without the thinking mode, running on an NVIDIA T4 GPU.
+
+\subsection{Objectives}
+
+To achieve this aim, the research will:
+\begin{enumerate}
+  \item \textbf{Implement} five compression configurations on \mbox{Qwen3-4B}: C0 (BF16 baseline), C1 (AWQ 4-bit), C2 (AWQ + TurboQuant 4-bit), C3 (AWQ + PyramidKV with a 1024-token limit), and C4 (all three combined).
+  \item \textbf{Measure} peak VRAM, average GPU power (W), total energy (J), throughput (tok/s), perplexity, and NIAH retrieval accuracy at context lengths of 512, 2048, and 8192 tokens.
+  \item \textbf{Quantify} how much extra energy and accuracy loss the built-in thinking mode adds under C0, C1, and C4 at 8192 tokens.
+  \item \textbf{Test} whether the differences between configurations are significant using paired t-tests or equivalent non-parametric tests at $\alpha = 0.05$.
+  \item \textbf{Build} Pareto frontier plots to show which configurations offer the best balance of energy and accuracy for different deployment needs.
+\end{enumerate}
+
+\subsection{Focus}
+
+This study deliberately fixes the model and hardware --- \mbox{Qwen3-4B} on a single NVIDIA T4 --- to isolate compression effects from hardware variation. Breadth across models is sacrificed in favour of measurement precision and full reproducibility on a widely available platform. The T4 has a 70W power limit and draws about 12W idle and up to 82W during inference \cite{argerich_watt_2026}; this is the hardware configuration shared by many student researchers and small teams who represent the primary audience for this study's findings.
+
+
+% ============================================================
+\section{Contributions}
+% ============================================================
+
+This research makes three contributions that are not currently in the published literature.
+
+\textbf{First}, this is the first study to measure GPU power at 10~Hz while running weight quantization, token eviction, and KV cache quantization together on a sub-4B model. No existing paper combines all three techniques at this scale with hardware energy monitoring. This answers a gap called out in SLMQuant \cite{wang_slmquant_2025}, RDKV \cite{zhang_rdkv_2026}, TurboQuant \cite{zandieh_turboquant_2025}, and the \mbox{Qwen3} quantization study \cite{zheng_empirical_2026}.
+
+\textbf{Second}, this is the first study to measure the energy cost of Qwen3-4B's built-in thinking mode under compression. Prior work on reasoning-model compression \cite{ramachandran_thinkv_2026} used a different model and did not measure real GPU power. This study fills that gap.
+
+\textbf{Third}, the study will release all experiment logs as open CSV files along with reproducible Python notebooks, so other researchers can extend the results without needing to redo the baseline experiments.
+
+
+% ============================================================
+\section{Related Works}
+% ============================================================
+
+Researchers have studied various ways to compress language models. This section reviews the most relevant work across weight quantization, token eviction, KV cache quantization, compound methods, and energy measurement.
+
+\textbf{Weight Quantization:} Lin et al.\ \cite{lin_awq_2025} developed AWQ, which achieves 4-bit compression by protecting the most important weights using activation patterns, giving 3$\times$ speedup without retraining. Frantar et al.\ \cite{frantar_gptq_2023} proposed GPTQ as an alternative using second-order Hessian approximation. The Qwen3 quantization study \cite{zheng_empirical_2026} compared five methods on Qwen3 and found AWQ worked best, but also noted Qwen3's unusual sensitivity to quantization. Wang et al.\ \cite{wang_slmquant_2025} introduced SLMQuant, the first benchmark focused specifically on sub-7B model quantization, finding that LLM-optimized methods often do not work as well on smaller models.
+
+\textbf{Token Eviction:} Zhang et al.\ \cite{zhang_h2o_nodate} showed that only about 20\% of tokens in the KV cache actually matter, which they called the Heavy Hitter Oracle. Li et al.\ \cite{li_snapkv_nodate} built on this with SnapKV, which uses a short observation window to figure out which tokens can be safely removed, achieving large memory savings at 16K context. Cai et al.\ \cite{cai_pyramidkv_2025} improved further with PyramidKV, which uses a pyramidal budget across layers and beats SnapKV by 5--15\% NIAH accuracy.
+
+\textbf{KV Cache Quantization:} Zandieh et al.\ \cite{zandieh_turboquant_2025} proposed TurboQuant, which uses random rotation plus Lloyd-Max scalar quantization to compress KV caches to about 3.5 bits with near-zero quality loss and no calibration data needed. Liu et al.\ \cite{liu_kivi_2023} offered KIVI as a simpler 2-bit baseline. Salfati \cite{salfati_quantization_2026} provided theoretical proof that quantization outperforms low-rank compression for GQA models, which directly supports using TurboQuant for Qwen3-4B.
+
+\textbf{Compound and Reasoning Methods:} Zhang et al.\ \cite{zhang_rdkv_2026} combined eviction and quantization using rate-distortion theory, achieving 9.1\% LongBench improvement but only on 7B+ models without any energy measurement. Ramachandran et al.\ \cite{ramachandran_thinkv_2026} compressed reasoning models by combining quantization and eviction, but measured throughput rather than hardware power.
+
+\textbf{Energy Measurement:} Argerich et al.\ \cite{argerich_watt_2026} published Watt Counts (2026), a large benchmark covering 5,000+ LLM inference experiments. They established that T4 GPUs draw about 12W idle and up to 82W at peak, and recommend polling GPU power every 50--200 ms using pynvml. Table~\ref{tab:comparison} summarizes how this study compares to all existing work.
+
+\begin{table}[htbp]
+\caption{How This Study Compares to Related Works}
+\label{tab:comparison}
+\centering
+\renewcommand{\arraystretch}{1.2}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Work} & \textbf{Wt.Q} & \textbf{Evict} & \textbf{KVQ} & \textbf{Energy} \\
+\midrule
+AWQ \cite{lin_awq_2025}              & \checkmark & -- & -- & -- \\
+GPTQ \cite{frantar_gptq_2023}            & \checkmark & -- & -- & -- \\
+SLMQuant \cite{wang_slmquant_2025}    & \checkmark & -- & -- & -- \\
+H2O \cite{zhang_h2o_nodate}              & -- & \checkmark & -- & -- \\
+SnapKV \cite{li_snapkv_nodate}        & -- & \checkmark & -- & -- \\
+PyramidKV \cite{cai_pyramidkv_2025}  & -- & \checkmark & -- & -- \\
+TurboQuant \cite{zandieh_turboquant_2025}& -- & -- & \checkmark & -- \\
+KIVI \cite{liu_kivi_2023}            & -- & -- & \checkmark & -- \\
+RDKV \cite{zhang_rdkv_2026}            & -- & \checkmark & \checkmark & -- \\
+ThinKV \cite{ramachandran_thinkv_2026}        & -- & \checkmark & \checkmark & -- \\
+Watt Counts \cite{argerich_watt_2026}& -- & -- & -- & \checkmark \\
+\textbf{This Work}          & \checkmark & \checkmark & \checkmark & \checkmark \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+As Table~\ref{tab:comparison} shows, no existing work covers all four dimensions together --- especially not at the SLM scale with real hardware energy measurement.
+
+
+% ============================================================
+\section{Research Questions}
+% ============================================================
+
+The main research question is: when AWQ, PyramidKV, and TurboQuant are combined on \mbox{Qwen3-4B}, do the energy and memory savings add up, and what happens to accuracy across different context lengths on a T4 GPU?
+
+This breaks down into three specific sub-questions:
+
+\begin{enumerate}
+\item \textbf{RQ1:} How does using AWQ, PyramidKV (or SnapKV), and TurboQuant all together affect total energy (J), peak VRAM (MB), and NIAH retrieval accuracy compared to using each method alone, at 512, 2048, and 8192 token contexts?
+
+\item \textbf{RQ2:} How much extra energy does \mbox{Qwen3-4B}'s thinking mode use under each compression setup, and does compression hurt reasoning accuracy more than regular generation?
+
+\item \textbf{RQ3:} Which compression configuration gives the best balance of energy and accuracy for each type of user --- edge device developers who need low memory, cloud providers who want to save energy at scale, and researchers studying sustainable AI?
+\end{enumerate}
+
+Based on what we know from the literature, the following predictions are made:
+
+\textbf{H1}: AWQ alone (C1) should cut energy by about 3$\times$ compared to the uncompressed baseline (C0) at 8K context while keeping NIAH accuracy above 90\% \cite{lin_awq_2025}.
+
+\textbf{H2}: Adding TurboQuant on top of AWQ (C2) should reduce peak VRAM by 15--20\% but might slightly increase energy per token due to the extra computation from the random rotation step \cite{zandieh_turboquant_2025}.
+
+\textbf{H3}: Token eviction (C3) should not change anything at 512 tokens, because there are not enough tokens yet to trigger the 1024-token eviction threshold. But at 8192 tokens, it should reduce VRAM and maintain accuracy \cite{cai_pyramidkv_2025}.
+
+\textbf{H4}: The fully combined C4 setup should achieve the lowest VRAM and energy, but accuracy may fall 10--30\% at long contexts due to interference between token eviction and cache quantization \cite{zhang_rdkv_2026, salfati_quantization_2026}.
+
+\textbf{H5}: Thinking mode will likely use 2--5$\times$ more energy than normal mode. But under C4, this ratio might be smaller, because evicting tokens also limits how long the reasoning chain can get.
+
+\textbf{H0} (null): No significant energy difference exists between any two configurations (paired t-test, $\alpha = 0.05$).
+
+
+% ============================================================
+\section{Planned Methodology}
+% ============================================================
+
+The research uses a quantitative experimental design. Experiments will be run in Google Colab using an NVIDIA T4 GPU and a fixed Python environment.
+
+\subsection{Phase 1: Setup and Baseline (Weeks 1--2)}
+
+The first phase sets up the environment and checks that the baseline works correctly before running any compression experiments.
+
+The software environment includes Python 3.10+, PyTorch 2.4+, HuggingFace Transformers 4.45+, AutoAWQ, TurboQuant, and \texttt{pynvml} for GPU monitoring. Two models are downloaded: the BF16 base model (about 8~GB) and the official AWQ INT4 model (about 2.9~GB).
+
+GPU power is recorded every 100 ms using \texttt{pynvml} in a background thread. Total energy is then calculated as: $E = \bar{P} \times \Delta t$, where $\bar{P}$ is average power in watts and $\Delta t$ is inference time in seconds. This approach matches the protocol recommended by Watt Counts \cite{argerich_watt_2026}. VRAM is tracked using \texttt{torch.cuda.max\_memory\_allocated()}.
+
+For accuracy testing, the study uses a Needle-in-a-Haystack (NIAH) prompt. A long haystack of filler text hides the sentence \textit{``The secret code name is SHADOW-8821''} at 50\% depth. The prompt ends mid-sentence so the model completes it, which avoids open-ended generation failures. For thinking-mode runs, the answer is extracted from the model's \texttt{\textbackslash boxed\{\}} output before checking if the needle was recalled.
+
+One important detail: perplexity must be computed with an active \texttt{past\_key\_values} argument. Without this, the compressed configurations appear to have the same perplexity as the baseline, which hides the compression effect and produces misleading results.
+
+Baseline validation checks: (1) C0 must pass the NIAH test at 512 tokens with above 95\% accuracy; (2) GPU power readings must fall in the 12--82W range for the T4 \cite{argerich_watt_2026}; (3) perplexity with an active cache must differ from perplexity without one.
+
+\subsection{Phase 2: Compression Experiments (Weeks 3--6)}
+
+The five configurations are implemented and tested as follows.
+
+\textbf{C0 (Baseline):} \mbox{Qwen3-4B} in BF16, no compression.
+
+\textbf{C1 (AWQ):} The AWQ 4-bit model loaded via AutoAWQ with layer fusing enabled.
+
+\textbf{C2 (AWQ + TurboQuant):} A \texttt{TurboQuantCache} object with 4-bit keys and values is passed to the model's \texttt{generate()} call. The head dimension of 128 maps to 32 outlier channels at 5-bit and 96 channels at 3-bit. GQA compatibility (8 KV heads) is verified in a pilot run first.
+
+\textbf{C3 (AWQ + PyramidKV):} The attention forward pass is modified via Python monkey-patching. At each step, tokens are scored by the attention they received from the last 32 tokens. A pyramid budget gives more cache space to early layers and less to late ones. If this conflicts with QK-Norm or rotary embedding, the fallback is SnapKV \cite{li_snapkv_nodate} with a flat 1024-token limit.
+
+\textbf{C4 (All Three):} AWQ model loaded, PyramidKV patch applied, and TurboQuant cache passed to generation.
+
+All results are saved to CSV after every run to handle the 12-hour Colab session timeout. The total experiment matrix is: 5 configurations $\times$ 3 context lengths $+$ 3 thinking-mode runs (C0, C1, C4 at 8192 tokens) $=$ \textbf{18 conditions}. Each condition runs 3 times and the average is taken. Three repetitions per condition reflect Google Colab session time constraints; per-run variance is expected to be low because pynvml power traces integrate over 30--60 seconds of inference per run, making run-to-run noise a small fraction of the between-configuration differences under study.
+
+\subsection{Phase 3: Analysis (Weeks 7--8)}
+
+Statistical testing starts with a Shapiro-Wilk normality test for each metric. If the data is approximately normal, repeated-measures ANOVA is run followed by paired t-tests. Otherwise, Kruskal-Wallis tests with Wilcoxon signed-rank follow-ups are used. All comparisons are Bonferroni-corrected ($k = 10$ pairs). Effect sizes are reported as Cohen's $d$ or Cliff's $\delta$.
+
+Seven charts are produced: (1) VRAM vs.~context length; (2) Energy vs.~context length; (3) NIAH accuracy matrix; (4) Throughput bars; (5) Thinking vs.~non-thinking energy; (6) Thinking-mode NIAH; and (7) a Pareto scatter of energy vs.~accuracy at 8192 tokens.
+
+If TurboQuant produces NaN perplexity values (a known issue with AWQ CUDA kernels \cite{zheng_empirical_2026}), those entries are excluded and NIAH accuracy serves as the sole quality metric. If TurboQuant is not compatible with Qwen3-4B's GQA setup, KIVI \cite{liu_kivi_2023} will serve as the replacement.
+
+
+% ============================================================
+% REFERENCES
+% ============================================================
+\printbibliography
+
+\end{document}
