@@ -3,3 +3,8 @@
 .claude/
 .aider-desk/
 skills-lock.json
+node_modules/
+generate_pptx.js
+package-lock.json
+package.json
+unpacked
