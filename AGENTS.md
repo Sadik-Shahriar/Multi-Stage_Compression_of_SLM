@@ -1,7 +1,7 @@
 # Project Context — SLM Energy Ablation Study
 
 ## Project
-Holistic Optimization of SLMs for Energy-Efficient Edge Inference — An Empirical Ablation Study stacking AWQ + PyramidKV/SnapKV + TurboQuant on Qwen3-4B with T4 GPU power monitoring.
+Holistic Optimization of SLMs for Energy-Efficient Edge Inference — An Empirical Ablation Study stacking AWQ + PyramidKV/SnapKV + TurboQuant on Llama 3.2-3B with T4 GPU power monitoring.
 
 ## Directory Structure
 ```
@@ -27,6 +27,10 @@ Project/
 ├── templates/              # LaTeX paper templates
 │   ├── acm_sigconf.tex
 │   └── ieee_proposal.tex
+├── experiments/            # Experiment notebooks
+│   ├── llama3_2_energy_ablation_colab.ipynb  # Primary experiment (active)
+│   ├── qwen3_energy_ablation_colab_output.ipynb  # Archived (blocked)
+│   └── qwen3_energy_ablation_colab_reconstructed output.ipynb  # Archived
 ├── archive/                # Historical content (DO NOT use)
 │   ├── Capstone_Proposal_Latest.md
 │   ├── outdated/           # Qwen2.5-1.5B-era files
@@ -35,35 +39,38 @@ Project/
 ```
 
 ## Status
-- **proposal/proposal.tex** — written, 22 citations, firecrawl-verified
+- **proposal/proposal.tex** — written, 22 citations, firecrawl-verified (still targets Qwen3-4B)
 - **proposal/references.bib** — 24 entries, fixed all fabricated author names
 - **proposal/proposal.md** — canonical markdown with 27 citations
 - **proposal/literature_review.md** — firecrawl-verified (20+ entries)
-- **research/research_plan.md** — master research plan
+- **research/research_plan.md** — master research plan (updated for Llama 3.2-3B)
+- **experiments/llama3_2_energy_ablation_colab.ipynb** — written, ~53 KB, ready for Colab T4
 
 ## Model
-- **Qwen3-4B**: 36 layers, GQA (32 Q / 8 KV heads), 32K native context
-- Thinking mode via chat template `/think` flag, answers in `\boxed{}` delimiters
-- Official AWQ weights: `Qwen/Qwen3-4B-AWQ` on HF
+- **Llama 3.2-3B-Instruct**: 28 layers, GQA (24 Q / 8 KV heads), 8K native context, head_dim=128
+- No built-in thinking mode (simpler ablation — 5 configs × 3 contexts = 15 runs only)
+- Official AWQ weights: `casperhansen/llama-3.2-3b-instruct-awq`
+- Baseline FP16: `unsloth/Llama-3.2-3B-Instruct`
 
 ## HW
 - **NVIDIA T4**: 16 GB VRAM, 70W TDP, measured idle ~12W, max ~82W
 - Google Colab via free tier
 
 ## Configs
-- **C0**: BF16 (baseline)
+- **C0**: FP16 (baseline)
 - **C1**: AWQ 4-bit
 - **C2**: AWQ + TurboQuant 4-bit
-- **C3**: AWQ + PyramidKV (1024 cap)
+- **C3**: AWQ + PyramidKV (layerwise budget avg 1024)
 - **C4**: AWQ + PyramidKV + TurboQuant (compound)
-- Contexts: 512, 2048, 8192; Thinking subset: C0/C1/C4 at 8192
+- Contexts: 512, 2048, 8192 (no thinking mode subset)
+- C2 TurboQuant validated via physical-storage gate (FP16-leak check)
 
 ## Critical Facts
-- AWQ > GPTQ on Qwen3-4B (66.0 vs 65.8 avg commonsense)
+- Llama 3.2-3B: 28 layers, 24 Q / 8 KV heads (3:1 GQA ratio)
+- KVCache-Factory natively supports Llama for PyramidKV — no custom monkey-patch
 - TurboQuant: Zandieh, Daliri, Hadian, Mirrokni (ICLR 2026) — NOT "Zhou et al."
 - SnapKV: Yuhong Li et al. (NeurIPS 2024) — NOT "Yuhang Li"
 - PyramidKV: Zefan Cai et al. (COLM 2025) — NOT "Yang, Chen"
-- Qwen3 Quant Study: Zheng, Xingyu et al. (arXiv 2505.02214) — NOT "Li, H."
 - SLMQuant (arXiv 2511.13023): SLMs more quantization-sensitive than LLMs
 - Quantization Dominates Rank Reduction (Salfati 2026, arXiv 2604.11501): INT4 preserves score ordering
 - ThinKV (Ramachandran et al., arXiv 2510.01290): hybrid for reasoning models
@@ -73,8 +80,8 @@ Project/
 ## Methodology
 - 10 Hz pynvml polling for power
 - Active KV cache passed for perplexity
-- PyramidKV monkey-patch of Qwen3Attention.forward (fallback to SnapKV)
-- TurboQuant: outlier-aware mixed precision (32 outlier at 5-bit, 96 at 3-bit)
+- PyramidKV via KVCache-Factory `DynamicCache` adapter (falls back to SnapKV-style scoring)
+- TurboQuantCache with physical-storage validation gate (rejects if FP16 copies retained)
 - Paired t-tests / Wilcoxon + Bonferroni
 - Pareto frontier (energy vs NIAH)
 
@@ -85,5 +92,6 @@ Project/
 - No fabricated quotes — verify every claim via read-paper
 
 ## Next
-- Compile proposal.tex on Overleaf (no local LaTeX compiler)
-- Final spell-check
+- Run experiment notebook on Colab T4 runtime
+- Check `cache_pilots.json` for TurboQuant validation outcome
+- Update `proposal/` docs and `ieee_proposal.tex` after results are in

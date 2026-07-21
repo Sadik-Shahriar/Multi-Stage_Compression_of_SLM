@@ -1,19 +1,28 @@
-
-@misc{yang_qwen3_2025,
-	title = {Qwen3 Technical Report},
-	url = {http://arxiv.org/abs/2505.09388},
-	doi = {10.48550/arXiv.2505.09388},
-	abstract = {In this work, we present Qwen3, the latest version of the Qwen model family. Qwen3 comprises a series of large language models ({LLMs}) designed to advance performance, efficiency, and multilingual capabilities. The Qwen3 series includes models of both dense and Mixture-of-Expert ({MoE}) architectures, with parameter scales ranging from 0.6 to 235 billion. A key innovation in Qwen3 is the integration of thinking mode (for complex, multi-step reasoning) and non-thinking mode (for rapid, context-driven responses) into a unified framework. This eliminates the need to switch between different models--such as chat-optimized models (e.g., {GPT}-4o) and dedicated reasoning models (e.g., {QwQ}-32B)--and enables dynamic mode switching based on user queries or chat templates. Meanwhile, Qwen3 introduces a thinking budget mechanism, allowing users to allocate computational resources adaptively during inference, thereby balancing latency and performance based on task complexity. Moreover, by leveraging the knowledge from the flagship models, we significantly reduce the computational resources required to build smaller-scale models, while ensuring their highly competitive performance. Empirical evaluations demonstrate that Qwen3 achieves state-of-the-art results across diverse benchmarks, including tasks in code generation, mathematical reasoning, agent tasks, etc., competitive against larger {MoE} models and proprietary models. Compared to its predecessor Qwen2.5, Qwen3 expands multilingual support from 29 to 119 languages and dialects, enhancing global accessibility through improved cross-lingual understanding and generation capabilities. To facilitate reproducibility and community-driven research and development, all Qwen3 models are publicly accessible under Apache 2.0.},
-	number = {{arXiv}:2505.09388},
-	publisher = {{arXiv}},
-	author = {Yang, An and Li, Anfeng and Yang, Baosong and Zhang, Beichen and Hui, Binyuan and Zheng, Bo and Yu, Bowen and Gao, Chang and Huang, Chengen and Lv, Chenxu and Zheng, Chujie and Liu, Dayiheng and Zhou, Fan and Huang, Fei and Hu, Feng and Ge, Hao and Wei, Haoran and Lin, Huan and Tang, Jialong and Yang, Jian and Tu, Jianhong and Zhang, Jianwei and Yang, Jianxin and Yang, Jiaxi and Zhou, Jing and Zhou, Jingren and Lin, Junyang and Dang, Kai and Bao, Keqin and Yang, Kexin and Yu, Le and Deng, Lianghao and Li, Mei and Xue, Mingfeng and Li, Mingze and Zhang, Pei and Wang, Peng and Zhu, Qin and Men, Rui and Gao, Ruize and Liu, Shixuan and Luo, Shuang and Li, Tianhao and Tang, Tianyi and Yin, Wenbiao and Ren, Xingzhang and Wang, Xinyu and Zhang, Xinyu and Ren, Xuancheng and Fan, Yang and Su, Yang and Zhang, Yichang and Zhang, Yinger and Wan, Yu and Liu, Yuqiong and Wang, Zekun and Cui, Zeyu and Zhang, Zhenru and Zhou, Zhipeng and Qiu, Zihan},
-	urldate = {2026-06-28},
-	date = {2025-05-14},
+@misc{grattafiori_llama3_2024,
+	title = {The {Llama} 3 Herd of Models},
+	url = {https://arxiv.org/abs/2407.21783},
+	doi = {10.48550/arXiv.2407.21783},
+	author = {Grattafiori, Aaron and Dubey, Abhimanyu and Jauhri, Abhinav and Pandey, Abhinav and Kadian, Abhishek and Al-Dahle, Ahmad and Letman, Aiesha and Mathur, Akhil and Schelten, Alan and Vaughan, Alex and others},
+	date = {2024-11-23},
 	eprinttype = {arxiv},
-	eprint = {2505.09388 [cs.CL]},
-	keywords = {Computer Science - Computation and Language},
-	file = {Preprint PDF:C\:\\Users\\ASUS\\Zotero\\storage\\KWA59QQN\\Yang et al. - 2025 - Qwen3 Technical Report.pdf:application/pdf;Snapshot:C\:\\Users\\ASUS\\Zotero\\storage\\IL2JW7I6\\2505.html:text/html},
+	eprint = {2407.21783 [cs.AI]},
 }
+
+@online{meta_llama32_2024,
+	title = {{Llama 3.2-3B-Instruct} Model Card},
+	author = {{Meta AI}},
+	url = {https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct},
+	date = {2024},
+	urldate = {2026-07-13},
+}
+
+@online{casperhansen_llama32_awq,
+	title = {{Llama 3.2-3B-Instruct AWQ} Checkpoint},
+	author = {Hansen, Casper},
+	url = {https://huggingface.co/casperhansen/llama-3.2-3b-instruct-awq},
+	urldate = {2026-07-13},
+}
+
 
 @misc{zandieh_turboquant_2025,
 	title = {{TurboQuant}: Online Vector Quantization with Near-optimal Distortion Rate},
@@ -127,7 +136,7 @@
 	title = {Energy and Policy Considerations for Deep Learning in {NLP}},
 	url = {https://aclanthology.org/P19-1355},
 	doi = {10.18653/v1/P19-1355},
-	abstract = {Recent progress in hardware and methodology for training neural networks has ushered in a new generation of large networks trained on abundant data. These models have obtained notable gains in accuracy across many {NLP} tasks. However, these accuracy improvements depend on the availability of exceptionally large computational resources that necessitate similarly substantial energy consumption. As a result these models are costly to train and develop, both ﬁnancially, due to the cost of hardware and electricity or cloud compute time, and environmentally, due to the carbon footprint required to fuel modern tensor processing hardware. In this paper we bring this issue to the attention of {NLP} researchers by quantifying the approximate ﬁnancial and environmental costs of training a variety of recently successful neural network models for {NLP}. Based on these ﬁndings, we propose actionable recommendations to reduce costs and improve equity in {NLP} research and practice.},
+	abstract = {Recent progress in hardware and methodology for training neural networks has ushered in a new generation of large networks trained on abundant data. These models have obtained notable gains in accuracy across many {NLP} tasks. However, these accuracy improvements depend on the availability of exceptionally large computational resources that necessitate similarly substantial energy consumption. As a result these models are costly to train and develop, both financially, due to the cost of hardware and electricity or cloud compute time, and environmentally, due to the carbon footprint required to fuel modern tensor processing hardware. In this paper we bring this issue to the attention of {NLP} researchers by quantifying the approximate financial and environmental costs of training a variety of recently successful neural network models for {NLP}. Based on these findings, we propose actionable recommendations to reduce costs and improve equity in {NLP} research and practice.},
 	eventtitle = {Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics},
 	pages = {3645--3650},
 	booktitle = {Proceedings of the 57th Annual Meeting of the Association for Computational Linguistics},
@@ -149,7 +158,7 @@
 
 @inproceedings{bender_dangers_2021,
 	location = {Virtual Event Canada},
-	title = {On the Dangers of Stochastic Parrots: Can Language Models Be Too Big? 🦜},
+	title = {On the Dangers of Stochastic Parrots: Can Language Models Be Too Big?},
 	isbn = {978-1-4503-8309-7},
 	url = {https://dl.acm.org/doi/10.1145/3442188.3445922},
 	doi = {10.1145/3442188.3445922},
@@ -199,25 +208,6 @@
 	eprint = {2210.17323 [cs.LG]},
 	keywords = {Computer Science - Machine Learning},
 	file = {Preprint PDF:C\:\\Users\\ASUS\\Zotero\\storage\\DRBQHWCQ\\Frantar et al. - 2023 - GPTQ Accurate Post-Training Quantization for Generative Pre-trained Transformers.pdf:application/pdf;Snapshot:C\:\\Users\\ASUS\\Zotero\\storage\\NR9IW8FW\\2210.html:text/html},
-}
-
-@article{zheng_empirical_2026,
-	title = {An empirical study of Qwen3 quantization},
-	volume = {4},
-	issn = {2097-3330, 2731-9008},
-	url = {https://link.springer.com/10.1007/s44267-026-00114-4},
-	doi = {10.1007/s44267-026-00114-4},
-	abstract = {Abstract
-            The Qwen series has emerged as a leading family of open-source large language models ({LLMs}), demonstrating remarkable capabilities in natural language understanding tasks. With the recent release of Qwen3, which exhibits superior performance across diverse benchmarks, there is an increased interest in the efficient deployment of these models in resource-constrained environments. Low-bit quantization presents a promising solution, yet its impact on Qwen3’s performance remains underexplored. This study conducts a systematic evaluation of Qwen3’s robustness under various quantization settings, aiming to identify both the opportunities and the challenges inherent in compressing this state-of-the-art model. We rigorously assess 5 existing classic post-training quantization techniques applied to Qwen3, spanning bit-widths from 1 to 8 bits, and evaluate their effectiveness across multiple datasets. Our findings reveal that while Qwen3 maintains competitive performance at moderate bit-widths, it experiences notable degradation in linguistic tasks under ultra-low precision, underscoring the persistent hurdles in {LLM} compression. These results emphasize the need for further research to mitigate performance loss in extreme quantization scenarios. We anticipate that this empirical analysis will provide actionable insights for advancing quantization methods tailored to Qwen3 and future {LLMs}, ultimately enhancing their practicality without compromising accuracy.},
-	pages = {11},
-	number = {1},
-	journaltitle = {Visual Intelligence},
-	shortjournal = {Vis. Intell.},
-	author = {Zheng, Xingyu and Li, Yuye and Chu, Haoran and Feng, Yue and Ma, Xudong and Wang, Zining and Luo, Jie and Guo, Jinyang and Qin, Haotong and Magno, Michele and Liu, Xianglong},
-	urldate = {2026-06-28},
-	date = {2026-12},
-	langid = {english},
-	file = {Full Text:C\:\\Users\\ASUS\\Zotero\\storage\\UBVPX6RN\\Zheng et al. - 2026 - An empirical study of Qwen3 quantization.pdf:application/pdf},
 }
 
 @inproceedings{wang_slmquant_2025,
@@ -289,9 +279,64 @@
 }
 
 @article{dao_flashattention_nodate,
-	title = {{FLASHATTENTION}: Fast and Memory-Efﬁcient Exact Attention with {IO}-Awareness},
-	abstract = {Transformers are slow and memory-hungry on long sequences, since the time and memory complexity of self-attention are quadratic in sequence length. Approximate attention methods have attempted to address this problem by trading off model quality to reduce the compute complexity, but often do not achieve wall-clock speedup. We argue that a missing principle is making attention algorithms {IO}-aware—accounting for reads and writes between levels of {GPU} memory. We propose {FLASHATTENTION}, an {IO}-aware exact attention algorithm that uses tiling to reduce the number of memory reads/writes between {GPU} high bandwidth memory ({HBM}) and {GPU} on-chip {SRAM}. We analyze the {IO} complexity of {FLASHATTENTION}, showing that it requires fewer {HBM} accesses than standard attention, and is optimal for a range of {SRAM} sizes. We also extend {FLASHATTENTION} to block-sparse attention, yielding an approximate attention algorithm that is faster than any existing approximate attention method. {FLASHATTENTION} trains Transformers faster than existing baselines: 15\% end-to-end wall-clock speedup on {BERT}-large (seq. length 512) compared to the {MLPerf} 1.1 training speed record, 3 speedup on {GPT}-2 (seq. length 1K), and 2.4 speedup on long-range arena (seq. length 1K-4K). {FLASHATTENTION} and block-sparse {FLASHATTENTION} enable longer context in Transformers, yielding higher quality models (0.7 better perplexity on {GPT}-2 and 6.4 points of lift on long-document classiﬁcation) and entirely new capabilities: the ﬁrst Transformers to achieve better-than-chance performance on the Path-X challenge (seq. length 16K, 61.4\% accuracy) and Path-256 (seq. length 64K, 63.1\% accuracy).},
+	title = {{FLASHATTENTION}: Fast and Memory-Efficient Exact Attention with {IO}-Awareness},
+	abstract = {Transformers are slow and memory-hungry on long sequences, since the time and memory complexity of self-attention are quadratic in sequence length. Approximate attention methods have attempted to address this problem by trading off model quality to reduce the compute complexity, but often do not achieve wall-clock speedup. We argue that a missing principle is making attention algorithms {IO}-aware—accounting for reads and writes between levels of {GPU} memory. We propose {FLASHATTENTION}, an {IO}-aware exact attention algorithm that uses tiling to reduce the number of memory reads/writes between {GPU} high bandwidth memory ({HBM}) and {GPU} on-chip {SRAM}. We analyze the {IO} complexity of {FLASHATTENTION}, showing that it requires fewer {HBM} accesses than standard attention, and is optimal for a range of {SRAM} sizes. We also extend {FLASHATTENTION} to block-sparse attention, yielding an approximate attention algorithm that is faster than any existing approximate attention method. {FLASHATTENTION} trains Transformers faster than existing baselines: 15\% end-to-end wall-clock speedup on {BERT}-large (seq. length 512) compared to the {MLPerf} 1.1 training speed record, 3 speedup on {GPT}-2 (seq. length 1K), and 2.4 speedup on long-range arena (seq. length 1K-4K). {FLASHATTENTION} and block-sparse {FLASHATTENTION} enable longer context in Transformers, yielding higher quality models (0.7 better perplexity on {GPT}-2 and 6.4 points of lift on long-document classification) and entirely new capabilities: the first Transformers to achieve better-than-chance performance on the Path-X challenge (seq. length 16K, 61.4\% accuracy) and Path-256 (seq. length 64K, 63.1\% accuracy).},
 	author = {Dao, Tri and Fu, Daniel Y and Ermon, Stefano and Rudra, Atri and Ré, Christopher},
 	langid = {english},
-	file = {PDF:C\:\\Users\\ASUS\\Zotero\\storage\\57ZNMVMW\\Dao et al. - FLASHATTENTION Fast and Memory-Efﬁcient Exact Attention with IO-Awareness.pdf:application/pdf},
+	file = {PDF:C\:\\Users\\ASUS\\Zotero\\storage\\57ZNMVMW\\Dao et al. - FLASHATTENTION Fast and Memory-Efficient Exact Attention with IO-Awareness.pdf:application/pdf},
+}
+
+@article{li2024survey,
+ title={A survey on large language model acceleration based on kv cache management},
+ author={Li, Haoyang and Li, Yiming and Tian, Anxin and Tang, Tianhao and Xu, Zhanchao and
+Chen, Xuejia and Hu, Nicole and Dong, Wei and Li, Qing and Chen, Lei},
+ journal={arXiv preprint arXiv:2412.19442},
+ year={2024}
+}
+
+@inproceedings{liu2025kv,
+title={KV cache compression for inference efficiency in LLMs: A review},
+author={Liu, Yanyu and Fu, Jingying and Liu, Sixiang and Zou, Yitian and Zhang, Shouhua and
+Zhou, Jiehan},
+booktitle={Proceedings of the 4th International Conference on Artificial Intelligence and
+Intelligent Information Processing},
+pages={207--212},
+year={2025}
+}
+@inproceedings{sun2026janusquant,
+ title={JanusQuant: Accurate and Efficient 2-bit KV Cache Quantization for Long-Context
+Inference},
+ author={Sun, Chengyu and Xia, Yaqi and Wang, Hulin and Yang, Donglin and Zhou, Xiaobo and
+Cheng, Dazhao},
+ booktitle={Proceedings of the 31st ACM SIGPLAN Annual Symposium on Principles and
+Practice of Parallel Programming},
+ pages={301--314},
+ year={2026}
+}
+@article{yang2024no,
+ title={No token left behind: Reliable kv cache compression via importance-aware mixed
+precision quantization},
+ author={Yang, June Yong and Kim, Byeongwook and Bae, Jeongin and Kwon, Beomseok and
+Park, Gunho and Yang, Eunho and Kwon, Se Jung and Lee, Dongsoo},
+ journal={arXiv preprint arXiv:2402.18096},
+ year={2024}
+}
+@article{hosseini2026innerq,
+ title={Innerq: Hardware-aware tuning-free quantization of kv cache for large language models},
+ author={Hosseini, Sayed Mohammadreza Tayaranian and Ardakani, Amir and Gross, Warren J},
+ journal={arXiv preprint arXiv:2602.23200},
+ year={2026}
+}
+@article{zhang2024fdc,
+ title={FDC: Fast KV dimensionality compression for efficient LLM inference},
+ author={Zhang, Zeyu and Shen, Haiying},
+ journal={arXiv preprint arXiv:2408.04107},
+ year={2024}
+}
+
+@inproceedings{yang2025kvlink,
+ title={KVLink: Accelerating Large Language Models via Efficient KV Cache Reuse},
+ author={Yang, Jingbo and Hou, Bairu and Wei, Wei and Bao, Yujia and Chang, Shiyu},
+ booktitle={Advances in Neural Information Processing Systems (NeurIPS)},
+ year={2025}
 }

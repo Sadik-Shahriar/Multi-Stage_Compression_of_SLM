@@ -7,4 +7,4 @@ node_modules/
 generate_pptx.js
 package-lock.json
 package.json
-unpacked
+scripts

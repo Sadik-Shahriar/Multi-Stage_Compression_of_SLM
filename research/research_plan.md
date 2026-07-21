@@ -11,15 +11,14 @@
 
 | Field | Detail |
 |---|---|
-| **Model** | Qwen3-4B (4.0B params, 36 layers, GQA 32 Q / 8 KV heads) |
+| **Model** | Llama 3.2-3B (3.2B params, 28 layers, GQA 24 Q / 8 KV heads) |
 | **Hardware** | NVIDIA T4 (16 GB VRAM, 70W TDP) |
 | **Weight quant** | AWQ (Activation-aware Weight Quantization) — 4-bit INT4 |
-| **Token eviction** | PyramidKV (target) / SnapKV (fallback) — 1024-token capacity |
+| **Token eviction** | PyramidKV (target) / SnapKV (fallback) — layerwise budget avg 1024 tokens |
 | **KV cache quant** | TurboQuant — 4-bit online vector quantization |
-| **Thinking mode** | Qwen3-4B built-in `enable_thinking` — tested on a focused subset |
 | **Metrics** | Peak VRAM, Avg Power (W), Energy (J), Throughput (tok/s), Perplexity, NIAH |
 | **Context lengths** | 512, 2048, 8192 tokens |
-| **Configurations** | C0 (BF16 baseline), C1 (AWQ), C2 (AWQ+TQ), C3 (AWQ+eviction), C4 (all three) |
+| **Configurations** | C0 (FP16 baseline), C1 (AWQ), C2 (AWQ+TQ), C3 (AWQ+eviction), C4 (all three) |
 
 ---
 
@@ -44,18 +43,18 @@ Three orthogonal compression techniques exist:
 2. **Token eviction** (SnapKV, H2O, PyramidKV) — removes unimportant tokens from cache
 3. **KV cache quantization** (TurboQuant, KIVI) — compresses surviving tokens to low-bit values
 
-Existing literature studies these techniques in isolation. **No published work has empirically measured the compound energy effect of all three on a single SLM with real hardware power monitoring.** Furthermore, no study has quantified how a model's **built-in reasoning (thinking mode)** interacts with compression in terms of energy cost.
+Existing literature studies these techniques in isolation. **No published work has empirically measured the compound energy effect of all three on a single SLM with real hardware power monitoring.**
 
-### 2.3 Why Qwen3-4B
+### 2.3 Why Llama 3.2-3B
 
 | Reason | Detail |
 |---|---|
-| Official AWQ weights | `Qwen/Qwen3-4B-AWQ` exists on HuggingFace — no calibration needed |
-| Built-in thinking mode | Switchable `enable_thinking` — lets us measure reasoning energy cost |
-| Architecture maturity | Qwen3-4B-Base matches Qwen2.5-7B-Base on benchmarks per Qwen3 Technical Report |
-| GQA efficiency | 32 Q / 8 KV heads — memory-efficient attention |
-| Existing implementation | `implementation_plan.md` already targets Qwen3Attention with QK-Norm |
-| AWQ performance | ~2.9 GB VRAM at INT4; ~52 tok/s (Transformers), ~200 tok/s (SGLang) |
+| Community AWQ weights | `casperhansen/llama-3.2-3b-instruct-awq` exists on HuggingFace — no calibration needed |
+| No built-in thinking mode | Simpler ablation — 5 configs × 3 contexts = 15 runs (no subset needed) |
+| Native KVCache-Factory support | PyramidKV works with Llama out of the box — no custom monkey-patch |
+| TurboQuant compatibility | `TurboQuantCache` supports LLaMA architecture without modification |
+| GQA efficiency | 24 Q / 8 KV heads (3:1 ratio) — memory-efficient attention |
+| 28-layer pyramid budget | More layers than typical sub-3B models, giving a meaningful PyramidKV gradient |
 
 ### 2.4 Why This Combination
 
@@ -63,7 +62,7 @@ Existing literature studies these techniques in isolation. **No published work h
 |---|---|---|
 | **AWQ** (weights) | Best-in-class for SLMs per EMNLP 2025; 3–4× speedup over FP16 | GPTQ: slower to quantize, worse perplexity. Pruning: doesn't generalize to SLMs |
 | **PyramidKV** (eviction) | Best NIAH among eviction methods; variable layer budget more efficient | SnapKV: simpler but 5–15% worse NIAH. H2O/StreamingLLM: strictly worse for retrieval |
-| **TurboQuant** (KV cache) | Data-oblivious, near-lossless at 3.5 bits, tested on Qwen models | KIVI: slight degradation on sub-7B. PolarQuant: less ecosystem support |
+| **TurboQuant** (KV cache) | Data-oblivious, near-lossless at 3.5 bits, compatible with LLaMA architectures | KIVI: slight degradation on sub-7B. PolarQuant: less ecosystem support |
 
 ---
 
@@ -71,23 +70,17 @@ Existing literature studies these techniques in isolation. **No published work h
 
 ### 3.1 Primary Research Question
 
-*"How does stacking AWQ (4-bit weights), PyramidKV/SnapKV (1024-token capacity), and TurboQuant (4-bit KV cache) affect total inference energy (Joules), peak VRAM (MB), and NIAH retrieval accuracy compared to the uncompressed BF16 baseline and each individual technique, when running Qwen3-4B at context lengths of 512, 2048, and 8192 tokens on an NVIDIA T4 GPU?"*
-
-### 3.2 Secondary Research Question
-
-*"What is the additional energy cost of Qwen3-4B's built-in thinking mode under each compression configuration, and does compression disproportionately degrade reasoning quality relative to direct response?"*
+*"How does stacking AWQ (4-bit weights), PyramidKV/SnapKV (1024-token average capacity), and TurboQuant (4-bit KV cache) affect total inference energy (Joules), peak VRAM (MB), and NIAH retrieval accuracy compared to the uncompressed FP16 baseline and each individual technique, when running Llama 3.2-3B at context lengths of 512, 2048, and 8192 tokens on an NVIDIA T4 GPU?"*
 
 ### 3.3 Hypotheses
 
-**H1:** AWQ (C1) reduces total inference energy by approximately 3× compared to the BF16 baseline (C0) at 8K context, while maintaining NIAH accuracy above 90%.
+**H1:** AWQ (C1) reduces total inference energy by approximately 3× compared to the FP16 baseline (C0) at 8K context, while maintaining NIAH accuracy above 90%.
 
 **H2:** Adding TurboQuant to AWQ (C2) reduces peak VRAM by ~15–20% compared to C1, but per-token energy increases by 5–15% due to the quantize/dequant overhead of the rotation transform.
 
 **H3:** Adding token eviction (PyramidKV) to AWQ (C3) reduces peak VRAM at 8K+ context lengths but shows no effect at 512 tokens (where total tokens < capacity). NIAH accuracy remains comparable to C1.
 
 **H4:** The compound configuration (C4 — all three techniques) achieves the lowest peak VRAM and total energy per task, but shows measurable NIAH degradation (10–30% reduction) due to compound compression noise from the interaction of eviction and quantization.
-
-**H5:** Thinking mode increases total energy by 2–5× compared to non-thinking mode at the same configuration. This ratio is smaller under compressed configurations because fewer preserved tokens limit the depth of the reasoning chain.
 
 **H0:** No statistically significant difference in energy consumption exists between configurations (paired t-test, α = 0.05).
 
@@ -98,12 +91,12 @@ Existing literature studies these techniques in isolation. **No published work h
 ### 4.1 Configurations (5-Way Ablation)
 
 | Config | Weights | Token Eviction | KV Cache Quant | What It Tests |
-|---|---|---|---|---|
-| **C0** | BF16 | None | FP16 (default) | Uncompressed baseline — the energy and memory cost without optimization |
+|---|---|---|---|---|---|
+| **C0** | FP16 | None | FP16 (default) | Uncompressed baseline — the energy and memory cost without optimization |
 | **C1** | AWQ 4-bit | None | FP16 (default) | Isolates the effect of weight quantization alone |
 | **C2** | AWQ 4-bit | None | TurboQuant 4-bit | Isolates the effect of KV cache quantization (on top of AWQ) |
-| **C3** | AWQ 4-bit | PyramidKV (cap=1024) | FP16 (default) | Isolates the effect of token eviction (on top of AWQ) |
-| **C4** | AWQ 4-bit | PyramidKV (cap=1024) | TurboQuant 4-bit | Compound effect of all three techniques |
+| **C3** | AWQ 4-bit | PyramidKV (avg cap=1024) | FP16 (default) | Isolates the effect of token eviction (on top of AWQ) |
+| **C4** | AWQ 4-bit | PyramidKV (avg cap=1024) | TurboQuant 4-bit | Compound effect of all three techniques |
 
 This design ensures each technique's individual contribution can be isolated:
 - C1 − C0 = effect of weight quantization
@@ -119,25 +112,13 @@ This design ensures each technique's individual contribution can be isolated:
 | **2048 tokens** | Medium — exceeds capacity. PyramidKV activates. Moderate KV cache size. |
 | **8192 tokens** | Long — largest tested. Where memory and energy savings should be most visible. |
 
-### 4.3 Thinking Mode Subset
-
-To limit experiment runtime while still addressing the secondary RQ, thinking mode is tested on:
-
-| Config | Context | Rationale |
-|---|---|---|
-| C0 | 8192 | Baseline cost of reasoning on uncompressed model |
-| C1 | 8192 | Does AWQ affect reasoning quality or energy? |
-| C4 | 8192 | Can the compressed model still reason? What's the energy ratio? |
-
-### 4.4 Experiment Matrix
+### 4.3 Experiment Matrix
 
 | Axis | Values | Runs |
 |---|---|---|
 | Configs | C0, C1, C2, C3, C4 | 5 |
 | Context lengths | 512, 2048, 8192 | 3 |
-| Thinking mode (subset) | C0/C1/C4 at 8192 | 3 |
-| **Total primary runs** | 5 × 3 = **15** | |
-| **Total with thinking subset** | 15 + 3 = **18** | |
+| **Total runs** | 5 × 3 = **15** | |
 
 Each run produces: Inference time, Tokens/sec, Peak VRAM (MB), Average Power (W), Total Energy (J), Perplexity, NIAH accuracy, KV Cache size (MB).
 
@@ -148,7 +129,7 @@ Each run produces: Inference time, Tokens/sec, Peak VRAM (MB), Average Power (W)
 ### 5.1 Environment
 
 - **Python 3.10+** with PyTorch 2.4+
-- Transformers 4.45+ (for Qwen3 support)
+- Transformers 4.45+ (for Llama 3.2 support)
 - AutoAWQ — for loading AWQ-quantized weights
 - TurboQuant — `pip install turboquant`
 - pynvml — for GPU power monitoring
@@ -165,7 +146,7 @@ pip install nvidia-ml-py3 psutil
 
 #### Step 2: Imports & GPU Check
 - Import all libraries, verify T4 GPU, print VRAM and CUDA version
-- Check TurboQuant version and Qwen3 model availability
+- Check TurboQuant version and Llama 3.2 model availability
 
 #### Step 3: Helper Functions
 - `ExperimentResult` dataclass (stores all metrics per run)
@@ -182,43 +163,40 @@ pip install nvidia-ml-py3 psutil
 - For thinking mode: extract final answer from `\boxed{...}` delimiter before checking
 
 #### Step 5: PyramidKV / SnapKV Implementation
-- Monkey-patch `Qwen3Attention.forward` to implement token eviction
+- Use KVCache-Factory's `DynamicCache` adapter for Llama (no monkey-patch needed)
 - **PyramidKV approach** (target):
-  - Allocate cache budget pyramidally across 36 layers (more in early layers, less in deep)
+  - Allocate cache budget pyramidally across 28 layers (more in early layers, less in deep)
   - Use attention scores from observation window (last 32 tokens) to select top tokens per layer
-- **SnapKV fallback** (if PyramidKV integration is too complex):
+- **SnapKV fallback** (if PyramidKV adapter is too complex):
   - Uniform budget of 1024 tokens per layer
   - Same observation-window scoring
 - Controlled by global `USE_EVICTION` and `EVICTION_METHOD` flags
-- Key considerations for Qwen3:
-  - Import from `transformers.models.qwen3.modeling_qwen3`
-  - Handle QK-Norm (LayerNorm on Q and K before attention)
-  - No QKV bias in Qwen3
-  - Proper `apply_rotary_pos_emb` import from qwen3 module
+- Key considerations for Llama 3.2:
+  - Llama architecture is natively supported by KVCache-Factory
+  - 24 Q heads / 8 KV heads — GQA handler maps correctly
 
 #### Step 6: TurboQuant Integration
 - Create `TurboQuantCache(key_bits=4, value_bits=4)` instance
 - Pass as `past_key_values` to `model.generate()`
-- Verify compatibility with Qwen3's GQA (8 KV heads)
+- Verify compatibility with Llama 3.2's GQA (8 KV heads)
 
 #### Step 7: Model Loaders
-- `load_bf16_model()` → `Qwen/Qwen3-4B` with `attn_implementation="eager"`
-- `load_awq_model()` → `Qwen/Qwen3-4B-AWQ` with `attn_implementation="eager"`
+- `load_fp16_model()` → `unsloth/Llama-3.2-3B-Instruct` with `attn_implementation="eager"`
+- `load_awq_model()` → `casperhansen/llama-3.2-3b-instruct-awq` with `attn_implementation="eager"`
 
 #### Step 8: Experiment Runner
 For each configuration:
-1. Load appropriate model (BF16 or AWQ)
+1. Load appropriate model (FP16 or AWQ)
 2. Set `USE_EVICTION` flag (on/off), `EVICTION_METHOD` (pyramid/snapkv)
 3. Create `TurboQuantCache` if needed (C2, C4)
-4. Set `enable_thinking` flag (False for primary, True for subset)
-5. For each context length:
+4. For each context length:
    a. Build NIAH test input
    b. Run generation with GPU monitoring
    c. Compute perplexity with active cache
    d. Check NIAH
    e. Store all metrics in `ExperimentResult`
-6. Unload model, clear cache
-7. Save intermediate results to CSV after each config
+5. Unload model, clear cache
+6. Save intermediate results to CSV after each config
 
 #### Step 9: Results Analysis
 - Load CSV into pandas DataFrame
@@ -227,9 +205,6 @@ For each configuration:
   2. Energy (J) vs Context Length (all configs)
   3. NIAH accuracy heatmap (configs × context lengths)
   4. Tokens/sec comparison bar chart
-- Generate 2 thinking-mode plots:
-  5. Energy comparison: non-thinking vs thinking (C0, C1, C4 at 8K)
-  6. NIAH comparison: non-thinking vs thinking
 - Statistical tests: Shapiro-Wilk normality → paired t-test or Wilcoxon
 - Pareto frontier: energy vs NIAH accuracy with config labels
 
@@ -272,14 +247,14 @@ For each configuration:
 ### 6.1 Quantitative Predictions
 
 | Config | VRAM @ 8K | Energy @ 8K | NIAH @ 8K | Tok/s @ 8K |
-|---|---|---|---|---|
-| C0 (BF16) | ~10.5 GB | ~1100 J | >95% | ~2 |
-| C1 (AWQ) | ~9.5 GB | ~350 J | >90% | ~3 |
-| C2 (AWQ+TQ) | ~9.3 GB | ~380 J | ~85% | ~2.5 |
-| C3 (AWQ+evict) | ~9.0 GB | ~340 J | >90% | ~3 |
-| C4 (all three) | ~8.8 GB | ~360 J | ~70% | ~2.5 |
+|---|---|---|---|---|---|
+| C0 (FP16) | ~8.5 GB | ~800 J | >95% | ~3 |
+| C1 (AWQ) | ~7.5 GB | ~250 J | >90% | ~4 |
+| C2 (AWQ+TQ) | ~7.3 GB | ~280 J | ~85% | ~3.5 |
+| C3 (AWQ+evict) | ~7.0 GB | ~240 J | >90% | ~4 |
+| C4 (all three) | ~6.8 GB | ~260 J | ~70% | ~3.5 |
 
-Note: VRAM values are approximate. At 8K context on a 4B model, the attention computation's O(n²) prefill matrix dominates VRAM, so KV cache savings are modest at this scale. Savings become dramatic at 32K+ contexts.
+Note: VRAM values are approximate. Llama 3.2-3B has ~20% fewer parameters than Qwen3-4B, so baseline VRAM and energy are lower. KV cache savings from TurboQuant and PyramidKV are proportional.
 
 ### 6.2 Expected Pareto Frontier
 
@@ -288,12 +263,6 @@ Note: VRAM values are approximate. At 8K context on a 4B model, the attention co
 - **Best for memory-constrained edge (<4 GB)**: C4
 - **Optimal all-rounder**: C3 (AWQ + eviction) — low energy, good accuracy, moderate memory
 
-### 6.3 Expected Thinking Mode Findings
-
-- Thinking mode: 2–5× more energy per task (2,000–8,000 internal thinking tokens)
-- C4 thinking: may show degraded reasoning quality (fewer preserved tokens → shorter reasoning chains)
-- Energy per **answer token** (excluding thinking tokens): similar across configs
-
 ---
 
 ## 7. Timeline
@@ -301,10 +270,9 @@ Note: VRAM values are approximate. At 8K context on a 4B model, the attention co
 | Week | Milestone | Deliverable |
 |---|---|---|
 | **1–2** | Literature review + Proposal | Project proposal (5 marks) |
-| **3** | Methodology design + Pilot | Verify Qwen3-4B-AWQ exists, test NIAH sanity |
-| **4** | Implementation | Build Python notebook with all 5 configs |
-| **4–5** | Debug | Fix perplexity, NIAH, PyramidKV integration |
-| **5** | Data collection | Run all 15 experiments + 3 thinking subset |
+| **3** | Methodology design + Notebook | Write Llama 3.2-3B notebook with all 5 configs |
+| **4** | Debug | Fix perplexity, NIAH, PyramidKV integration |
+| **4–5** | Data collection | Run all 15 experiments on Colab T4 |
 | **6** | Analysis | Statistical tests, plots, Pareto frontier |
 | **7** | Writing | Results, Discussion, Conclusion |
 | **8** | Final report | Complete term paper (15 marks) + presentation |
@@ -316,7 +284,7 @@ Note: VRAM values are approximate. At 8K context on a 4B model, the attention co
 ### EP1 — Depth of Knowledge Required (40%)
 
 The research requires in-depth engineering knowledge (K8 level) across multiple domains:
-- **Transformer architecture**: Attention mechanisms, KV cache dynamics, Grouped Query Attention (Qwen3-4B: 32 Q / 8 KV heads), QK-Norm, Rotary Position Embeddings
+- **Transformer architecture**: Attention mechanisms, KV cache dynamics, Grouped Query Attention (Llama 3.2-3B: 24 Q / 8 KV heads), Rotary Position Embeddings
 - **Quantization theory**: AWQ's activation-aware scaling, TurboQuant's random rotation + Beta distribution + Lloyd-Max quantizer + QJL inner product estimation
 - **Token eviction algorithms**: PyramidKV's pyramidal information funneling hypothesis, attention score computation, observation window design
 - **Hardware-software co-design**: GPU memory hierarchy, CUDA kernel behavior under compressed caches, NVML power sensor polling
@@ -351,7 +319,7 @@ The research design explicitly addresses all four by measuring the full accuracy
 
 | # | Paper | Venue | Relevance |
 |---|---|---|---|
-| 1 | [Qwen3 Technical Report](https://arxiv.org/abs/2505.09388) | arXiv, May 2025 | Model architecture, benchmarks, thinking mode |
+| 1 | [Llama 3.2 Model Card](https://huggingface.co/meta-llama/Llama-3.2-3B-Instruct) | HuggingFace, Sep 2025 | Model architecture, GQA, context length |
 | 2 | [AWQ: Activation-aware Weight Quantization](https://arxiv.org/abs/2306.00978) | MLSys 2024 Best Paper | Weight quantization methodology |
 | 3 | [TurboQuant: Online Vector Quantization](https://arxiv.org/abs/2504.19874) | ICLR 2026 | KV cache quantization, our approach |
 | 4 | [SnapKV: LLM Knows What You Are Looking For](https://arxiv.org/abs/2404.14469) | NeurIPS 2024 | Token eviction (fallback method) |
@@ -397,14 +365,12 @@ The research design explicitly addresses all four by measuring the full accuracy
 ## 10. Risk Assessment
 
 | Risk | Likelihood | Impact | Mitigation |
-|---|---|---|---|
-| Qwen3-4B-AWQ not available on HF | Low | High | Fall back to AutoAWQ calibration |
-| TurboQuant incompatible with Qwen3 GQA | Medium | High | Verify with small test; fall back to KIVI |
-| PyramidKV too complex to integrate | Medium | Medium | Fall back to SnapKV (already partially implemented) |
+|---|---|---|---|---|
+| TurboQuant cache retains FP16 copies (storage gate fails) | Medium | High | Fall back to HQQ quantization |
+| PyramidKV via KVCache-Factory adapter not working | Low | Medium | Fall back to SnapKV-style scoring manually |
 | Colab T4 session timeout (12h limit) | Medium | Medium | Save CSV after each config; run in multiple sessions |
 | NaN perplexity from AWQ CUDA kernels | High | Low | Document as known artifact; use NIAH as primary metric |
-| NIAH fails on BF16 baseline | Low | Critical | Fix prompt format; test before full run |
-| Thinking mode produces unparseable output | Medium | Medium | Handle multiple delimiter formats; log raw output |
+| NIAH fails on FP16 baseline | Low | Critical | Fix prompt format; test before full run |
 
 ---
 
@@ -412,11 +378,10 @@ The research design explicitly addresses all four by measuring the full accuracy
 
 The proposal requires ≥3 cited sources in the problem statement and ≥25 in the final paper. For the proposal, cite at minimum:
 
-1. Qwen3 Technical Report (2025) — for model capability claims
-2. TurboQuant paper (ICLR 2026) — for KV cache quantization theory
-3. AWQ paper (MLSys 2024) — for weight quantization methodology
-4. IEA (2024) or similar — for energy context statistics
-5. SnapKV or PyramidKV paper — for token eviction methodology
-6. EMNLP 2025 SLM quantization paper — for justification of AWQ over pruning
+1. TurboQuant paper (ICLR 2026) — for KV cache quantization theory
+2. AWQ paper (MLSys 2024) — for weight quantization methodology
+3. IEA (2024) or similar — for energy context statistics
+4. SnapKV or PyramidKV paper — for token eviction methodology
+5. EMNLP 2025 SLM quantization paper — for justification of AWQ over pruning
 
 Use IEEE numbered citation style throughout.
