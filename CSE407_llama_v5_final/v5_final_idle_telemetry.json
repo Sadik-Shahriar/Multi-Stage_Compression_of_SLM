@@ -1,0 +1,20 @@
+[
+  {
+    "label": "C0_FP16_model_resident",
+    "seconds": 10.0,
+    "samples": 98,
+    "power_median_w": 29.116,
+    "power_mean_w": 29.099653061224487,
+    "power_sd_w": 0.06302349456211492,
+    "temperature_median_c": 65.0
+  },
+  {
+    "label": "AWQ_model_resident",
+    "seconds": 10.0,
+    "samples": 98,
+    "power_median_w": 30.183,
+    "power_mean_w": 31.98579591836734,
+    "power_sd_w": 4.143868731151374,
+    "temperature_median_c": 70.0
+  }
+]

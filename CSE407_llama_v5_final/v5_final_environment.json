@@ -1,0 +1,60 @@
+{
+  "schema_version": "v5-final-2026-07-31-1",
+  "gpu": "Tesla T4",
+  "vram_gb": 14.56,
+  "torch": "2.11.0+cu128",
+  "transformers": "5.12.1",
+  "turboquant": "0.2.0",
+  "turboquant_source_sha256": "7358e2778c8de6974b0c7212ae8e3dbe00552a96b2e2df0aa42878f239a4c72a",
+  "gptqmodel": "7.1.0",
+  "contexts": [
+    1024,
+    2048,
+    4096
+  ],
+  "fixed_decode_tokens": 64,
+  "seed": 407,
+  "cuda_runtime": "12.8",
+  "accelerate": "1.14.0",
+  "numpy": "2.2.6",
+  "pandas": "2.2.2",
+  "scipy": "1.16.3",
+  "pyramid_sensitivity": [
+    512,
+    1536
+  ],
+  "tq_bit_sensitivity": [
+    2,
+    3
+  ],
+  "sensitivity_context": 4096,
+  "sensitivity_conditions": [
+    {
+      "variant": "C2-B512",
+      "config": "C2",
+      "average_budget": 512,
+      "tq_bits": 4
+    },
+    {
+      "variant": "C2-B1536",
+      "config": "C2",
+      "average_budget": 1536,
+      "tq_bits": 4
+    },
+    {
+      "variant": "C3-TQ2",
+      "config": "C3",
+      "average_budget": 1024,
+      "tq_bits": 2
+    },
+    {
+      "variant": "C3-TQ3",
+      "config": "C3",
+      "average_budget": 1024,
+      "tq_bits": 3
+    }
+  ],
+  "model_fp16_revision": "006f5dcd1393c3add266de40994ba96225e9689d",
+  "model_awq_revision": "272b3bde867b606760447deb9a4d2719fbdfd3ae",
+  "session_id": "20260731T125351-ad1b5249"
+}
