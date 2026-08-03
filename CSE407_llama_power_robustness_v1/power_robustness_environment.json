@@ -1,0 +1,59 @@
+{
+  "schema_version": "track-a-llama-power-robustness-v1-2026-08-03-1",
+  "v5_fingerprint": "8d27af8c9ee94de3",
+  "full_fingerprint": "106a561c07c62937",
+  "v5_manifest_sha256": "a7087d7e2e24a929df0f62177bc6fc1e7be38cd1bf12d8ffaf9849f6c7677b19",
+  "full_manifest_sha256": "2a4c996f32916b36aa11ad3e18104e6378ed7ad7a54230d8f728b7c1f52ba9bc",
+  "trace_counts": {
+    "v5": 95,
+    "c1w": 5
+  },
+  "caps_w": [
+    82.0,
+    70.0
+  ],
+  "thresholds_w": [
+    70.0,
+    82.0,
+    100.0
+  ],
+  "pinned_versions": {
+    "numpy": "2.5.1",
+    "pandas": "3.0.5",
+    "scipy": "1.18.0",
+    "matplotlib": "3.11.1"
+  },
+  "integration": "phasewise numpy.trapezoid over elapsed_s and min(power_w, cap)",
+  "core_variants": [
+    "C0",
+    "C1",
+    "C2",
+    "C3-Ref",
+    "C4-Ref"
+  ],
+  "contrasts": [
+    "C1-C2",
+    "C1-C3-Ref",
+    "C1-C4-Ref",
+    "C2-C4-Ref",
+    "C3-Ref-C4-Ref"
+  ],
+  "test_metrics": [
+    "total_energy_j",
+    "decode_energy_j",
+    "decode_s",
+    "decode_tok_s"
+  ],
+  "correction": "Holm within the original 20-test core family for each regime",
+  "fingerprint": "91ebc63773e735e6",
+  "numpy": "2.5.1",
+  "pandas": "3.0.5",
+  "scipy": "1.18.0",
+  "matplotlib": "3.11.1",
+  "source_roots": [
+    "CSE407_llama_v5_final",
+    "CSE407_llama_track_a_full_v1"
+  ],
+  "output_root": "CSE407_llama_power_robustness_v1",
+  "raw_joules_policy": "Raw trace integration is primary; capped values are sensitivity analyses."
+}

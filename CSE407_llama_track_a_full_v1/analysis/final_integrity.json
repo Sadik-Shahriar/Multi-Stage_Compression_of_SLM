@@ -1,0 +1,13 @@
+{
+  "passed": true,
+  "fingerprint": "106a561c07c62937",
+  "schema_version": "track-a-llama-full-v1-2026-08-03-1",
+  "quality_rows": 300,
+  "energy_rows": 5,
+  "unique_quality_keys": 300,
+  "paired_prompt_hash_gate": true,
+  "energy_trace_reintegration_gate": true,
+  "bounded_quality_uncertainty": "Wilson 95% intervals",
+  "paired_comparison_method": "depth-stratified paired bootstrap",
+  "completed_at_utc": "2026-08-03T16:44:24Z"
+}

@@ -1,0 +1,22 @@
+{
+  "fingerprint": "91ebc63773e735e6",
+  "schema_version": "track-a-llama-power-robustness-v1-2026-08-03-1",
+  "v5": {
+    "artifact_root": "CSE407_llama_v5_final",
+    "fingerprint": "8d27af8c9ee94de3",
+    "expected_files": 115,
+    "observed_files": 114,
+    "optional_absent": [
+      ".gitignore"
+    ],
+    "verified": true
+  },
+  "notebook5": {
+    "artifact_root": "CSE407_llama_track_a_full_v1",
+    "fingerprint": "106a561c07c62937",
+    "expected_files": 324,
+    "observed_files": 324,
+    "optional_absent": [],
+    "verified": true
+  }
+}

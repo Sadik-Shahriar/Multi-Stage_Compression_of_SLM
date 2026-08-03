@@ -1,9 +1,33 @@
 # Research Plan — CSE407 Green Computing Term Project
 
+## Current Executed Protocol Override
+
+The original proposal assumptions later in this file are retained as planning
+history. The executed protocol supersedes them:
+
+- Historical Llama v5 systems matrix: C0 FP16, C1 AWQ, C2 AWQ + custom
+  pyramidal eviction, C3-Ref AWQ + `turboquant==0.2.0` numerical reference, and
+  C4-Ref sequential eviction then TQ-Ref at 1024/2048/4096 tokens.
+- Frozen hard-retrieval/control run: 4096 tokens, 60 prompts per configuration,
+  300 quality rows, C1-S/C1-W parity, and five C1-W energy blocks.
+- TQ-Ref is not packed, fused, or physically 4-bit. The custom eviction path is
+  PyramidKV-style, not the official KVCache-Factory implementation.
+- Current fingerprints: v5 `8d27af8c9ee94de3`; hard retrieval/control
+  `106a561c07c62937`.
+- Power robustness is complete: all 100 traces verified and raw/82 W/70 W
+  rankings and registered significance decisions were stable.
+- Current next step: Qwen2.5-3B adapter/parity validation, followed by the full
+  cross-model replication only if all gates pass.
+
 **Title:** Holistic Optimization of Small Language Models for Energy-Efficient Edge Inference: An Empirical Ablation Study
 **Student:** Md. Sadik Shahriar
 **Course:** CSE407 Green Computing — East West University (Summer 2026)
 **Instructor:** Ahmed Abdal Shafi Rasel (AASR)
+
+**Execution format:** All new experiments must be self-contained Google Colab
+`.ipynb` notebooks with explanatory Markdown cells. Standalone `.py` experiment
+runners are not permitted. Keep each track in a dedicated notebook folder with
+numeric run-order prefixes and isolated Drive artifact paths.
 
 ---
 
@@ -14,11 +38,11 @@
 | **Model** | Llama 3.2-3B (3.2B params, 28 layers, GQA 24 Q / 8 KV heads) |
 | **Hardware** | NVIDIA T4 (16 GB VRAM, 70W TDP) |
 | **Weight quant** | AWQ (Activation-aware Weight Quantization) — 4-bit INT4 |
-| **Token eviction** | PyramidKV (target) / SnapKV (fallback) — layerwise budget avg 1024 tokens |
-| **KV cache quant** | TurboQuant — 4-bit online vector quantization |
-| **Metrics** | Peak VRAM, Avg Power (W), Energy (J), Throughput (tok/s), Perplexity, NIAH |
-| **Context lengths** | 512, 2048, 8192 tokens |
-| **Configurations** | C0 (FP16 baseline), C1 (AWQ), C2 (AWQ+TQ), C3 (AWQ+eviction), C4 (all three) |
+| **Token eviction** | Validated custom PyramidKV-style scorer — layerwise budget avg 1024 tokens |
+| **KV cache quant** | `turboquant==0.2.0` numerical TQ-Ref; uint8 indices plus retained materialized K/V |
+| **Metrics** | Live cache, peak VRAM, power, energy, throughput, strict hard retrieval, format, target NLL |
+| **Context lengths** | Executed systems: 1024, 2048, 4096; hard quality: 4096 |
+| **Configurations** | C0 FP16, C1/C1-W AWQ, C2 AWQ+eviction, C3-Ref AWQ+TQ-Ref, C4-Ref sequential compound |
 
 ---
 
@@ -50,13 +74,16 @@ Existing literature studies these techniques in isolation. **No published work h
 | Reason | Detail |
 |---|---|
 | Community AWQ weights | `casperhansen/llama-3.2-3b-instruct-awq` exists on HuggingFace — no calibration needed |
-| No built-in thinking mode | Simpler ablation — 5 configs × 3 contexts = 15 runs (no subset needed) |
-| Native KVCache-Factory support | PyramidKV works with Llama out of the box — no custom monkey-patch |
-| TurboQuant compatibility | `TurboQuantCache` supports LLaMA architecture without modification |
+| No built-in thinking mode | Removes thinking-mode confounding from the completed systems and hard-quality matrices |
+| Llama cache path | A custom attention wrapper was implemented and passed stock-versus-wrapper parity |
+| TurboQuant compatibility | `TurboQuantCache` was integrated as a numerical reference and audited for active decode use and physical storage |
 | GQA efficiency | 24 Q / 8 KV heads (3:1 ratio) — memory-efficient attention |
 | 28-layer pyramid budget | More layers than typical sub-3B models, giving a meaningful PyramidKV gradient |
 
-### 2.4 Why This Combination
+### 2.4 Original Technique Selection Rationale (Historical)
+
+> These were proposal-stage expectations. Executed findings and implementation
+> boundaries in the override above supersede performance assumptions here.
 
 | Technique | Why Chosen | Why Not Alternatives |
 |---|---|---|
@@ -66,7 +93,10 @@ Existing literature studies these techniques in isolation. **No published work h
 
 ---
 
-## 3. Research Questions & Hypotheses
+## 3. Original Research Questions & Hypotheses (Superseded)
+
+> This section records pre-execution assumptions only. Use the Current Executed
+> Protocol Override and experiment registry for current labels and claims.
 
 ### 3.1 Primary Research Question
 
@@ -86,7 +116,7 @@ Existing literature studies these techniques in isolation. **No published work h
 
 ---
 
-## 4. Experimental Design
+## 4. Original Experimental Design (Superseded)
 
 ### 4.1 Configurations (5-Way Ablation)
 
@@ -124,7 +154,7 @@ Each run produces: Inference time, Tokens/sec, Peak VRAM (MB), Average Power (W)
 
 ---
 
-## 5. Methodology
+## 5. Original Methodology (Superseded)
 
 ### 5.1 Environment
 
@@ -242,7 +272,7 @@ For each configuration:
 
 ---
 
-## 6. Expected Outcomes
+## 6. Original Expected Outcomes (Superseded)
 
 ### 6.1 Quantitative Predictions
 
@@ -362,15 +392,15 @@ The research design explicitly addresses all four by measuring the full accuracy
 
 ---
 
-## 10. Risk Assessment
+## 10. Current Risk Assessment
 
 | Risk | Likelihood | Impact | Mitigation |
 |---|---|---|---|---|
-| TurboQuant cache retains FP16 copies (storage gate fails) | Medium | High | Fall back to HQQ quantization |
-| PyramidKV via KVCache-Factory adapter not working | Low | Medium | Fall back to SnapKV-style scoring manually |
-| Colab T4 session timeout (12h limit) | Medium | Medium | Save CSV after each config; run in multiple sessions |
-| NaN perplexity from AWQ CUDA kernels | High | Low | Document as known artifact; use NIAH as primary metric |
-| NIAH fails on FP16 baseline | Low | Critical | Fix prompt format; test before full run |
+| TQ-Ref retains materialized K/V and does not realize packed physical storage | Confirmed | High | Report numerical and physical realization separately; do not claim production TurboQuant behavior |
+| Raw NVML contains isolated readings above the enforced 70 W limit | Confirmed | Medium | Preserve raw joules; the completed 82 W/70 W analysis showed stable rankings and decisions |
+| Qwen adapter differs from Llama cache semantics | Medium | High | Require architecture inspection and stock-versus-wrapper parity before any Qwen measurement |
+| Colab session timeout | Medium | Medium | Use atomic per-row persistence, isolated paths, and strict resume validation |
+| Hard retrieval has limited paired power at 60 scenarios | Medium | Medium | Use Wilson intervals and paired depth-stratified analysis; avoid unsupported non-inferiority claims |
 
 ---
 

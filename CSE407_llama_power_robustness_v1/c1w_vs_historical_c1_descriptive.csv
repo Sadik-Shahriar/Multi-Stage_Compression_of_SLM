@@ -1,0 +1,4 @@
+regime,historical_c1_mean_j,historical_c1_sd_j,c1w_mean_j,c1w_sd_j,c1w_minus_c1_j,c1w_minus_c1_percent,interpretation
+raw,631.2452935271054,5.0546368403330515,639.8583090337439,5.480943147032053,8.613015506638476,1.3644482731131264,"descriptive only; session and 4096-token prompt/workload differ; not paired, causal, or isolated wrapper overhead"
+cap82,630.5893103232236,5.524787192459266,638.6633054233882,6.253631678270821,8.073995100164666,1.2803888312071365,"descriptive only; session and 4096-token prompt/workload differ; not paired, causal, or isolated wrapper overhead"
+cap70,619.5646848910466,4.488736479630526,630.9373171567192,7.590533939482117,11.372632265672678,1.8355843292896221,"descriptive only; session and 4096-token prompt/workload differ; not paired, causal, or isolated wrapper overhead"

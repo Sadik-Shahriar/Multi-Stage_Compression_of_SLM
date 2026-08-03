@@ -1,88 +1,225 @@
-### I. Overall Project Context & Narrative
+# Project Status and Next Actions
 
-**Project Goal:** A multi-objective empirical ablation study measuring the physical energy (Joules), latency, and memory interactions of three compression techniques on a sub-4B Small Language Model deployed on constrained edge hardware (NVIDIA T4 GPU).
-**The Stack:** Weight Quantization (AWQ) + Token Eviction (PyramidKV) + KV Quantization (TurboQuant).
-**The Core Discovery:** While theoretical papers advocate for joint eviction and quantization, real-world edge deployment relies on "unfused" quantization code (like the PyPI `turboquant==0.2.0` package) which causes a massive computational overhead and energy spike. However, applying eviction *before* this unfused quantization acts as a physical "energy shield," filtering tokens out and drastically dropping energy consumption back down.
+Last updated after the completed frozen hard-retrieval and matched-wrapper run.
 
----
+## Experiment Format Rule
 
-### II. Instructor's Review & Our Rebuttal
+- Implement all new experiments as self-contained Google Colab `.ipynb`
+  notebooks with proper Markdown cells.
+- Do not create standalone `.py` experiment runners.
+- Keep each experiment track in a dedicated notebook folder with numeric
+  run-order prefixes and isolated Drive output paths.
+- Current Track A notebooks are in `experiments/track_a_failsafe_colab/`.
 
-**The Instructor's Critique:**
+## I. Current Project Narrative
 
-* **Weakness:** The novelty is narrower than claimed because joint eviction and quantization methods (like RDKV and ThinKV) already exist.
-* **Suggestions:**
-1. Compare against existing joint eviction-and-quantization methods.
-2. Add a Pareto-frontier-with-uncertainty analysis.
-3. Extend beyond Llama 3.2-3B to a second small-model family (like Qwen2.5-3B) to test architectural generalization.
+**Project goal:** Measure the physical energy, latency, throughput, memory, and quality interactions of AWQ weight quantization, pyramidal KV-token eviction, and TurboQuant numerical KV quantization on sub-4B language models running on an NVIDIA T4.
 
+**Current implementation:** AWQ + a custom PyramidKV-style eviction path + the independent `turboquant==0.2.0` reference package.
 
+**Current Llama finding:** AWQ plus pyramidal eviction (C2) provides the best tested core systems trade-off at 4096 tokens. TurboQuant-only C3-Ref adds substantial runtime energy and live-storage overhead. Applying eviction before TurboQuant in C4-Ref is associated with much lower overhead than C3-Ref, producing a significant configuration-level non-additivity contrast.
 
-**Our Reply & Commitments:**
-We successfully defended our domain by clarifying that RDKV and ThinKV focus on datacenter throughput (A100 GPUs), whereas we are measuring **physical hardware energy (Joules) on the edge (T4)**. We agreed to their suggestions and committed to:
-
-1. Discussing the theoretical limits of sequential stacking vs. joint math in the paper.
-2. Adding Pareto frontiers with standard deviation error bars to prove statistical significance.
-3. Replicating the entire pipeline on `Qwen2.5-3B-Instruct`.
+**Important wording boundary:** C4-Ref is a sequential stack, not an implementation of RDKV or ThinKV. The custom eviction path is PyramidKV-style and is not the official KVCache-Factory implementation. TurboQuant bit width is numerical codebook precision in this package, not packed physical 2/3/4-bit storage.
 
 ---
 
-### III. Gap Analysis: Proposal vs. Current `llama3_2_energy_ablation_final_v5.py`
+## II. Instructor Feedback Status
 
-Your coding agent needs to know that the current Llama 3.2 script is missing several commitments explicitly stated in your project proposal.
-
-**1. Missing TurboQuant Bit-Width Sensitivity Study**
-
-* *What the proposal promised:* Evaluating C3 path sensitivity using TurboQuant bit widths of **2, 3, and 4** at 4096 tokens.
-
-
-* *What the code has:* TurboQuant is hardcoded to `bits=4` via `TurboQuantCache(bits=4)`.
-
-
-
-**2. Missing PyramidKV Retention-Budget Sensitivity Study**
-
-* *What the proposal promised:* Evaluating C2 path sensitivity using PyramidKV average budgets of **512, 1024, and 1536** at 4096 tokens.
-
-
-* *What the code has:* The budget is hardcoded to 1024 via `build_pyramid_budgets(layers=28, average=1024, window=32, beta=20)`.
-
-
-
-**3. Missing Pareto-Frontier-with-Uncertainty Visualization**
-
-* *What the code has:* Basic line plots of Energy/VRAM/Decode vs. Context Length.
-
-
-* *What is needed:* A scatter plot at 4096 tokens mapping Total Energy (X-axis) vs. NIAH Accuracy (Y-axis) with crosshair error bars (standard deviations from the 5 repeated runs), as requested by the instructor.
-
-**4. Missing "Joint-Method" Proxy / Baseline (Instructor Suggestion 1)**
-
-* *What is needed:* A Configuration 5 (C5) that acts as a proxy for joint compression to compare against your sequential C4 stack.
+| Instructor concern | Current status | Remaining action |
+|---|---|---|
+| Discuss sequential stacking versus joint mathematical optimization | Partially complete | IEEE paper now discusses RDKV/ThinKV and states that C4-Ref is sequential. Expand this discussion in the final paper. |
+| Compare against an existing joint eviction-and-quantization method | Not completed | Run a genuine compatible joint method if feasible. Otherwise document the missing baseline as a limitation. Do not use a fake PyTorch dynamic-quantization proxy. |
+| Add a Pareto frontier with uncertainty | Implemented | The historical frontier exists and Notebook 5 adds hard retrieval with Wilson intervals and paired uncertainty. Regenerate the final frontier after power robustness. |
+| Extend to a second SLM family | Not completed | Build and run the Qwen2.5-3B pipeline. |
 
 ---
 
-### IV. Master To-Do List for the Coding Agent
+## III. Completed Llama 3.2-3B Work
 
-Instruct your agent to execute these tasks in the following strict order:
+### Notebook and Artifacts
 
-**Task 1: Complete the Llama 3.2-3B Notebook**
+- [x] Final source notebook: `experiments/Latest/llama3_2_energy_ablation_final_v5.ipynb`.
+- [x] Executed notebook: `Latest notebook run output.ipynb`.
+- [x] Artifact directory: `CSE407_llama_v5_final/`.
+- [x] Experiment fingerprint: `8d27af8c9ee94de3`.
+- [x] Schema: `v5-final-2026-07-31-1`.
+- [x] Pinned FP16/AWQ model revisions and TurboQuant source hash.
+- [x] All notebook sections completed without a Jupyter error or failed assertion.
+- [x] Full hard-retrieval/control notebook completed with fingerprint
+  `106a561c07c62937`, 300 quality rows, five C1-W energy rows, and passed final
+  integrity.
 
-* **Step 1.1:** Refactor `build_pyramid_budgets` and `new_cache` to accept dynamic `average_budget` and `tq_bits` parameters.
-* **Step 1.2:** Add the Sensitivity Matrix logic to Section 9 (Energy) and Section 10 (Quality). It must specifically test PyramidKV budgets `[512, 1536]` (since 1024 is already tested in C2) and TurboQuant bits `[2, 3]` (since 4 is already tested in C3/C4) **only at the 4096 context length**.
+### Core Matrix
 
+- [x] Five configurations: C0--C4.
+- [x] Contexts: 1024, 2048, and 4096 tokens.
+- [x] Five measured energy blocks per condition.
+- [x] 75/75 unique core energy rows.
+- [x] 225/225 unique core NIAH rows.
+- [x] Fixed 64-token teacher-forced decode workload.
+- [x] Separate retrieval correctness and exact-format compliance.
 
-* **Step 1.3:** Inject the matplotlib code to generate the "Pareto Frontier with Uncertainty" plot (Energy vs. Accuracy with X/Y standard deviation error bars) in Section 11.
-* **Step 1.4:** *(Optional but recommended)* Integrate a basic joint-compression baseline (e.g., standard SnapKV + INT4 PyTorch dynamic quantization) to serve as a proxy for RDKV/ThinKV to satisfy the instructor's first suggestion.
+### Sensitivity Studies
 
-**Task 2: Build the Qwen2.5-3B Notebook**
+- [x] Dynamic `average_budget` and `tq_bits` parameters.
+- [x] Pyramid-style budgets 512 and 1536 at 4096, with core C2/1024 as baseline.
+- [x] TurboQuant bits 2 and 3 at 4096, with core C3-Ref/TQ4 as baseline.
+- [x] 20/20 sensitivity energy rows.
+- [x] 60/60 sensitivity quality rows.
+- [x] TurboQuant distortion diagnostics for 2, 3, and 4 bits.
 
-* **Step 2.1:** Create a duplicate of the completed Llama notebook.
-* **Step 2.2:** Swap `MODEL_FP16` and `MODEL_AWQ` to target `Qwen/Qwen2.5-3B-Instruct`.
-* **Step 2.3:** Completely rewrite the monkey-patch hook in Section 6. It must target `transformers.models.qwen2.modeling_qwen2.Qwen2Attention.forward` instead of `LlamaAttention.forward`. The slicing and RoPE application logic will need to be adjusted to match Qwen2's specific source code.
-* **Step 2.4:** Update the output CSV filenames (e.g., `v5_qwen_energy_results.csv`) to prevent overwriting the Llama data.
+### Measurement and Validation
 
-**Task 3: Data Synthesis Script**
+- [x] Approximately 10 Hz NVML sampling.
+- [x] 95/95 raw power traces present.
+- [x] Every trace reintegrates to its stored joules within floating-point precision.
+- [x] Idle-adjusted and gross energy stored separately.
+- [x] Prefill and decode energy/timing stored separately.
+- [x] Temperature, clocks, power limit, and throttle telemetry stored.
+- [x] Post-prefill and post-decode memory stored.
+- [x] Deduplicated live cache bytes and logical retention metrics stored.
+- [x] Seven mandatory validation paths passed.
+- [x] Every one of the 380 primary rows has `structural_pass=True`.
+- [x] Unified full-prompt prefill semantics for C2--C4.
 
-* **Step 3.1:** Create a final, separate analysis script that ingests both the Llama and Qwen CSV files.
-* **Step 3.2:** Plot side-by-side Pareto frontiers and energy-spike graphs to prove the "Energy Shield" effect generalizes across both model architectures.
+### Analysis and Figures
+
+- [x] Core energy summary and paired AWQ-path tests.
+- [x] Holm multiple-comparison correction.
+- [x] Configuration-level difference-in-differences interaction table.
+- [x] Energy-vs-retrieval Pareto frontier with X/Y sample-SD bars.
+- [x] Multi-objective empirical mean Pareto table.
+- [x] Throughput-vs-energy plot.
+- [x] Peak-vs-persistent-memory plot.
+- [x] Pyramid-budget and TurboQuant-bit sensitivity plot.
+- [x] Figures copied into `proposal/ieee format/` for Overleaf.
+
+### Main Llama Results at 4096
+
+| Config | Mean total energy | Decode throughput | Post-decode live cache | Retrieval |
+|---|---:|---:|---:|---:|
+| C0 FP16 | 701.08 +/- 8.12 J | 11.34 tok/s | 455.00 MiB | 100% |
+| C1 AWQ | 631.25 +/- 5.05 J | 13.77 tok/s | 455.00 MiB | 100% |
+| C2 AWQ + pyramidal eviction | **529.30 +/- 20.02 J** | **20.34 tok/s** | **119.00 MiB** | 100% |
+| C3-Ref AWQ + TQ-Ref | 913.48 +/- 2.11 J | 7.66 tok/s | 696.50 MiB | 100% |
+| C4-Ref sequential compound | 659.50 +/- 21.35 J | 12.53 tok/s | 187.25 MiB | 100% |
+
+### Paper Update
+
+- [x] `proposal/ieee format/ieee_proposal.tex` changed from planned methodology to an executed Llama findings draft.
+- [x] Abstract updated with measured results.
+- [x] Results, interaction, sensitivity, Pareto, discussion, threats, and conclusion sections added.
+- [x] Retrieval ceiling and power-telemetry caveats documented.
+- [x] Custom PyramidKV-style implementation disclosed.
+- [x] C1 stock-attention versus C2--C4-Ref wrapper confound disclosed.
+- [x] Sequential C4-Ref versus joint-method distinction disclosed.
+- [x] `\nocite{*}` removed and table checkmarks made LaTeX-safe.
+- [ ] Compile the paper on Overleaf with Biber and resolve any visual layout/float issues.
+
+---
+
+## IV. Llama Validity Work Still Needed
+
+### 1. Harder Retrieval Evaluation
+
+- [x] Replace repetitive filler with a larger, semantically diverse distractor corpus.
+- [x] Separate target and distractor records rather than placing all codes in one compact block.
+- [x] Calibrate and freeze 60 scenarios: 20 per depth with 32 records each.
+- [x] Accept V4 at 75% C1-W pilot retrieval with every depth at least 50%.
+- [x] Run all 20 frozen scenarios per depth for every final configuration.
+- [x] Rerun quality only; the completed energy matrix was not repeated.
+- [x] Report bounded quality uncertainty with Wilson and paired bootstrap intervals.
+- [ ] Regenerate the retrieval Pareto figure after the harder quality run.
+- [ ] Add an exact-format Pareto frontier as a secondary analysis.
+
+### 2. Matched Wrapper Control
+
+- [x] Add C1-W through the custom wrapper with neither eviction nor TurboQuant.
+- [x] Measure C1-W at 4096 tokens with five blocks.
+- [x] Verify exact C1-S/C1-W parity on fixed probes.
+- [x] Use C1-W as the matched behavioral baseline for hard quality comparisons.
+- [ ] Keep historical v5 C1 versus new C1-W energy descriptive because the runs
+  are from separate sessions rather than paired blocks.
+
+### 3. Power-Telemetry Robustness
+
+- [x] Build and locally validate the self-contained Notebook 06 source against
+  all 100 copied immutable traces.
+- [x] Execute the robustness notebook/table using raw, 82 W-capped, and 70 W-capped energy.
+- [x] Report samples above 70/82/100 W and the maximum 124.496 W reading.
+- [x] Confirm that core and sensitivity rankings remain unchanged under both caps.
+- [ ] Add the robustness table or appendix figure to the paper.
+- [ ] Preserve raw joules as the primary measured result; do not silently overwrite them with capped values.
+
+### 4. Statistical Follow-up
+
+- [ ] Add descriptive or inferential comparisons for the sensitivity conditions.
+- [ ] Keep C0-vs-AWQ context results descriptive because C0 ran in a separate model-resident phase.
+- [ ] Do not interpret zero retrieval SD as zero population uncertainty.
+- [ ] Correct generated test-column labels that use `_j` for seconds and tokens/s if analysis is rerun.
+
+### 5. Documentation Consistency
+
+- [ ] Align C2/C3 names across `AGENTS.md`, `proposal/proposal.md`, `research/research_plan.md`, and any presentation files.
+- [ ] Use C2 = AWQ + pyramidal eviction and C3-Ref = AWQ + TQ-Ref consistently for the current experiment.
+- [ ] State that the eviction path is custom PyramidKV-style, not official KVCache-Factory PyramidKV.
+- [ ] State that TurboQuant 2/3/4-bit settings use one uint8 index per coordinate and identical physical index storage.
+- [ ] Complete or clean incomplete bibliography metadata before final submission.
+
+---
+
+## V. Next GPU Task After A3: Qwen2.5-3B Replication
+
+### Notebook Construction
+
+- [ ] Duplicate the completed Llama protocol into a new Qwen notebook; do not modify the completed Llama artifacts.
+- [ ] Select and pin the exact Qwen2.5-3B FP16 and AWQ checkpoints.
+- [ ] Confirm Qwen architecture values, rotary embedding behavior, attention signatures, and cache semantics from the pinned Transformers version.
+- [ ] Rewrite the attention wrapper for `transformers.models.qwen2.modeling_qwen2.Qwen2Attention.forward`.
+- [ ] Preserve full-prompt attention before storing full or selected K/V.
+- [ ] Add a stock-versus-wrapper parity gate before running measurements.
+- [ ] Port all structural, storage, distortion, telemetry, trace, and resumability gates.
+- [ ] Use a separate schema, Drive folder, CSV names, trace directory, and fingerprint.
+
+### Qwen Experiment
+
+- [ ] Use Q1-S only for parity, then run Q0, Q1-W, Q2, Q3-Ref, and Q4-Ref at 1024, 2048, and 4096 tokens with five measured energy blocks.
+- [ ] Run the same fixed 64-token decode trace.
+- [ ] Run the harder NIAH quality protocol rather than the current easy filler.
+- [ ] Run 4096-token Pyramid-budget and TurboQuant-bit sensitivity.
+- [ ] Validate every requested path before accepting rows.
+- [ ] Inspect power telemetry before treating the Qwen run as final.
+
+---
+
+## VI. Joint-Method Decision
+
+- [ ] Investigate whether an authentic RDKV, ThinKV, or another joint eviction-and-quantization implementation can run fairly on Qwen/Llama with a T4.
+- [ ] Match context, retained cache, workload, and quality protocol if a joint baseline is feasible.
+- [ ] Do not label sequential SnapKV plus unrelated dynamic weight quantization as a joint KV baseline.
+- [ ] If no fair implementation is feasible, document the hardware/software incompatibility and retain the missing baseline as an explicit limitation.
+
+---
+
+## VII. Cross-Model Synthesis
+
+- [ ] Create a separate analysis script that reads final Llama and Qwen primary CSVs.
+- [ ] Validate fingerprints, schemas, row counts, and trace availability before combining results.
+- [ ] Produce side-by-side energy-vs-context plots.
+- [ ] Produce side-by-side Pareto frontiers with bounded quality uncertainty.
+- [ ] Compare interaction contrasts across architectures.
+- [ ] Compare raw and capped-energy robustness across architectures.
+- [ ] Determine whether the C4 energy-shield pattern generalizes.
+- [ ] Update the IEEE paper abstract, results, discussion, limitations, and conclusion with Qwen findings.
+
+---
+
+## VIII. Recommended Execution Order
+
+1. Build and validate the Qwen adapter/parity pilot.
+2. Build the full Qwen notebook only after every adapter gate passes.
+3. Run Qwen core energy and quality matrices.
+4. Run Qwen sensitivity matrices.
+5. Decide and document the genuine joint-method baseline outcome.
+6. Build the cross-model synthesis notebook and figures.
+7. Finalize the paper and presentation, then compile on Overleaf with Biber.

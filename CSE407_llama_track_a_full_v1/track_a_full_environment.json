@@ -1,0 +1,53 @@
+{
+  "schema_version": "track-a-llama-full-v1-2026-08-03-1",
+  "model_fp16": "unsloth/Llama-3.2-3B-Instruct",
+  "model_fp16_revision": "006f5dcd1393c3add266de40994ba96225e9689d",
+  "model_awq": "casperhansen/llama-3.2-3b-instruct-awq",
+  "model_awq_revision": "272b3bde867b606760447deb9a4d2719fbdfd3ae",
+  "transformers": "5.12.1",
+  "turboquant": "0.2.0",
+  "turboquant_source_sha256": "7358e2778c8de6974b0c7212ae8e3dbe00552a96b2e2df0aa42878f239a4c72a",
+  "generator_version": "track-a-hard-retrieval-v4-controlled-pairs-draft",
+  "semantic_sha256": "fffa82607af6e7d2c892d18d5bc790524570833472ad397b7ab2e54eb03005ef",
+  "prompt_set_sha256": "4e1ced4fd4829629929a346879cc00c45476f38fa0936137909b8779242321e8",
+  "context_tokens": 4096,
+  "depths": [
+    0.1,
+    0.5,
+    0.9
+  ],
+  "scenarios_per_depth": 20,
+  "record_count": 32,
+  "quality_variants": [
+    "C0",
+    "C1-W",
+    "C2",
+    "C3-Ref",
+    "C4-Ref"
+  ],
+  "quality_max_new_tokens": 32,
+  "average_budget": 1024,
+  "tq_bits": 4,
+  "window": 32,
+  "pool_kernel": 5,
+  "pyramid_beta": 20,
+  "parity_atol": 0.005,
+  "parity_rtol": 0.005,
+  "energy_blocks": 5,
+  "fixed_decode_tokens": 64,
+  "trace_text_sha256": "37d78b47fba6700cdf7ccc6faf8dd2aa24fbd0124544d5b9604d02643fc768c4",
+  "fingerprint": "106a561c07c62937",
+  "session_id": "20260803T153710-2a4dc573",
+  "gpu": "Tesla T4",
+  "vram_gb": 14.56,
+  "torch": "2.11.0+cu128",
+  "cuda_runtime": "12.8",
+  "gptqmodel": "7.1.0",
+  "artifact_path": "CSE407_llama_track_a_full_v1",
+  "label_policy": {
+    "C2": "AWQ + custom pyramidal eviction",
+    "C3-Ref": "AWQ + turboquant==0.2.0 numerical reference path",
+    "C4-Ref": "AWQ + sequential eviction then TQ-Ref",
+    "TQ-Ref_boundary": "not packed, fused, or physically 4-bit"
+  }
+}

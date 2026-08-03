@@ -1,0 +1,11 @@
+{
+  "fingerprint": "b0e6646087995e5f",
+  "status": "DISCARDED_DIFFICULTY_PILOT",
+  "decision": "TOO_HARD_REDUCE_DIFFICULTY",
+  "c1w_retrieval": 0.5,
+  "c2_retrieval": 0.5,
+  "scenarios_per_variant": 12,
+  "freeze_automatic": false,
+  "next_action": "Inspect failures, then explicitly freeze or revise the generator.",
+  "completed_at_utc": "2026-08-03T13:22:52Z"
+}

@@ -1,0 +1,17 @@
+{
+  "fingerprint": "15a1017ec54949b9",
+  "status": "DISCARDED_DIFFICULTY_PILOT",
+  "decision": "PASS_FREEZE_CANDIDATE",
+  "c1w_retrieval": 0.75,
+  "c2_retrieval": 0.75,
+  "c1w_retrieval_by_depth": {
+    "0.1": 1.0,
+    "0.5": 0.5,
+    "0.9": 0.75
+  },
+  "depth_floor_pass": true,
+  "scenarios_per_variant": 12,
+  "freeze_automatic": false,
+  "next_action": "Inspect failures, then explicitly freeze or revise the generator.",
+  "completed_at_utc": "2026-08-03T14:17:36Z"
+}

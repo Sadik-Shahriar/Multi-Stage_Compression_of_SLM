@@ -1,0 +1,113 @@
+{
+  "manifest_schema": "cse407-derived-artifact-manifest-v1",
+  "experiment_id": "llama-3.2-3b-v5-power-robustness",
+  "artifact_root": "CSE407_llama_power_robustness_v1",
+  "status": "IMMUTABLE_ACCEPTED_DERIVED_EVIDENCE",
+  "policy": "Never edit or overwrite files under artifact_root; verify against this manifest.",
+  "facts": {
+    "schema_version": "track-a-llama-power-robustness-v1-2026-08-03-1",
+    "fingerprint": "91ebc63773e735e6",
+    "source_manifests_verified": true,
+    "trace_count": 100,
+    "v5_trace_count": 95,
+    "c1w_trace_count": 5,
+    "maximum_raw_power_w": 124.496,
+    "samples_gt_70w": 1501,
+    "samples_gt_82w": 82,
+    "samples_gt_100w": 21,
+    "rankings_stable_82w": true,
+    "rankings_stable_70w": true,
+    "significance_stable": true
+  },
+  "inventory": {
+    "file_count": 15,
+    "total_bytes": 301578,
+    "csv_count": 8,
+    "json_count": 3,
+    "png_count": 2,
+    "pdf_count": 1,
+    "markdown_count": 1
+  },
+  "completion_output": {
+    "path": "output cell.md",
+    "bytes": 1042,
+    "sha256": "733404c7076663916c320d410cd61adbfb15cbe4cf259dcc7b88d447369921ed"
+  },
+  "files": [
+    {
+      "path": "c1w_vs_historical_c1_descriptive.csv",
+      "bytes": 811,
+      "sha256": "6940f6f2e52c18c771b80fe52541af685f1686401c00346025e93f9d051ecc61"
+    },
+    {
+      "path": "condition_power_robustness_summary.csv",
+      "bytes": 3939,
+      "sha256": "651746c8273c5dbebfca47ab39f9d41caeaeafdf8c67647129557ac3666f58c2"
+    },
+    {
+      "path": "core_4096_power_cap_robustness.pdf",
+      "bytes": 20878,
+      "sha256": "2801b2022796b6673d06043d424541b485246cac10be6931dcd2536c114bdf4d"
+    },
+    {
+      "path": "core_4096_power_cap_robustness.png",
+      "bytes": 60011,
+      "sha256": "d8e2e3af4769cc06443c2f23487c375d78445da808c63f0674ff4bcd8b6f923a"
+    },
+    {
+      "path": "core_4096_tests_by_regime.csv",
+      "bytes": 10931,
+      "sha256": "ade14a2f2ed5211bafc28d48e43bd34238f343ec190e52cfb999e5a9da74cfd0"
+    },
+    {
+      "path": "energy_rankings_by_regime.csv",
+      "bytes": 2880,
+      "sha256": "2dedabaad0527057a674f1487d622109f9b105c03eea04968fe3b45948711174"
+    },
+    {
+      "path": "final_integrity.json",
+      "bytes": 1014,
+      "sha256": "e3a2b43ef04595942e28f44396a1a02e08f972861e250de8ba6223616fb32cd6"
+    },
+    {
+      "path": "maximum_power_samples.png",
+      "bytes": 133554,
+      "sha256": "f55c252b34b06baee07f38e36e193c1a3f5e4c564cca903965197729f16c0f60"
+    },
+    {
+      "path": "power_anomaly_inventory.csv",
+      "bytes": 9734,
+      "sha256": "10b6265c4401b4512c42eb87895a8a6e78f0f3edae012ced0562b39667ffa871"
+    },
+    {
+      "path": "power_robustness_environment.json",
+      "bytes": 1433,
+      "sha256": "e3885eb6fd5a8d649098a419566846783e1e08484547ebe1cacc730feffc7038"
+    },
+    {
+      "path": "power_robustness_report.md",
+      "bytes": 502,
+      "sha256": "cdfb9ae97d4b431a5193d84cc6c4d0434c6838b1408bc28e31f6f18f79078dea"
+    },
+    {
+      "path": "ranking_stability.csv",
+      "bytes": 726,
+      "sha256": "837993d3f6f444ef60c93b5ab620ce8c6eeebc40e2e5307e6090fcd583359694"
+    },
+    {
+      "path": "significance_stability.csv",
+      "bytes": 2617,
+      "sha256": "bfe9c0112ea75762be8383a7896c979c0ea366655c222483d1171de51cf2db41"
+    },
+    {
+      "path": "source_verification.json",
+      "bytes": 552,
+      "sha256": "236b85d8f775f27e01cf9631783d8814255a73c24a3c74e8f63a83f0972bbc7a"
+    },
+    {
+      "path": "trace_level_power_robustness.csv",
+      "bytes": 51996,
+      "sha256": "0564ed6498dec13a3aa43789b82f5106397285471f2cdf916050474fb89e6c8b"
+    }
+  ]
+}

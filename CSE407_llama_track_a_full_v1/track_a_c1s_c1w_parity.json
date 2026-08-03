@@ -1,0 +1,84 @@
+{
+  "fingerprint": "106a561c07c62937",
+  "schema_version": "track-a-llama-full-v1-2026-08-03-1",
+  "atol": 0.005,
+  "rtol": 0.005,
+  "passed": true,
+  "rows": [
+    {
+      "scenario_id": "d10-s00",
+      "input_ids_sha256": "e2be87f3c4160752d467315cbfe99aa5c6666f41b7bd3454b7cbf5c54be42bce",
+      "max_abs_logit_difference": 0.0,
+      "logits_allclose": true,
+      "top1_agreement": true,
+      "greedy_token_ids_equal": true,
+      "greedy_responses_equal": true,
+      "full_cache_lengths_equal": true,
+      "absence_of_eviction_quantization_state": true,
+      "stock_output_token_ids": [
+        32,
+        23402,
+        11500,
+        1544,
+        128009
+      ],
+      "wrapped_output_token_ids": [
+        32,
+        23402,
+        11500,
+        1544,
+        128009
+      ]
+    },
+    {
+      "scenario_id": "d50-s00",
+      "input_ids_sha256": "ebdb5cf10c1441038bb5042079dac710dbef8619c9fa35cf0c6bb4d496e3850f",
+      "max_abs_logit_difference": 0.0,
+      "logits_allclose": true,
+      "top1_agreement": true,
+      "greedy_token_ids_equal": true,
+      "greedy_responses_equal": true,
+      "full_cache_lengths_equal": true,
+      "absence_of_eviction_quantization_state": true,
+      "stock_output_token_ids": [
+        33,
+        23480,
+        16222,
+        4643,
+        128009
+      ],
+      "wrapped_output_token_ids": [
+        33,
+        23480,
+        16222,
+        4643,
+        128009
+      ]
+    },
+    {
+      "scenario_id": "d90-s00",
+      "input_ids_sha256": "3a8c0595dc0609f22a43162e99a6772d3b469d4055054e96a594e70839fe4d58",
+      "max_abs_logit_difference": 0.0,
+      "logits_allclose": true,
+      "top1_agreement": true,
+      "greedy_token_ids_equal": true,
+      "greedy_responses_equal": true,
+      "full_cache_lengths_equal": true,
+      "absence_of_eviction_quantization_state": true,
+      "stock_output_token_ids": [
+        32,
+        3965,
+        29342,
+        4578,
+        128009
+      ],
+      "wrapped_output_token_ids": [
+        32,
+        3965,
+        29342,
+        4578,
+        128009
+      ]
+    }
+  ]
+}

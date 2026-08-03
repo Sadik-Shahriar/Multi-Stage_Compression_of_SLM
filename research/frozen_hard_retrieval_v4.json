@@ -1,0 +1,31 @@
+{
+  "freeze_schema": "cse407-hard-retrieval-freeze-v1",
+  "status": "FROZEN_FOR_FULL_TRACK_A_RUN",
+  "frozen_on": "2026-08-03",
+  "generator_version": "track-a-hard-retrieval-v4-controlled-pairs-draft",
+  "semantic_sha256": "fffa82607af6e7d2c892d18d5bc790524570833472ad397b7ab2e54eb03005ef",
+  "prompt_set_sha256": "4e1ced4fd4829629929a346879cc00c45476f38fa0936137909b8779242321e8",
+  "semantic_manifest_file_sha256": "4fb10e16f749219371fe591753e525043341f2e5082e55a4a5c7df1b4bd9558d",
+  "llama_prompt_manifest_file_sha256": "26f7e008d5dadd5aaecee10a517b2f02cdf8b5668ab4701e6aae11ee708d4558",
+  "pilot_results_file_sha256": "7b91071e5a7d591f292decf0011688a82375a3350e832d65581e104fdca52064",
+  "tokenizer_id": "casperhansen/llama-3.2-3b-instruct-awq",
+  "tokenizer_revision": "272b3bde867b606760447deb9a4d2719fbdfd3ae",
+  "context_tokens": 4096,
+  "depths": [0.1, 0.5, 0.9],
+  "scenarios_per_depth": 20,
+  "record_count": 32,
+  "query_window_limit": 32,
+  "accepted_pilot": {
+    "fingerprint": "15a1017ec54949b9",
+    "artifact_path": "CSE407_llama_track_a_pilot_v4_discarded",
+    "c1w_retrieval": 0.75,
+    "c2_retrieval": 0.75,
+    "c1w_retrieval_by_depth": {
+      "0.1": 1.0,
+      "0.5": 0.5,
+      "0.9": 0.75
+    },
+    "depth_floor_pass": true
+  },
+  "policy": "Pilot rows remain discarded calibration evidence. The generator semantics and prompt hashes are frozen; do not tune them after inspecting C3-Ref or C4-Ref."
+}

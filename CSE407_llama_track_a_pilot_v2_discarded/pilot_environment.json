@@ -1,0 +1,31 @@
+{
+  "schema_version": "track-a-llama-hard-pilot-v2-2026-08-03-1",
+  "model_awq": "casperhansen/llama-3.2-3b-instruct-awq",
+  "model_awq_revision": "272b3bde867b606760447deb9a4d2719fbdfd3ae",
+  "transformers": "5.12.1",
+  "gptqmodel": "7.1.0",
+  "generator_version": "track-a-hard-retrieval-v2-record32-draft",
+  "semantic_sha256": "2233315ff73e96b6aa11fde4bc736bcecc5991ec7b54bf6654228f0b1d4fa9dd",
+  "prompt_set_sha256": "da7b44c29c2d9f956d116a6f716bc228d2f9a758596e2ff45bd14b6da8f971c6",
+  "pilot_scenarios": [
+    "d10-s00",
+    "d10-s05",
+    "d10-s10",
+    "d10-s15",
+    "d50-s00",
+    "d50-s05",
+    "d50-s10",
+    "d50-s15",
+    "d90-s00",
+    "d90-s05",
+    "d90-s10",
+    "d90-s15"
+  ],
+  "pilot_variants": [
+    "C1-W",
+    "C2"
+  ],
+  "context_tokens": 4096,
+  "average_budget": 1024,
+  "fingerprint": "922e8877398679eb"
+}
