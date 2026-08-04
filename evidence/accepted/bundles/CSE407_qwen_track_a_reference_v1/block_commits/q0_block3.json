@@ -1,0 +1,20 @@
+{
+  "fingerprint": "861d89617e53034d",
+  "phase": "q0",
+  "block": 3,
+  "attempt_id": "q0_block3_20260804T154752-97822cdb",
+  "items": [
+    {
+      "row": "core__Q0__ctx1024__block3.json",
+      "trace": "core__Q0__ctx1024__block3__trace.json"
+    },
+    {
+      "row": "core__Q0__ctx2048__block3.json",
+      "trace": "core__Q0__ctx2048__block3__trace.json"
+    },
+    {
+      "row": "core__Q0__ctx4096__block3.json",
+      "trace": "core__Q0__ctx4096__block3__trace.json"
+    }
+  ]
+}

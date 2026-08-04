@@ -1,0 +1,72 @@
+{
+  "fingerprint": "861d89617e53034d",
+  "phase": "awq",
+  "block": 0,
+  "attempt_id": "awq_block0_20260804T154752-97822cdb",
+  "items": [
+    {
+      "row": "core__Q1-W__ctx4096__block0.json",
+      "trace": "core__Q1-W__ctx4096__block0__trace.json"
+    },
+    {
+      "row": "core__Q2__ctx4096__block0.json",
+      "trace": "core__Q2__ctx4096__block0__trace.json"
+    },
+    {
+      "row": "core__Q3-Ref__ctx1024__block0.json",
+      "trace": "core__Q3-Ref__ctx1024__block0__trace.json"
+    },
+    {
+      "row": "core__Q1-W__ctx2048__block0.json",
+      "trace": "core__Q1-W__ctx2048__block0__trace.json"
+    },
+    {
+      "row": "core__Q4-Ref__ctx4096__block0.json",
+      "trace": "core__Q4-Ref__ctx4096__block0__trace.json"
+    },
+    {
+      "row": "sensitivity__Q2-B512__ctx4096__block0.json",
+      "trace": "sensitivity__Q2-B512__ctx4096__block0__trace.json"
+    },
+    {
+      "row": "core__Q2__ctx1024__block0.json",
+      "trace": "core__Q2__ctx1024__block0__trace.json"
+    },
+    {
+      "row": "core__Q4-Ref__ctx2048__block0.json",
+      "trace": "core__Q4-Ref__ctx2048__block0__trace.json"
+    },
+    {
+      "row": "sensitivity__Q3-Ref-TQ2__ctx4096__block0.json",
+      "trace": "sensitivity__Q3-Ref-TQ2__ctx4096__block0__trace.json"
+    },
+    {
+      "row": "sensitivity__Q3-Ref-TQ3__ctx4096__block0.json",
+      "trace": "sensitivity__Q3-Ref-TQ3__ctx4096__block0__trace.json"
+    },
+    {
+      "row": "sensitivity__Q2-B1536__ctx4096__block0.json",
+      "trace": "sensitivity__Q2-B1536__ctx4096__block0__trace.json"
+    },
+    {
+      "row": "core__Q1-W__ctx1024__block0.json",
+      "trace": "core__Q1-W__ctx1024__block0__trace.json"
+    },
+    {
+      "row": "core__Q2__ctx2048__block0.json",
+      "trace": "core__Q2__ctx2048__block0__trace.json"
+    },
+    {
+      "row": "core__Q3-Ref__ctx2048__block0.json",
+      "trace": "core__Q3-Ref__ctx2048__block0__trace.json"
+    },
+    {
+      "row": "core__Q3-Ref__ctx4096__block0.json",
+      "trace": "core__Q3-Ref__ctx4096__block0__trace.json"
+    },
+    {
+      "row": "core__Q4-Ref__ctx1024__block0.json",
+      "trace": "core__Q4-Ref__ctx1024__block0__trace.json"
+    }
+  ]
+}

@@ -17,7 +17,7 @@
   "query_window_limit": 32,
   "accepted_pilot": {
     "fingerprint": "15a1017ec54949b9",
-    "artifact_path": "CSE407_llama_track_a_pilot_v4_discarded",
+    "artifact_path": "evidence/discarded/bundles/CSE407_llama_track_a_pilot_v4_discarded",
     "c1w_retrieval": 0.75,
     "c2_retrieval": 0.75,
     "c1w_retrieval_by_depth": {

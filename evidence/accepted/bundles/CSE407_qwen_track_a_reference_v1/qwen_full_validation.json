@@ -1,0 +1,299 @@
+{
+  "passed": true,
+  "schema_version": "track-a-qwen-full-reference-v1-2026-08-04-1",
+  "fingerprint": "861d89617e53034d",
+  "session_id": "20260804T154752-97822cdb",
+  "runtime_sha256": "8883c3ef97ce51e55655e99fe2de97df51162b4de3574e07405bb4ca66dd2d71",
+  "source_hashes": {
+    "qwen2": "99fa98c5676604cf6ef505892b70fda5c1c4cd835971459f38d61090cccab1e4",
+    "cache_utils": "2783b2702910dbb6e70aa05a093f71e1c51c110d7fa73c904fc38d12e5882545",
+    "masking_utils": "aa525d800f824b25cbe9542ca7cc5b35e948e7cfa3178e2c0f2356a15ff32df2",
+    "sdpa_attention": "87f933d1a2d8508df572da5c0748c6b24c22ff2b625796949957dcd86cc57564",
+    "turboquant": "7358e2778c8de6974b0c7212ae8e3dbe00552a96b2e2df0aa42878f239a4c72a"
+  },
+  "fp16_architecture": {
+    "passed": true,
+    "layers": 36,
+    "dtype": "torch.float16"
+  },
+  "awq_architecture_passed": true,
+  "parity_rows": [
+    {
+      "scenario_id": "d10-s00",
+      "max_abs_logit_difference": 0.0,
+      "passed": true
+    },
+    {
+      "scenario_id": "d50-s00",
+      "max_abs_logit_difference": 0.0,
+      "passed": true
+    },
+    {
+      "scenario_id": "d90-s00",
+      "max_abs_logit_difference": 0.0,
+      "passed": true
+    }
+  ],
+  "path_probes": [
+    {
+      "variant": "Q1-W",
+      "top1": 33,
+      "structure": {
+        "structural_pass": true,
+        "quantized_layers": 0,
+        "residual_only_layers": [],
+        "evicted_layers": 0,
+        "cache_min_prefill": 4096,
+        "cache_max_prefill": 4096,
+        "active_decode_cache_updates": 36,
+        "tq_actual_path_max_nmse": 0.0
+      },
+      "storage": {
+        "probe_final_cache_live_bytes": 151031808,
+        "probe_final_unique_storages": 72,
+        "probe_final_tensor_references": 72,
+        "probe_final_aliased_references": 0,
+        "probe_final_raw_reference_bytes": 151031808,
+        "probe_final_alias_deduplicated": true,
+        "probe_final_retained_fp16_bytes": 151031808,
+        "probe_final_tq_index_bytes": 0,
+        "probe_final_tq_norm_bytes": 0,
+        "probe_final_tq_residual_bytes": 0,
+        "probe_final_tq_materialized_bytes": 151031808,
+        "probe_final_tq_package_reported_bytes": 0,
+        "probe_final_logical_tq_payload_bytes": 0,
+        "probe_final_package_bytes_reconciled": true
+      }
+    },
+    {
+      "variant": "Q2",
+      "top1": 33,
+      "structure": {
+        "structural_pass": true,
+        "quantized_layers": 0,
+        "residual_only_layers": [],
+        "evicted_layers": 36,
+        "cache_min_prefill": 82,
+        "cache_max_prefill": 1966,
+        "active_decode_cache_updates": 36,
+        "tq_actual_path_max_nmse": 0.0
+      },
+      "storage": {
+        "probe_final_cache_live_bytes": 37785600,
+        "probe_final_unique_storages": 72,
+        "probe_final_tensor_references": 72,
+        "probe_final_aliased_references": 0,
+        "probe_final_raw_reference_bytes": 37785600,
+        "probe_final_alias_deduplicated": true,
+        "probe_final_retained_fp16_bytes": 37785600,
+        "probe_final_tq_index_bytes": 0,
+        "probe_final_tq_norm_bytes": 0,
+        "probe_final_tq_residual_bytes": 0,
+        "probe_final_tq_materialized_bytes": 37785600,
+        "probe_final_tq_package_reported_bytes": 0,
+        "probe_final_logical_tq_payload_bytes": 0,
+        "probe_final_package_bytes_reconciled": true
+      }
+    },
+    {
+      "variant": "Q3-Ref",
+      "top1": 33,
+      "structure": {
+        "structural_pass": true,
+        "quantized_layers": 36,
+        "residual_only_layers": [],
+        "evicted_layers": 0,
+        "cache_min_prefill": 4096,
+        "cache_max_prefill": 4096,
+        "active_decode_cache_updates": 36,
+        "tq_actual_path_max_nmse": 0.023843251168727875
+      },
+      "storage": {
+        "probe_final_cache_live_bytes": 231230016,
+        "probe_final_unique_storages": 288,
+        "probe_final_tensor_references": 288,
+        "probe_final_aliased_references": 0,
+        "probe_final_raw_reference_bytes": 231230016,
+        "probe_final_alias_deduplicated": true,
+        "probe_final_retained_fp16_bytes": 151031808,
+        "probe_final_tq_index_bytes": 73156608,
+        "probe_final_tq_norm_bytes": 2286144,
+        "probe_final_tq_residual_bytes": 4755456,
+        "probe_final_tq_materialized_bytes": 151031808,
+        "probe_final_tq_package_reported_bytes": 80161344,
+        "probe_final_logical_tq_payload_bytes": 80161344,
+        "probe_final_package_bytes_reconciled": true
+      }
+    },
+    {
+      "variant": "Q4-Ref",
+      "top1": 33,
+      "structure": {
+        "structural_pass": true,
+        "quantized_layers": 35,
+        "residual_only_layers": [
+          35
+        ],
+        "evicted_layers": 36,
+        "cache_min_prefill": 82,
+        "cache_max_prefill": 1966,
+        "active_decode_cache_updates": 36,
+        "tq_actual_path_max_nmse": 0.021893132477998734
+      },
+      "storage": {
+        "probe_final_cache_live_bytes": 59482896,
+        "probe_final_unique_storages": 282,
+        "probe_final_tensor_references": 284,
+        "probe_final_aliased_references": 2,
+        "probe_final_raw_reference_bytes": 59567888,
+        "probe_final_alias_deduplicated": true,
+        "probe_final_retained_fp16_bytes": 37785600,
+        "probe_final_tq_index_bytes": 16556544,
+        "probe_final_tq_norm_bytes": 517392,
+        "probe_final_tq_residual_bytes": 4708352,
+        "probe_final_tq_materialized_bytes": 37785600,
+        "probe_final_tq_package_reported_bytes": 21746448,
+        "probe_final_logical_tq_payload_bytes": 21746448,
+        "probe_final_package_bytes_reconciled": true
+      }
+    },
+    {
+      "variant": "Q2-B512",
+      "top1": 33,
+      "structure": {
+        "structural_pass": true,
+        "quantized_layers": 0,
+        "residual_only_layers": [],
+        "evicted_layers": 36,
+        "cache_min_prefill": 56,
+        "cache_max_prefill": 968,
+        "active_decode_cache_updates": 36,
+        "tq_actual_path_max_nmse": 0.0
+      },
+      "storage": {
+        "probe_final_cache_live_bytes": 18911232,
+        "probe_final_unique_storages": 72,
+        "probe_final_tensor_references": 72,
+        "probe_final_aliased_references": 0,
+        "probe_final_raw_reference_bytes": 18911232,
+        "probe_final_alias_deduplicated": true,
+        "probe_final_retained_fp16_bytes": 18911232,
+        "probe_final_tq_index_bytes": 0,
+        "probe_final_tq_norm_bytes": 0,
+        "probe_final_tq_residual_bytes": 0,
+        "probe_final_tq_materialized_bytes": 18911232,
+        "probe_final_tq_package_reported_bytes": 0,
+        "probe_final_logical_tq_payload_bytes": 0,
+        "probe_final_package_bytes_reconciled": true
+      }
+    },
+    {
+      "variant": "Q2-B1536",
+      "top1": 33,
+      "structure": {
+        "structural_pass": true,
+        "quantized_layers": 0,
+        "residual_only_layers": [],
+        "evicted_layers": 36,
+        "cache_min_prefill": 107,
+        "cache_max_prefill": 2965,
+        "active_decode_cache_updates": 36,
+        "tq_actual_path_max_nmse": 0.0
+      },
+      "storage": {
+        "probe_final_cache_live_bytes": 56659968,
+        "probe_final_unique_storages": 72,
+        "probe_final_tensor_references": 72,
+        "probe_final_aliased_references": 0,
+        "probe_final_raw_reference_bytes": 56659968,
+        "probe_final_alias_deduplicated": true,
+        "probe_final_retained_fp16_bytes": 56659968,
+        "probe_final_tq_index_bytes": 0,
+        "probe_final_tq_norm_bytes": 0,
+        "probe_final_tq_residual_bytes": 0,
+        "probe_final_tq_materialized_bytes": 56659968,
+        "probe_final_tq_package_reported_bytes": 0,
+        "probe_final_logical_tq_payload_bytes": 0,
+        "probe_final_package_bytes_reconciled": true
+      }
+    },
+    {
+      "variant": "Q3-Ref-TQ2",
+      "top1": 33,
+      "structure": {
+        "structural_pass": true,
+        "quantized_layers": 36,
+        "residual_only_layers": [],
+        "evicted_layers": 0,
+        "cache_min_prefill": 4096,
+        "cache_max_prefill": 4096,
+        "active_decode_cache_updates": 36,
+        "tq_actual_path_max_nmse": 0.137366384267807
+      },
+      "storage": {
+        "probe_final_cache_live_bytes": 231230016,
+        "probe_final_unique_storages": 288,
+        "probe_final_tensor_references": 288,
+        "probe_final_aliased_references": 0,
+        "probe_final_raw_reference_bytes": 231230016,
+        "probe_final_alias_deduplicated": true,
+        "probe_final_retained_fp16_bytes": 151031808,
+        "probe_final_tq_index_bytes": 73156608,
+        "probe_final_tq_norm_bytes": 2286144,
+        "probe_final_tq_residual_bytes": 4755456,
+        "probe_final_tq_materialized_bytes": 151031808,
+        "probe_final_tq_package_reported_bytes": 80161344,
+        "probe_final_logical_tq_payload_bytes": 80161344,
+        "probe_final_package_bytes_reconciled": true
+      }
+    },
+    {
+      "variant": "Q3-Ref-TQ3",
+      "top1": 33,
+      "structure": {
+        "structural_pass": true,
+        "quantized_layers": 36,
+        "residual_only_layers": [],
+        "evicted_layers": 0,
+        "cache_min_prefill": 4096,
+        "cache_max_prefill": 4096,
+        "active_decode_cache_updates": 36,
+        "tq_actual_path_max_nmse": 0.055095940828323364
+      },
+      "storage": {
+        "probe_final_cache_live_bytes": 231230016,
+        "probe_final_unique_storages": 288,
+        "probe_final_tensor_references": 288,
+        "probe_final_aliased_references": 0,
+        "probe_final_raw_reference_bytes": 231230016,
+        "probe_final_alias_deduplicated": true,
+        "probe_final_retained_fp16_bytes": 151031808,
+        "probe_final_tq_index_bytes": 73156608,
+        "probe_final_tq_norm_bytes": 2286144,
+        "probe_final_tq_residual_bytes": 4755456,
+        "probe_final_tq_materialized_bytes": 151031808,
+        "probe_final_tq_package_reported_bytes": 80161344,
+        "probe_final_logical_tq_payload_bytes": 80161344,
+        "probe_final_package_bytes_reconciled": true
+      }
+    }
+  ],
+  "tq_numerical_probes": [
+    {
+      "bits": 2,
+      "normalized_mse": 0.12819069623947144,
+      "physical_index_bytes_per_coordinate": 1
+    },
+    {
+      "bits": 3,
+      "normalized_mse": 0.04900365322828293,
+      "physical_index_bytes_per_coordinate": 1
+    },
+    {
+      "bits": 4,
+      "normalized_mse": 0.01932257041335106,
+      "physical_index_bytes_per_coordinate": 1
+    }
+  ],
+  "validated_before_measurement": "2026-08-04T15:52:57Z"
+}

@@ -1,0 +1,39 @@
+{
+  "protocol": {
+    "version": "qwen-full-analysis-v2",
+    "energy_metrics": {
+      "total_energy_j": "total_energy_j",
+      "decode_energy_j": "decode_energy_j",
+      "decode_s": "decode_s",
+      "decode_tok_s": "decode_tok_s"
+    },
+    "energy_contrasts": [
+      [
+        "Q1-W",
+        "Q2"
+      ],
+      [
+        "Q1-W",
+        "Q3-Ref"
+      ],
+      [
+        "Q1-W",
+        "Q4-Ref"
+      ],
+      [
+        "Q2",
+        "Q4-Ref"
+      ],
+      [
+        "Q3-Ref",
+        "Q4-Ref"
+      ]
+    ],
+    "energy_family": "five-contrasts-x-four-metrics-holm-20-per-regime",
+    "interaction_formula": "(Q4-Ref-Q3-Ref)-(Q2-Q1-W); four metrics; holm-4-per-regime",
+    "quality_tests": "paired-mcnemar-exact; bonferroni-12-core-16-sensitivity",
+    "pareto": "strict-energy-and-error-dominance-with-one-strict; paired-block-and-depth-scenario-bootstrap-2000",
+    "q0_interpretation": "descriptive-cross-phase-reference"
+  },
+  "sha256": "f9fc97e0388874b150c413729bb74e3b1c8faaf7db421307aa7de9ff057cc9a0"
+}

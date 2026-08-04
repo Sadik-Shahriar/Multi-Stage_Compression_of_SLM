@@ -1,0 +1,21 @@
+model,regime,metric,n,mean_interaction,ci95_low,ci95_high,p_raw,p_adjusted,source,baseline_wrapper_matched,caveat
+llama,raw,total_energy_j,5,-152.03179408735835,-187.10756547462751,-116.95602270008921,0.0002733718788021,0.0010934875152084,registered_v5,False,configuration-level interaction; stock C1 versus wrapped C2-C4
+llama,raw,decode_energy_j,5,-126.00121272646628,-160.0839201860814,-91.918505266851184,0.00050797124996620005,0.0015239137498988,registered_v5,False,configuration-level interaction; stock C1 versus wrapped C2-C4
+llama,raw,decode_s,5,-1.7423728079999818,-2.3275667119599435,-1.1571789040400202,0.0011684414236152001,0.0023368828472304002,registered_v5,False,configuration-level interaction; stock C1 versus wrapped C2-C4
+llama,raw,decode_tok_s,5,-1.6963556637142894,-4.0533757746157608,0.66066444718718209,0.116353140950739,0.116353140950739,registered_v5,False,configuration-level interaction; stock C1 versus wrapped C2-C4
+llama,cap82,total_energy_j,5,-151.57946517766285,-187.64094434795444,-115.51798600737126,,,derived_capped_descriptive,False,trace-clipping sensitivity; no new inferential decision
+llama,cap82,decode_energy_j,5,-126.00121272646629,-160.0839201860814,-91.918505266851184,,,derived_capped_descriptive,False,trace-clipping sensitivity; no new inferential decision
+llama,cap70,total_energy_j,5,-159.63644534815961,-195.57376087829437,-123.69912981802486,,,derived_capped_descriptive,False,trace-clipping sensitivity; no new inferential decision
+llama,cap70,decode_energy_j,5,-130.01296535521695,-165.71738453430211,-94.308546176131784,,,derived_capped_descriptive,False,trace-clipping sensitivity; no new inferential decision
+qwen,raw,total_energy_j,5,-112.32029467618344,-147.35739003353214,-77.283199318834761,0.00088060908661160002,0.0035224363464464998,registered_qwen,True,within Qwen session; capped regimes are trace reintegrations
+qwen,raw,decode_energy_j,5,-98.40349860291208,-138.66479481252344,-58.142202393300721,0.0024621086124038002,0.0073863258372114,registered_qwen,True,within Qwen session; capped regimes are trace reintegrations
+qwen,raw,decode_s,5,-0.65231475520004101,-1.5414907187758109,0.23686120837572899,0.1113419475722577,0.2226838951445155,registered_qwen,True,within Qwen session; capped regimes are trace reintegrations
+qwen,raw,decode_tok_s,5,1.0904835148881151,-1.3912565495320854,3.5722235793083157,0.28948115210333508,0.28948115210333508,registered_qwen,True,within Qwen session; capped regimes are trace reintegrations
+qwen,cap82,total_energy_j,5,-112.02980264043944,-147.3100839171471,-76.749521363731802,0.00091333207879980001,0.0036533283151994,registered_qwen,True,within Qwen session; capped regimes are trace reintegrations
+qwen,cap82,decode_energy_j,5,-98.40349860291208,-138.66479481252344,-58.142202393300721,0.0024621086124038002,0.0073863258372114,registered_qwen,True,within Qwen session; capped regimes are trace reintegrations
+qwen,cap82,decode_s,5,-0.65231475520004101,-1.5414907187758109,0.23686120837572899,0.1113419475722577,0.2226838951445155,registered_qwen,True,within Qwen session; capped regimes are trace reintegrations
+qwen,cap82,decode_tok_s,5,1.0904835148881151,-1.3912565495320854,3.5722235793083157,0.28948115210333508,0.28948115210333508,registered_qwen,True,within Qwen session; capped regimes are trace reintegrations
+qwen,cap70,total_energy_j,5,-112.21249178938471,-146.36312303616558,-78.061860542603853,0.0008009654696848,0.0032038618787392,registered_qwen,True,within Qwen session; capped regimes are trace reintegrations
+qwen,cap70,decode_energy_j,5,-97.540514099142527,-136.53732190124757,-58.543706297037488,0.0022583962846799001,0.0067751888540396998,registered_qwen,True,within Qwen session; capped regimes are trace reintegrations
+qwen,cap70,decode_s,5,-0.65231475520004101,-1.5414907187758109,0.23686120837572899,0.1113419475722577,0.2226838951445155,registered_qwen,True,within Qwen session; capped regimes are trace reintegrations
+qwen,cap70,decode_tok_s,5,1.0904835148881151,-1.3912565495320854,3.5722235793083157,0.28948115210333508,0.28948115210333508,registered_qwen,True,within Qwen session; capped regimes are trace reintegrations

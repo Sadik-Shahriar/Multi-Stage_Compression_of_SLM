@@ -1,0 +1,13 @@
+{
+  "identity": {
+    "torch": "2.11.0+cu128",
+    "cuda_runtime": "12.8",
+    "pandas": "2.2.2",
+    "nvidia_ml_py": "13.610.43",
+    "python": "3.12.13",
+    "transformers": "5.12.1",
+    "numpy": "2.2.6",
+    "scipy": "1.16.1"
+  },
+  "sha256": "8883c3ef97ce51e55655e99fe2de97df51162b4de3574e07405bb4ca66dd2d71"
+}

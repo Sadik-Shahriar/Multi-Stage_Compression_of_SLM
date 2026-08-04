@@ -1,0 +1,14 @@
+model,source_variant,projected_variant,normalized_role,context,average_budget,nominal_tq_bits,has_eviction,observed_numerical_path,observed_energy_path,observed_hard60_quality,observed_common15_quality,storage_only_eligible,quality_energy_pareto_eligible,quality_population,baseline_variant,baseline_session,eligibility_reason
+llama,C3-TQ2,llama_ideal_tq2,awq_tq_ideal,4096,1024,2,False,True,True,False,False,True,False,historical_easy_ineligible,C1,20260731T125351-ad1b5249,Llama low-bit quality task is not hard60-comparable
+llama,unobserved_C4_TQ2,llama_ideal_eviction_tq2,awq_eviction_tq_ideal,4096,1024,2,True,False,False,False,False,True,False,unknown,C2,20260731T125351-ad1b5249,unobserved low-bit compound; storage only
+llama,C3-TQ3,llama_ideal_tq3,awq_tq_ideal,4096,1024,3,False,True,True,False,False,True,False,historical_easy_ineligible,C1,20260731T125351-ad1b5249,Llama low-bit quality task is not hard60-comparable
+llama,unobserved_C4_TQ3,llama_ideal_eviction_tq3,awq_eviction_tq_ideal,4096,1024,3,True,False,False,False,False,True,False,unknown,C2,20260731T125351-ad1b5249,unobserved low-bit compound; storage only
+llama,C3,llama_ideal_tq4,awq_tq_ideal,4096,1024,4,False,True,True,True,False,True,True,hard60,C1,20260731T125351-ad1b5249,observed same-bit TQ-only numerical path
+llama,C4,llama_ideal_eviction_tq4,awq_eviction_tq_ideal,4096,1024,4,True,True,True,True,False,True,True,hard60,C2,20260731T125351-ad1b5249,observed four-bit compound path
+qwen,Q3-Ref-TQ2,qwen_ideal_tq2,awq_tq_ideal,4096,1024,2,False,True,True,False,True,True,True,qwen_common15,Q1-W,20260804T154752-97822cdb,observed same-bit TQ-only numerical path
+qwen,unobserved_Q4_TQ2,qwen_ideal_eviction_tq2,awq_eviction_tq_ideal,4096,1024,2,True,False,False,False,False,True,False,unknown,Q2,20260804T154752-97822cdb,unobserved low-bit compound; storage only
+qwen,Q3-Ref-TQ3,qwen_ideal_tq3,awq_tq_ideal,4096,1024,3,False,True,True,False,True,True,True,qwen_common15,Q1-W,20260804T154752-97822cdb,observed same-bit TQ-only numerical path
+qwen,unobserved_Q4_TQ3,qwen_ideal_eviction_tq3,awq_eviction_tq_ideal,4096,1024,3,True,False,False,False,False,True,False,unknown,Q2,20260804T154752-97822cdb,unobserved low-bit compound; storage only
+qwen,Q3-Ref,qwen_ideal_tq4,awq_tq_ideal,4096,1024,4,False,True,True,True,True,True,True,hard60,Q1-W,20260804T154752-97822cdb,observed same-bit TQ-only numerical path
+qwen,Q4-Ref,qwen_ideal_eviction_tq4,awq_eviction_tq_ideal,4096,1024,4,True,True,True,True,False,True,True,hard60,Q2,20260804T154752-97822cdb,observed four-bit compound path
+qwen,Q3-Ref,qwen_ideal_tq4_common15,awq_tq_ideal,4096,1024,4,False,True,True,False,True,True,True,qwen_common15,Q1-W,20260804T154752-97822cdb,observed four-bit TQ-only path restricted to the common 15 scenario IDs

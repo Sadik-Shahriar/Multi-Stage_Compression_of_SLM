@@ -1,0 +1,8 @@
+{
+  "label": "Q0_FP16_model_resident",
+  "samples": 98,
+  "seconds": 10,
+  "power_median_w": 30.582,
+  "power_mean_w": 30.597357142857145,
+  "power_sd_w": 0.06975572252326145
+}

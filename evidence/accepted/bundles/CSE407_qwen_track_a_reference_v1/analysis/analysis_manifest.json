@@ -1,0 +1,80 @@
+{
+  "fingerprint": "861d89617e53034d",
+  "files": [
+    {
+      "path": "analysis_provenance.json",
+      "bytes": 1630,
+      "sha256": "3886bc46fe74e6b51a67a9c732cf9badf371fe2191d306523a12a92bffe66b62"
+    },
+    {
+      "path": "common15_pareto_uncertainty.csv",
+      "bytes": 1008,
+      "sha256": "ec1353a55f108601931f50e66f7ec41c5f3ab85e1912f7eace3fb638b3f035b8"
+    },
+    {
+      "path": "condition_power_summary.csv",
+      "bytes": 2546,
+      "sha256": "858140d002c2a045f9bcd3518956a8b63806f4dea8dbd6e53101d66b7a618b43"
+    },
+    {
+      "path": "core_energy_tests_by_regime.csv",
+      "bytes": 7356,
+      "sha256": "7bd575983ac482f56b19694947529f71055ff0c3ec0629340af47ad05245dc2a"
+    },
+    {
+      "path": "core_paired_prediction_flips.csv",
+      "bytes": 1005,
+      "sha256": "5cec500eb75ea95b4b6786f1340277d15980a1416b573d23fb52a126faf95331"
+    },
+    {
+      "path": "core_pareto_uncertainty.csv",
+      "bytes": 623,
+      "sha256": "934ecc78acf5d3ed903427d44ac0100aeba3c6314e37da07c03140549f6342ef"
+    },
+    {
+      "path": "energy_rankings_by_regime.csv",
+      "bytes": 2690,
+      "sha256": "c36ae082301fc58d9740a0cab9f27859fae2bb012b1f6357acce44010f60e094"
+    },
+    {
+      "path": "failure_categories.csv",
+      "bytes": 1907,
+      "sha256": "042c18048853a0dd429152579e249b3aacb57dd6b7dbc00af7fe28fc28f4a63d"
+    },
+    {
+      "path": "interaction_tests_by_regime.csv",
+      "bytes": 1251,
+      "sha256": "2020e4702f189deb9c66afbca66f90c97de7c2814cf16627409030b90729cf3a"
+    },
+    {
+      "path": "quality_wilson_intervals.csv",
+      "bytes": 4631,
+      "sha256": "854cce505f788bfe85bf88bc621c4d8ec185660463a0adf09d6b0217e50470be"
+    },
+    {
+      "path": "ranking_stability.csv",
+      "bytes": 125,
+      "sha256": "0b6f850d8443eeeecb1a4131bff605a4e12f490d69221a9ad31c6b4255ea8e70"
+    },
+    {
+      "path": "sensitivity_energy_summary.csv",
+      "bytes": 305,
+      "sha256": "fd7b1f7bc1c40c4ce35cdcbace3c7764fde108873a73d2d181ff3dd3c157dc26"
+    },
+    {
+      "path": "sensitivity_paired_prediction_flips.csv",
+      "bytes": 1172,
+      "sha256": "6f46cf6ecf5ea3727dcd229d89c38c0d68e428e63e3f7ec6c8059a48a879dd52"
+    },
+    {
+      "path": "significance_stability.csv",
+      "bytes": 1917,
+      "sha256": "38e17c7585862ce6ee5dd080f9b62e20635b69d366b51b792eacb183a2cabe67"
+    },
+    {
+      "path": "trace_level_power_robustness.csv",
+      "bytes": 21480,
+      "sha256": "3f5069f848c37c034b1af3b7401f4a795d00dba173bb8c9abf35f6cedcadd504"
+    }
+  ]
+}

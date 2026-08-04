@@ -1,0 +1,6 @@
+axis,stable_82,stable_70
+core_ctx1024,True,True
+core_ctx2048,True,True
+core_ctx4096,True,True
+pyramid,True,True
+tq,True,True

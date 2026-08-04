@@ -14,7 +14,7 @@
       "track": "A0",
       "schema_version": "v5-final-2026-07-31-1",
       "fingerprint": "8d27af8c9ee94de3",
-      "artifact_path": "CSE407_llama_v5_final",
+      "artifact_path": "evidence/accepted/bundles/CSE407_llama_v5_final",
       "manifest_path": "research/llama_v5_artifact_manifest.json",
       "verification_notebook": "experiments/track_a_failsafe_colab/00_verify_historical_evidence.ipynb",
       "models": {
@@ -41,9 +41,9 @@
       "track": "A1-A2",
       "schema_version": "track-a-llama-full-v1-2026-08-03-1",
       "fingerprint": "106a561c07c62937",
-      "artifact_path": "CSE407_llama_track_a_full_v1",
+      "artifact_path": "evidence/accepted/bundles/CSE407_llama_track_a_full_v1",
       "manifest_path": "research/llama_track_a_full_v1_artifact_manifest.json",
-      "executed_notebook_path": "Final notebooks/05_llama_full_quality_control_v1 output.ipynb",
+      "executed_notebook_path": "notebooks/executed/llama/05_llama_full_quality_control_v1_output.ipynb",
       "models": {
         "fp16": {
           "id": "unsloth/Llama-3.2-3B-Instruct",
@@ -58,7 +58,7 @@
       "notebook_path": "experiments/track_a_failsafe_colab/05_llama_full_quality_control_v1.ipynb",
       "quality_matrix": "300 rows: C0, C1-W, C2, C3-Ref, and C4-Ref on 60 frozen scenarios",
       "energy_control": "Five C1-W blocks at 4096 tokens with fixed 64-token teacher-forced decode",
-      "pilot_artifact_path": "CSE407_llama_track_a_pilot_v4_discarded",
+      "pilot_artifact_path": "evidence/discarded/bundles/CSE407_llama_track_a_pilot_v4_discarded",
       "generator_version": "track-a-hard-retrieval-v4-controlled-pairs-draft",
       "draft_semantic_sha256": "fffa82607af6e7d2c892d18d5bc790524570833472ad397b7ab2e54eb03005ef",
       "frozen_prompt_registry": "research/frozen_hard_retrieval_v4.json",
@@ -66,7 +66,7 @@
       "pilot_v1": {
         "status": "DISCARDED_TOO_HARD",
         "notebook": "experiments/track_a_failsafe_colab/01_llama_hard_retrieval_pilot.ipynb",
-        "artifact_path": "CSE407_llama_track_a_pilot_discarded",
+        "artifact_path": "evidence/discarded/bundles/CSE407_llama_track_a_pilot_discarded",
         "fingerprint": "b0e6646087995e5f",
         "c1w_retrieval": 0.5,
         "c2_retrieval": 0.5
@@ -74,7 +74,7 @@
       "pilot_v2": {
         "status": "DISCARDED_TOO_HARD",
         "notebook": "experiments/track_a_failsafe_colab/02_llama_hard_retrieval_pilot_v2.ipynb",
-        "artifact_path": "CSE407_llama_track_a_pilot_v2_discarded",
+        "artifact_path": "evidence/discarded/bundles/CSE407_llama_track_a_pilot_v2_discarded",
         "fingerprint": "922e8877398679eb",
         "c1w_retrieval": 0.5,
         "c2_retrieval": 0.5
@@ -82,7 +82,7 @@
       "pilot_v3": {
         "status": "DISCARDED_TOO_HARD",
         "notebook": "experiments/track_a_failsafe_colab/03_llama_hard_retrieval_pilot_v3.ipynb",
-        "artifact_path": "CSE407_llama_track_a_pilot_v3_discarded",
+        "artifact_path": "evidence/discarded/bundles/CSE407_llama_track_a_pilot_v3_discarded",
         "fingerprint": "43041ef3243f87a3",
         "c1w_retrieval": 0.25,
         "c2_retrieval": 0.16666666666666666
@@ -90,7 +90,7 @@
       "pilot_v4": {
         "status": "ACCEPTED_FOR_PROMPT_FREEZE",
         "notebook": "experiments/track_a_failsafe_colab/04_llama_hard_retrieval_pilot_v4.ipynb",
-        "artifact_path": "CSE407_llama_track_a_pilot_v4_discarded",
+        "artifact_path": "evidence/discarded/bundles/CSE407_llama_track_a_pilot_v4_discarded",
         "fingerprint": "15a1017ec54949b9",
         "c1w_retrieval": 0.75,
         "c2_retrieval": 0.75,
@@ -112,7 +112,7 @@
       "track": "A3",
       "schema_version": "track-a-llama-power-robustness-v1-2026-08-03-1",
       "fingerprint": "91ebc63773e735e6",
-      "artifact_path": "CSE407_llama_power_robustness_v1",
+      "artifact_path": "evidence/accepted/bundles/CSE407_llama_power_robustness_v1",
       "manifest_path": "research/llama_power_robustness_v1_artifact_manifest.json",
       "model_revision": "Inherited from llama-3.2-3b-v5-reference and the C1-W control",
       "backend": "Offline raw, 82 W-capped, and 70 W-capped integration of 95 v5 plus five C1-W traces",
@@ -133,44 +133,161 @@
     },
     {
       "experiment_id": "qwen2.5-3b-adapter-parity-pilot",
-      "status": "SOURCE_NOTEBOOK_PENDING",
+      "status": "IMMUTABLE_ACCEPTED_PILOT_EVIDENCE",
       "track": "A4",
-      "schema_version": null,
-      "fingerprint": null,
-      "artifact_path": "CSE407_qwen_track_a_adapter_pilot_v1",
+      "schema_version": "track-a-qwen-adapter-pilot-v1-2026-08-04-1",
+      "fingerprint": "91def77c920729e9",
+      "artifact_path": "evidence/accepted/bundles/CSE407_qwen_track_a_adapter_pilot_v1",
+      "manifest_path": "research/qwen2_5_adapter_pilot_v1_artifact_manifest.json",
       "models": {
         "fp16": {
           "id": "Qwen/Qwen2.5-3B-Instruct",
-          "revision": null
+          "revision": "aa8e72537993ba99e69dfaafa59ed015b17504d1"
         },
         "awq": {
           "id": "Qwen/Qwen2.5-3B-Instruct-AWQ",
-          "revision": null
+          "revision": "3559b226e8ce77211e2c1bd7ddfb7686fec4d6dd"
         }
       },
-      "backend": "Transformers 5.12.1 Qwen2 reference path; exact adapter must pass parity and cache gates",
+      "backend": "Transformers 5.12.1 Qwen2 SDPA reference path with GPTQModel 7.1.0 AWQ and turboquant==0.2.0 TQ-Ref",
       "notebook_path": "experiments/track_a_failsafe_colab/07_qwen2_5_adapter_parity_pilot_v1.ipynb",
-      "execution_gate": "Pin revisions and pass Qwen architecture, prompt, Q1-S/Q1-W parity, position, cache, eviction, TQ-Ref, active-use, and storage gates"
+      "source_notebook_sha256": "7ddad2c18febcbd23577fb85c52920bfbde18f31de2077fcc9bef6e192927809",
+      "source_validation": {
+        "nbformat_valid": true,
+        "embedded_python_syntax_valid": true,
+        "execution_counts_null": true,
+        "outputs_empty": true,
+        "forbidden_writes_absent": true,
+        "reviewed_on": "2026-08-04"
+      },
+      "frozen_protocol": {
+        "semantic_sha256": "fffa82607af6e7d2c892d18d5bc790524570833472ad397b7ab2e54eb03005ef",
+        "qwen_prompt_set_sha256": "115c1568fea7aeea038a46ce309d0c8bcaf1f5405544466ad6f379ee7e94ae3a",
+        "tokenizer_backend_sha256": "e360e6f6266884e6667874f3a7d158ca20c4639e2e1dc80427e1edc2c69a38c7",
+        "context_tokens": 4096,
+        "scenario_count": 60,
+        "parity_scenarios": ["d10-s00", "d50-s00", "d90-s00"],
+        "probe_scenario": "d50-s00",
+        "energy_rows": 0,
+        "quality_rows": 0
+      },
+      "completion": {
+        "session_id": "20260804T074536-e61a076f",
+        "artifact_files": 5,
+        "prompt_count": 60,
+        "parity_rows": 3,
+        "path_probes": 4,
+        "q1w_q1s_exact_parity": true,
+        "prefill_logit_agreement_all_paths": true,
+        "q3_ref_max_actual_path_nmse": 0.024612387642264366,
+        "q4_ref_max_actual_path_nmse": 0.025117898359894753,
+        "final_validation_passed": true
+      },
+      "execution_gate": "COMPLETED: architecture, prompt, Q1-S/Q1-W parity, absolute-position, cache, eviction-first, actual TQ-Ref reconstruction, active-returned-cache, and alias-deduplicated storage gates passed"
     },
     {
       "experiment_id": "qwen2.5-3b-track-a-reference",
-      "status": "BLOCKED_ON_ADAPTER_PILOT",
+      "status": "COMPLETED_ACCEPTED_IMMUTABLE",
       "track": "A4",
-      "schema_version": null,
-      "fingerprint": null,
-      "artifact_path": "CSE407_qwen_track_a_reference_v1",
+      "schema_version": "track-a-qwen-full-reference-v1-2026-08-04-1",
+      "fingerprint": "861d89617e53034d",
+      "artifact_path": "evidence/accepted/bundles/CSE407_qwen_track_a_reference_v1",
+      "source_notebook": "experiments/track_a_failsafe_colab/08_qwen2_5_full_reference_v1.ipynb",
+      "source_sha256": "28089774e7abd540ff385f08d3acb729e0c0263f2ee048d6d02fe927295a1629",
+      "initial_handoff_source_sha256": "d3f7524b96bb20e36f05c35516b53d41eb0d6136c0a58370aaa4f069edde77ea",
+      "post_repair_clean_source_sha256": "2ebec17477d55429ad88885be871eb1b10881646574a81f8d0a69a21c4291dae",
       "models": {
         "fp16": {
           "id": "Qwen/Qwen2.5-3B-Instruct",
-          "revision": null
+          "revision": "aa8e72537993ba99e69dfaafa59ed015b17504d1"
         },
         "awq": {
           "id": "Qwen/Qwen2.5-3B-Instruct-AWQ",
-          "revision": null
+          "revision": "3559b226e8ce77211e2c1bd7ddfb7686fec4d6dd"
         }
       },
       "backend": "Transformers reference path; exact adapter must pass parity gates",
-      "execution_gate": "Build only after the separate adapter/parity pilot executes successfully and its artifacts are accepted"
+      "validated_adapter_pilot": {
+        "experiment_id": "qwen2.5-3b-adapter-parity-pilot",
+        "fingerprint": "91def77c920729e9",
+        "manifest_path": "research/qwen2_5_adapter_pilot_v1_artifact_manifest.json"
+      },
+      "expected_inventory": {
+        "core_energy_rows": 75,
+        "sensitivity_energy_rows": 20,
+        "power_traces": 95,
+        "core_quality_rows": 300,
+        "sensitivity_quality_rows": 60,
+        "unique_measurement_rows": 455,
+        "q1s_measurement_rows": 0
+      },
+      "static_validation": "PASSED: nbformat, embedded Python syntax, fingerprint, schedules, isolated writes, strict independent runtime/integrity review",
+      "completion": {
+        "session_id": "20260804T154752-97822cdb",
+        "completed_at_utc": "2026-08-04T17:36:37Z",
+        "final_integrity_passed": true,
+        "artifact_files": 593,
+        "artifact_manifest_entries": 591,
+        "artifact_manifest_sha256": "975cb8f19405f9d7e4267bc4a8143ead943c853776c6ba88b8697695ac78c1c9",
+        "validation_sha256": "f05ef59b3eb3679b7de9a78a1f22f96c37430e50afad377612cdbd2c0b3b94be",
+        "analysis_input_sha256": "fd44a27a71e7370e4735dae3ae66b4b285dfcfd9741c3000d0bd51230dc0f971",
+        "core_energy_rows": 75,
+        "sensitivity_energy_rows": 20,
+        "power_traces": 95,
+        "core_quality_rows": 300,
+        "sensitivity_quality_rows": 60,
+        "unique_measurement_rows": 455,
+        "q1s_measurement_rows": 0,
+        "trace_reintegration_max_abs_error_j": 0.0
+      },
+      "audit": {
+        "accepted": true,
+        "csv_shard_mismatches": 0,
+        "manifest_mismatches": 0,
+        "unexpected_files": 0,
+        "execution_note": "Completed after in-session quality-validator and capped-analysis repair cells; the exported notebook contains both fixes inline",
+        "provenance_caveat": "The experiment fingerprint and artifact manifest do not cryptographically bind the executed notebook or repair-cell source",
+        "repair_sources": {
+          "colab_fix_quality_collection_cell.py": "1c7e7b2220173911d4b6dc382ea63b92be964714c48037a5485fb355c9909484",
+          "colab_fix_analysis_cell.py": "d5fe5f49936457d157dc8982cea4e0ceb3ce4ff1107537752a24999ae119432f"
+        }
+      },
+      "execution_gate": "COMPLETED: all registered validation, measurement, trace, analysis, provenance, and final-integrity gates passed; treat CSE407_qwen_track_a_reference_v1 as immutable"
+    },
+    {
+      "experiment_id": "llama-qwen-cross-model-synthesis-v1",
+      "status": "COLAB_EXECUTION_PENDING_LOCAL_PROVISIONAL_EXISTS",
+      "track": "A5",
+      "schema_version": "cse407-cross-model-synthesis-v1-2026-08-05-1",
+      "fingerprint": null,
+      "artifact_path": "evidence/pending/CSE407_cross_model_synthesis_v1",
+      "source_notebook": "experiments/track_a_failsafe_colab/09_cross_model_synthesis_v1_colab.ipynb",
+      "source_file_sha256": "8c80214140365ee4ea2da41fe00063ffe62010bdf20c05ef5a206efaa251c593",
+      "normalized_source_sha256": "a1ce5d98efa70a9085b1ba5a0a583aafcc099a964f77ec63c2ab986a11845055",
+      "backend": "Pending CPU-only Google Colab synthesis with split source-tree and flat MyDrive artifact anchors; no new GPU measurement",
+      "local_provisional": {
+        "artifact_path": "evidence/provisional/bundles/CSE407_cross_model_synthesis_local_provisional",
+        "fingerprint": "b19adce0924b4203",
+        "normalized_source_sha256": "95cf3b4b1027a4a59ad9ebe2306cc38f660a8ac916384aa6fb953a32d9760745",
+        "input_manifest_sha256": "d1a95ba585bf76507d4290b044098921f4e1cd2e9ce12fd1bc665b6e505bf6cc",
+        "analysis_protocol_sha256": "ee9a89079a68becb9750633af7444e31051faba7051065858e9e25b5d7e17cb6",
+        "ideal_tq_assumptions_sha256": "98d27bc5651128779159b07a141355fcafada1804581675cc4d27e023ec02173",
+        "output_manifest_sha256": "5eff24b806adda1571f8595e120d2400f37e3856208cd27dc54acb1dd7917d10",
+        "authoritative_for_final_reproducibility": false,
+        "completed_at_utc": "2026-08-04T20:36:19.599655+00:00",
+        "final_integrity_passed": true,
+        "artifact_files": 41,
+        "source_validation_gates": 36,
+        "source_traces_reintegrated": 195,
+        "normalized_energy_rows": 585,
+        "normalized_quality_rows": 885,
+        "conditional_ideal_pareto_rows": 19272,
+        "robust_optimality_rows": 19272,
+        "independent_review_blocking_high_medium_findings": 0
+      },
+      "claim_boundary": "Empirical, realized-reference, and ideal-counterfactual tiers remain separate. Ideal persistent-KV memory is analytical; ideal energy and latency are not measured or point-identified.",
+      "evidence_limitation": "No direct live tensor dump was preserved; shape/dtype validation uses runtime-asserted contracts plus persisted aggregate/category bytes.",
+      "execution_gate": "PENDING: run the Colab notebook from its registered Drive path into a nonexistent CSE407_cross_model_synthesis_v1 directory, then independently validate and register the Colab fingerprint"
     },
     {
       "experiment_id": "production-kv-backend-pilot",
@@ -178,7 +295,7 @@
       "track": "B",
       "schema_version": null,
       "fingerprint": null,
-      "artifact_path": "CSE407_track_b_backend_pilot_v1",
+      "artifact_path": "evidence/pending/CSE407_track_b_backend_pilot_v1",
       "model_revision": null,
       "backend": null,
       "execution_gate": "Select and validate one production backend in an isolated environment"

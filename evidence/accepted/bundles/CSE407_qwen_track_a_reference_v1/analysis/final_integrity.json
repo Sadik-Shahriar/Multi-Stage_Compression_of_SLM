@@ -1,0 +1,32 @@
+{
+  "passed": true,
+  "schema_version": "track-a-qwen-full-reference-v1-2026-08-04-1",
+  "fingerprint": "861d89617e53034d",
+  "session_id": "20260804T154752-97822cdb",
+  "runtime_sha256": "8883c3ef97ce51e55655e99fe2de97df51162b4de3574e07405bb4ca66dd2d71",
+  "analysis_protocol_sha256": "f9fc97e0388874b150c413729bb74e3b1c8faaf7db421307aa7de9ff057cc9a0",
+  "validation_sha256": "f05ef59b3eb3679b7de9a78a1f22f96c37430e50afad377612cdbd2c0b3b94be",
+  "artifact_manifest": "artifact_manifest.json",
+  "artifact_manifest_sha256": "975cb8f19405f9d7e4267bc4a8143ead943c853776c6ba88b8697695ac78c1c9",
+  "core_energy_rows": 75,
+  "sensitivity_energy_rows": 20,
+  "power_traces": 95,
+  "core_quality_rows": 300,
+  "sensitivity_quality_rows": 60,
+  "unique_measurement_keys": 455,
+  "q1s_measurement_rows": 0,
+  "semantic_sha256": "fffa82607af6e7d2c892d18d5bc790524570833472ad397b7ab2e54eb03005ef",
+  "prompt_set_sha256": "115c1568fea7aeea038a46ce309d0c8bcaf1f5405544466ad6f379ee7e94ae3a",
+  "schedule_sha256": "3784f684a6da44aed47dc32725ed1c9148c00a920292c4f5e1e4deb404aa1373",
+  "decode_ids_sha256": "b4d56dec09bd027278c2b39e7b397b9501328955aeef32e2155204f8d0920889",
+  "trace_reintegration_passed": true,
+  "raw_primary": true,
+  "capped_sensitivity_regimes": [
+    82,
+    70
+  ],
+  "core_pareto_rows": 5,
+  "common15_pareto_rows": 9,
+  "analysis_manifest": "analysis_manifest.json",
+  "completed_at_utc": "2026-08-04T17:36:37Z"
+}

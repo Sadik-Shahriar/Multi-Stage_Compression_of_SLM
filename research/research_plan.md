@@ -16,8 +16,89 @@ history. The executed protocol supersedes them:
   `106a561c07c62937`.
 - Power robustness is complete: all 100 traces verified and raw/82 W/70 W
   rankings and registered significance decisions were stable.
-- Current next step: Qwen2.5-3B adapter/parity validation, followed by the full
-  cross-model replication only if all gates pass.
+- Notebook 07 completed under fingerprint `91def77c920729e9`; exact parity and
+  every architecture, prompt, position, cache, eviction, TQ-Ref, active-use, and
+  storage gate passed.
+- Notebook 08 completed under schema `track-a-qwen-full-reference-v1-2026-08-04-1`
+  and fingerprint `861d89617e53034d`. Its immutable 593-file bundle passed final
+  integrity with 75 core energy, 20 sensitivity energy, 95 trace, 300 core
+  quality, and 60 sensitivity-quality rows.
+- At 4096 tokens, Q2 used `550.48 +/- 10.07 J` versus `621.75 +/- 25.14 J` for
+  Q1-W, but retrieval fell from 48/60 to 1/60. Q3-Ref retained 49/60 retrieval
+  but used `812.28 +/- 13.11 J`. Q4-Ref also retrieved only 1/60.
+- Raw, 82 W, and 70 W core/sensitivity rankings and registered significance
+  decisions were stable. The next task is CPU-only cross-model synthesis.
+- A local Notebook 09 reference run completed under provisional fingerprint
+  `b19adce0924b4203`, but the authoritative Google Colab CPU execution is still
+  pending. Use `09_cross_model_synthesis_v1_colab.ipynb`; register only its new
+  Drive output and fingerprint as final A5 evidence.
+
+## Registered Ideal-Realization Extension
+
+Notebook 09 must add a realization-gap analysis that keeps empirical evidence,
+the measured TQ-Ref object graph, and an ideal packed/fused counterfactual
+separate. This extension is analytical and CPU-only; it is not a substitute for
+a production-kernel experiment.
+
+The batch-one persistent-KV model uses exact layerwise retained budgets, KV
+heads, head dimension, nominal index width, norms, residual window, tensor-level
+alignment, and layer/configuration-specific metadata. It must first reproduce
+observed FP16 tensor geometry and the package's uint8 logical TQ payload from
+direct shapes/dtypes. Numerical/energy/quality projection requires the same
+observed `(model, variant, tq_bits)` path. Unobserved combinations are eligible
+only for algebraic storage rows with quality unknown and no energy/Pareto claim.
+
+Memory dominance may be proved under fixed weights, retained tokens, and
+representation assumptions when packed-index savings exceed norm, residual,
+alignment, and metadata costs. Total peak VRAM must remain separate because
+weights, allocator reserves, and temporary workspaces are not eliminated.
+
+Energy is only partially identified. The registered model is:
+
+```text
+E_ideal[m,b,v,q,c,phase,s,regime] = E_baseline[m,b,c,phase,s,regime]
+    - epsilon_mem[m,b,c,phase,s,regime] * Delta_D[m,v,q,c,phase]
+    + O_net[m,b,v,q,c,phase,s,regime]
+```
+
+where `b` identifies the baseline path, `s` the source session, and `regime` the
+raw or capped integration. `Delta_D` is modeled compulsory/logical byte-demand
+saving, not measured DRAM traffic; `epsilon_mem` is path/session/regime-specific
+effective energy per avoided modeled byte; and `O_net` contains non-traffic compute, launch,
+occupancy/runtime, and background-energy changes. Avoid double counting traffic.
+Require nonnegative energy and `Delta_D > 0` before division. Report the
+parameter-free break-even condition `O_net < epsilon_mem * Delta_D`, a
+zero-net-overhead reference envelope, and numerical sensitivity only for justified finite
+parameter domains. Otherwise retain symbolic regions and do not create numerical
+energy Pareto points.
+
+Prefill and fixed-64-token decode demand are modeled separately. Prefill must
+preserve full-prompt attention before eviction and may count only justified
+post-attention representation writes. Decode counts growing K/V reads and cache
+updates. Total-energy projection requires both phase models and uses the sum;
+otherwise the projected claim is decode-energy-only.
+
+Projected unchanged quality uses TQ-Ref only in a strict output-equivalence case
+that preserves the observed nominal-bit path and complete attention/logit/output
+arithmetic. Otherwise implementation-induced quality change is unidentified.
+Hard-quality optimization excludes unobserved 2/3-bit compound paths and Llama's
+task-incomparable historical low-bit quality. Qwen TQ-only 2/3/4 comparisons use
+the common 15 scenarios. Optimization is quality-constrained over `retrieval >=
+A_min`, with a separate point-estimate boolean and exclusive interval states:
+feasible, uncertain, or infeasible.
+
+Each quality threshold produces separate point-estimate, conservative
+lower-bound, and possible upper-bound frontiers; conservative is primary for
+deployment claims. Energy and quality are resampled independently, registered
+energy pairing is preserved only within source sessions, and paired quality IDs
+are resampled within depth strata.
+
+The projected frontier uses only conditional energy and persistent KV bytes;
+latency remains empirical because no fused latency model is identified. The
+uncertainty analysis keeps empirical bootstrap uncertainty distinct from
+counterfactual parameter uncertainty. It reports bootstrap frontier-membership
+frequency as resampling stability, not truth probability; scenario-grid
+fractions are not probabilities without a justified distribution.
 
 **Title:** Holistic Optimization of Small Language Models for Energy-Efficient Edge Inference: An Empirical Ablation Study
 **Student:** Md. Sadik Shahriar

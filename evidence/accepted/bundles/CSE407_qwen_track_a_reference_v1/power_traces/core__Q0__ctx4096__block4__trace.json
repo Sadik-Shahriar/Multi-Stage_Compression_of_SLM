@@ -1,0 +1,589 @@
+{
+  "schema_version": "track-a-qwen-full-reference-v1-2026-08-04-1",
+  "fingerprint": "861d89617e53034d",
+  "table": "core",
+  "variant": "Q0",
+  "context": 4096,
+  "block": 4,
+  "decode_ids_sha256": "b4d56dec09bd027278c2b39e7b397b9501328955aeef32e2155204f8d0920889",
+  "prefill": [
+    {
+      "power_w": 43.523,
+      "nvml_used_mb": 8670.1875,
+      "temperature_c": 67.0,
+      "elapsed_s": 0.0
+    },
+    {
+      "power_w": 80.223,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 0.104117391
+    },
+    {
+      "power_w": 69.802,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 0.203728453
+    },
+    {
+      "power_w": 80.764,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 0.3052621
+    },
+    {
+      "power_w": 66.277,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 0.404989379
+    },
+    {
+      "power_w": 58.845,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 0.505963209
+    },
+    {
+      "power_w": 62.044,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 0.607975912
+    },
+    {
+      "power_w": 67.452,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 0.708413481
+    },
+    {
+      "power_w": 78.274,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 0.810565958
+    },
+    {
+      "power_w": 71.965,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 0.913797091
+    },
+    {
+      "power_w": 59.63,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 1.004216352
+    },
+    {
+      "power_w": 59.789,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 1.104717826
+    },
+    {
+      "power_w": 66.22,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 1.204384936
+    },
+    {
+      "power_w": 68.333,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 1.30973264
+    },
+    {
+      "power_w": 79.397,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 1.406779718
+    },
+    {
+      "power_w": 70.64,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 1.505925433
+    },
+    {
+      "power_w": 60.316,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 1.611776992
+    },
+    {
+      "power_w": 60.709,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 1.704981333
+    },
+    {
+      "power_w": 63.417,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 1.80376072
+    },
+    {
+      "power_w": 73.432,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 1.908183126
+    },
+    {
+      "power_w": 76.514,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 2.008085798
+    },
+    {
+      "power_w": 59.041,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 2.105630386
+    },
+    {
+      "power_w": 59.433,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 2.210030945
+    },
+    {
+      "power_w": 64.75,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 2.312712226
+    },
+    {
+      "power_w": 67.9,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 2.410316442
+    },
+    {
+      "power_w": 77.883,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 2.508759934
+    },
+    {
+      "power_w": 72.748,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 2.608735654
+    },
+    {
+      "power_w": 60.807,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 2.708747603
+    },
+    {
+      "power_w": 60.414,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 2.80971637
+    },
+    {
+      "power_w": 64.3,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 2.91271514
+    },
+    {
+      "power_w": 70.151,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 3.008798045
+    },
+    {
+      "power_w": 78.566,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 3.111095437
+    },
+    {
+      "power_w": 61.848,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 3.208750333
+    },
+    {
+      "power_w": 59.139,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 3.311726149
+    },
+    {
+      "power_w": 63.77,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 3.414700598
+    },
+    {
+      "power_w": 68.431,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 3.51318089
+    },
+    {
+      "power_w": 78.371,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 3.619830178
+    },
+    {
+      "power_w": 72.454,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 3.716843856
+    },
+    {
+      "power_w": 60.218,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 3.822858953
+    },
+    {
+      "power_w": 60.022,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 3.907682428
+    },
+    {
+      "power_w": 65.338,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 4.010858603
+    },
+    {
+      "power_w": 69.215,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 4.11277766
+    },
+    {
+      "power_w": 79.785,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 4.207790004
+    },
+    {
+      "power_w": 64.75,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 4.308751963
+    },
+    {
+      "power_w": 58.452,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 4.407735822
+    },
+    {
+      "power_w": 58.452,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 4.448091868
+    }
+  ],
+  "decode": [
+    {
+      "power_w": 58.452,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 0.0
+    },
+    {
+      "power_w": 57.737,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 0.114982134
+    },
+    {
+      "power_w": 66.22,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 0.209235705
+    },
+    {
+      "power_w": 67.102,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 0.305120926
+    },
+    {
+      "power_w": 66.71,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 0.410933041
+    },
+    {
+      "power_w": 67.004,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 0.508188014
+    },
+    {
+      "power_w": 67.746,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 0.610020479
+    },
+    {
+      "power_w": 65.494,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 0.708881802
+    },
+    {
+      "power_w": 68.431,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 0.810110004
+    },
+    {
+      "power_w": 67.942,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 0.904577679
+    },
+    {
+      "power_w": 67.354,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 1.005735051
+    },
+    {
+      "power_w": 67.494,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 1.105333974
+    },
+    {
+      "power_w": 67.648,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 1.204693379
+    },
+    {
+      "power_w": 67.06,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 68.0,
+      "elapsed_s": 1.305849222
+    },
+    {
+      "power_w": 67.256,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 1.405103469
+    },
+    {
+      "power_w": 67.844,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 1.504999957
+    },
+    {
+      "power_w": 66.473,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 1.605490472
+    },
+    {
+      "power_w": 67.55,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 1.706473865
+    },
+    {
+      "power_w": 67.494,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 1.805102581
+    },
+    {
+      "power_w": 65.534,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 1.911105499
+    },
+    {
+      "power_w": 67.648,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 2.008639964
+    },
+    {
+      "power_w": 67.298,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 2.105198243
+    },
+    {
+      "power_w": 66.906,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 2.204666062
+    },
+    {
+      "power_w": 67.452,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 2.304966154
+    },
+    {
+      "power_w": 66.122,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 2.404679121
+    },
+    {
+      "power_w": 66.726,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 2.504707782
+    },
+    {
+      "power_w": 67.648,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 2.604815203
+    },
+    {
+      "power_w": 66.71,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 2.705121038
+    },
+    {
+      "power_w": 66.726,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 2.804768601
+    },
+    {
+      "power_w": 66.767,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 2.905128693
+    },
+    {
+      "power_w": 67.844,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 3.004821896
+    },
+    {
+      "power_w": 66.792,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 3.105579316
+    },
+    {
+      "power_w": 68.375,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 3.204863348
+    },
+    {
+      "power_w": 67.06,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 3.305128565
+    },
+    {
+      "power_w": 68.585,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 3.404714872
+    },
+    {
+      "power_w": 66.359,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 3.505236294
+    },
+    {
+      "power_w": 67.55,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 3.605951592
+    },
+    {
+      "power_w": 67.102,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 3.705411327
+    },
+    {
+      "power_w": 66.947,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 3.809085779
+    },
+    {
+      "power_w": 67.298,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 3.910184335
+    },
+    {
+      "power_w": 67.354,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 4.006142679
+    },
+    {
+      "power_w": 66.416,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 4.110487592
+    },
+    {
+      "power_w": 67.241,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 4.211835202
+    },
+    {
+      "power_w": 66.751,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 4.305071608
+    },
+    {
+      "power_w": 66.041,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 4.404546584
+    },
+    {
+      "power_w": 67.731,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 4.504595316
+    },
+    {
+      "power_w": 67.55,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 4.604834835
+    },
+    {
+      "power_w": 66.71,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 4.705414792
+    },
+    {
+      "power_w": 67.437,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 4.805096935
+    },
+    {
+      "power_w": 67.437,
+      "nvml_used_mb": 11554.1875,
+      "temperature_c": 69.0,
+      "elapsed_s": 4.857686848
+    }
+  ]
+}

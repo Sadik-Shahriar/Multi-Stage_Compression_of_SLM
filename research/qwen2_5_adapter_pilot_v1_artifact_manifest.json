@@ -1,0 +1,54 @@
+{
+  "manifest_schema": "cse407-artifact-manifest-v1",
+  "experiment_id": "qwen2.5-3b-adapter-parity-pilot",
+  "artifact_root": "CSE407_qwen_track_a_adapter_pilot_v1",
+  "status": "IMMUTABLE_ACCEPTED_PILOT_EVIDENCE",
+  "policy": "Never edit or overwrite files under artifact_root; verify against this manifest.",
+  "facts": {
+    "schema_version": "track-a-qwen-adapter-pilot-v1-2026-08-04-1",
+    "fingerprint": "91def77c920729e9",
+    "session_id": "20260804T074536-e61a076f",
+    "semantic_sha256": "fffa82607af6e7d2c892d18d5bc790524570833472ad397b7ab2e54eb03005ef",
+    "qwen_prompt_set_sha256": "115c1568fea7aeea038a46ce309d0c8bcaf1f5405544466ad6f379ee7e94ae3a",
+    "model_fp16_revision": "aa8e72537993ba99e69dfaafa59ed015b17504d1",
+    "model_awq_revision": "3559b226e8ce77211e2c1bd7ddfb7686fec4d6dd",
+    "source_notebook_sha256": "7ddad2c18febcbd23577fb85c52920bfbde18f31de2077fcc9bef6e192927809",
+    "prompt_count": 60,
+    "parity_rows": 3,
+    "path_probes": 4,
+    "energy_rows": 0,
+    "quality_rows": 0,
+    "final_validation_passed": true
+  },
+  "inventory": {
+    "file_count": 5,
+    "total_bytes": 3615455
+  },
+  "files": [
+    {
+      "path": "frozen_qwen_prompt_manifest.json",
+      "bytes": 3368064,
+      "sha256": "41c0f12488eff8a5316ecb7885126f643a8dc0770738e73466c74bffecc84af2"
+    },
+    {
+      "path": "frozen_semantic_manifest.json",
+      "bytes": 226566,
+      "sha256": "4fb10e16f749219371fe591753e525043341f2e5082e55a4a5c7df1b4bd9558d"
+    },
+    {
+      "path": "qwen_adapter_environment.json",
+      "bytes": 3430,
+      "sha256": "7cc73696559eab91cac274bd1d1bbcba31af2593c5507c497f1abc5c4086c5c3"
+    },
+    {
+      "path": "qwen_adapter_validation.json",
+      "bytes": 14911,
+      "sha256": "5005f1a96b72a202dc781a0b1d94d211560235f418113386473945f1adec00d2"
+    },
+    {
+      "path": "qwen_q1s_q1w_parity.json",
+      "bytes": 2484,
+      "sha256": "4b58bf90e8fdb7ed3c4cc7fee0d4d567a2ac4a52216e0d3eb5b41d895b0c070f"
+    }
+  ]
+}

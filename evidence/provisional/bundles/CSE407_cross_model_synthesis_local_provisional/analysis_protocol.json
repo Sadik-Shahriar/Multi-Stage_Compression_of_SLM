@@ -1,0 +1,41 @@
+{
+  "baseline_policy": {
+    "compound_baseline": "C2/Q2",
+    "llama_4096_control": "separate-session C1-W descriptive",
+    "llama_context_matrix": "stock C1",
+    "qwen_context_matrix": "matched-wrapper Q1-W"
+  },
+  "bootstrap": {
+    "energy_quality_resampled_independently": true,
+    "frequency_interpretation": "resampling selection stability; not truth probability",
+    "repetitions": 2000,
+    "seed": 909407
+  },
+  "capped_values_are_trace_sensitivities": true,
+  "formulas": {
+    "break_even": "O_net<epsilon_mem*Delta_D",
+    "energy": "E_ideal=E_baseline-epsilon_mem*Delta_D+O_net",
+    "fp_kv": "2*H*d*s_fp*sum_l(B_l)",
+    "ideal_kv": "2*H*sum_l((B-r)*(d*q/8+s_norm)+r*d*s_fp), tensorwise ceiling/alignment"
+  },
+  "notebook_source_sha256": "95cf3b4b1027a4a59ad9ebe2306cc38f660a8ac916384aa6fb953a32d9760745",
+  "parameter_domains": {
+    "O_net": null,
+    "epsilon_mem": null
+  },
+  "quality_policy": {
+    "delta_impl_domain": "-wilson_low <= delta_impl <= 1-wilson_high",
+    "hard": "60 tokenizer-specific materializations per model",
+    "llama_low_bits": "excluded from hard Pareto",
+    "qwen_low_bits": "common 15 scenario IDs",
+    "strict_output_equivalence_required": true
+  },
+  "raw_joules_primary": true,
+  "runtime": {
+    "matplotlib": "3.11.1",
+    "numpy": "2.5.0",
+    "pandas": "3.0.5",
+    "python": "3.14.0"
+  },
+  "schema_version": "cse407-cross-model-synthesis-v1-2026-08-05-1"
+}

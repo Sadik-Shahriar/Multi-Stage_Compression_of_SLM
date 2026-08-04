@@ -1,0 +1,4 @@
+contrast,model,estimate,bootstrap_ci95_low,bootstrap_ci95_high,bootstrap_repetitions,paired_within_depth,cross_model_pairing,interpretation
+llama_eviction_minus_awq,llama,-0.016666666666666607,-0.050000000000000044,0,5000,True,False,within-model hard60 retrieval-rate change
+qwen_eviction_minus_awq,qwen,-0.78333333333333333,-0.8666666666666667,-0.68333333333333335,5000,True,False,within-model hard60 retrieval-rate change
+qwen_minus_llama_eviction_effect,cross_model_descriptive,-0.76666666666666672,-0.86666666666666659,-0.66666666666666663,5000,True,False,independent model bootstraps; tokenizer-specific prompts; architecture alone not causal

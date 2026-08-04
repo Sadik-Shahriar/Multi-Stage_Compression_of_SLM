@@ -1,0 +1,11 @@
+analysis,context,raw_lowest_to_highest,cap82_lowest_to_highest,cap70_lowest_to_highest,cap82_matches_raw,cap70_matches_raw,model,sensitivity_type,axis,stable_82,stable_70
+core,1024,C0 < C2 < C1 < C4-Ref < C3-Ref,C0 < C2 < C1 < C4-Ref < C3-Ref,C0 < C2 < C1 < C4-Ref < C3-Ref,True,True,llama,trace_clipping_reintegration,,,
+core,2048,C1 < C2 < C0 < C4-Ref < C3-Ref,C1 < C2 < C0 < C4-Ref < C3-Ref,C1 < C2 < C0 < C4-Ref < C3-Ref,True,True,llama,trace_clipping_reintegration,,,
+core,4096,C2 < C1 < C4-Ref < C0 < C3-Ref,C2 < C1 < C4-Ref < C0 < C3-Ref,C2 < C1 < C4-Ref < C0 < C3-Ref,True,True,llama,trace_clipping_reintegration,,,
+pyramid_budget,4096,C2-B512 < C2-B1024 < C2-B1536,C2-B512 < C2-B1024 < C2-B1536,C2-B512 < C2-B1024 < C2-B1536,True,True,llama,trace_clipping_reintegration,,,
+tq_numerical_bits,4096,C3-Ref-TQ2 < C3-Ref-TQ3 < C3-Ref-TQ4,C3-Ref-TQ2 < C3-Ref-TQ3 < C3-Ref-TQ4,C3-Ref-TQ2 < C3-Ref-TQ3 < C3-Ref-TQ4,True,True,llama,trace_clipping_reintegration,,,
+,,,,,,,qwen,trace_clipping_reintegration,core_ctx1024,True,True
+,,,,,,,qwen,trace_clipping_reintegration,core_ctx2048,True,True
+,,,,,,,qwen,trace_clipping_reintegration,core_ctx4096,True,True
+,,,,,,,qwen,trace_clipping_reintegration,pyramid,True,True
+,,,,,,,qwen,trace_clipping_reintegration,tq,True,True

@@ -1,0 +1,8 @@
+{
+  "label": "AWQ_model_resident",
+  "samples": 98,
+  "seconds": 10,
+  "power_median_w": 32.638,
+  "power_mean_w": 34.19137755102041,
+  "power_sd_w": 3.75803053957762
+}

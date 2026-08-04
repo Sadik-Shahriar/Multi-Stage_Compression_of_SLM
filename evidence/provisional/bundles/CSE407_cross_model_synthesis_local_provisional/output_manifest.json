@@ -1,0 +1,201 @@
+{
+  "files": [
+    {
+      "bytes": 1421,
+      "path": "analysis_protocol.json",
+      "sha256": "ee9a89079a68becb9750633af7444e31051faba7051065858e9e25b5d7e17cb6"
+    },
+    {
+      "bytes": 28685070,
+      "path": "conditional_ideal_pareto.csv",
+      "sha256": "6b3b56df407b57b09a51448610fdc4a09c1cdf4fc34ba840303ca39268063742"
+    },
+    {
+      "bytes": 2770,
+      "path": "counterfactual_eligibility.csv",
+      "sha256": "569afcdec45a531837803103ebe98cc22df315600d63ba63ba6cfda7fec4d92a"
+    },
+    {
+      "bytes": 4157,
+      "path": "cross_model_interaction_summary.csv",
+      "sha256": "63839aae168c9bd60c7b2fbc9aa5fa162a7449a004224c5f30e68ec3d5eba6ad"
+    },
+    {
+      "bytes": 648,
+      "path": "cross_model_quality_contrasts.csv",
+      "sha256": "776c53cc7c0bf2bb3535fbacab2dfdb85e3a60c673dedb82d370754311749851"
+    },
+    {
+      "bytes": 2772,
+      "path": "empirical_pareto.csv",
+      "sha256": "afdab1d15b4a40cee88fedc868d8f6cd2dff41bc8ac75b16765d0dcf45d8a6b0"
+    },
+    {
+      "bytes": 37379,
+      "path": "energy_break_even_surface.csv",
+      "sha256": "ce557788fc42cae43989def01396b1f53f2d3a6d040ec65d7efa3adb5e4c22db"
+    },
+    {
+      "bytes": 23635,
+      "path": "fig_empirical_and_projected_pareto.pdf",
+      "sha256": "150f78ea7d4de265a6ba2103a6b4ce0528b65e82d1006d07742ccc0ca1a53d3c"
+    },
+    {
+      "bytes": 105937,
+      "path": "fig_empirical_and_projected_pareto.png",
+      "sha256": "d883e193182b39328399abe086e4496e084fd2beec9cf87e303e7e3f1de0503e"
+    },
+    {
+      "bytes": 17294,
+      "path": "fig_energy_break_even_regions.pdf",
+      "sha256": "f3687d39c5e5186a26f4160bbbe0cc7295fce0802eab425734c75784e3a46e12"
+    },
+    {
+      "bytes": 106701,
+      "path": "fig_energy_break_even_regions.png",
+      "sha256": "cb077cc86828d790999635c422b918bf94910b253764ec712600431a3388c1f0"
+    },
+    {
+      "bytes": 28083,
+      "path": "fig_energy_throughput_vs_context.pdf",
+      "sha256": "9ca18b56f90650571e6b5a2c869dc916f46e274d1a0117d9876badc0e8570796"
+    },
+    {
+      "bytes": 307089,
+      "path": "fig_energy_throughput_vs_context.png",
+      "sha256": "baf986babeb56a2497cd5d54f0a20137b8e3b8060d4aae458860322192fbaed6"
+    },
+    {
+      "bytes": 20406,
+      "path": "fig_hard_quality_wilson.pdf",
+      "sha256": "2a9f49a17521e3a95683165eb68f84a152f7d9d22f612c88c608f42bff7fb0aa"
+    },
+    {
+      "bytes": 128636,
+      "path": "fig_hard_quality_wilson.png",
+      "sha256": "3684a7c5edbb9ec5a9a8b6acc7bbae464bc71cfb2fcce699cf79e5f11a080eec"
+    },
+    {
+      "bytes": 17108,
+      "path": "fig_interaction_by_power_regime.pdf",
+      "sha256": "2b7c3e16c170d15268927f3f2bdc998a531a4a5dd079b6ff126bbf051a0ba8af"
+    },
+    {
+      "bytes": 54866,
+      "path": "fig_interaction_by_power_regime.png",
+      "sha256": "3e8bf7f257fc9af13d223b91fa6cc4ea6eb09e1dd75e42ff0815c535648db189"
+    },
+    {
+      "bytes": 17811,
+      "path": "fig_measured_realized_ideal_storage.pdf",
+      "sha256": "00e8c30d95a2aebcbdbba9f3b73c414652824180f3edae340af6d107eb4018c4"
+    },
+    {
+      "bytes": 73215,
+      "path": "fig_measured_realized_ideal_storage.png",
+      "sha256": "cb427387677deaa48b2353a20295724a7722b6953a41fc0d18d02ef64e1685a0"
+    },
+    {
+      "bytes": 8915,
+      "path": "ideal_packed_kv_footprint.csv",
+      "sha256": "a6baae4943a8fa4ad313c1d1811b7d5521dafdcb4b1ac0a57e0ce96645daf433"
+    },
+    {
+      "bytes": 980614,
+      "path": "ideal_packed_kv_tensor_accounting.csv",
+      "sha256": "0b13f90a023c197532c16bbc0a57c50aa6338ef8591a7d1e020fb356d416ac9e"
+    },
+    {
+      "bytes": 2063,
+      "path": "ideal_tq_assumptions.json",
+      "sha256": "98d27bc5651128779159b07a141355fcafada1804581675cc4d27e023ec02173"
+    },
+    {
+      "bytes": 321804,
+      "path": "input_manifest.json",
+      "sha256": "d1a95ba585bf76507d4290b044098921f4e1cd2e9ce12fd1bc665b6e505bf6cc"
+    },
+    {
+      "bytes": 6958,
+      "path": "measured_realized_ideal_storage.csv",
+      "sha256": "e441130fa4ec2b0f8aa3830b86b6753f093c7e0a3d4e432a477ea94ed1f3b6b8"
+    },
+    {
+      "bytes": 14899,
+      "path": "modeled_phase_byte_demand.csv",
+      "sha256": "07dab5c3ea98ef47e6c86f891228f275affbde9a02948346be39301887a621af"
+    },
+    {
+      "bytes": 265550,
+      "path": "normalized_energy_rows.csv",
+      "sha256": "83a421a002b2372408839d1e18c931885c8c461744e2d0552e92c82f78469353"
+    },
+    {
+      "bytes": 220714,
+      "path": "normalized_quality_rows.csv",
+      "sha256": "26a8d63f704acbc7b14f753a310cf1e089a5244384acb40c7fa7a1e0b3c3bbe6"
+    },
+    {
+      "bytes": 1269,
+      "path": "power_regime_stability.csv",
+      "sha256": "6b85f53f33c06846c6113fa2e44dda93cb0e33e47a3b74f659cb69dbd7fa8849"
+    },
+    {
+      "bytes": 217739,
+      "path": "quality_constraint_regions.csv",
+      "sha256": "cef6b08c764357bba020b95adfa8eb5db1ffdf35aae5147dfd064291644cf46b"
+    },
+    {
+      "bytes": 3688,
+      "path": "quality_wilson_intervals.csv",
+      "sha256": "05988560ddb2b7b73252bd49e79d960e2e4464c8dfba0c25a4b37999aa8f9dc9"
+    },
+    {
+      "bytes": 1570,
+      "path": "realization_gap_summary.md",
+      "sha256": "88317e565f99320d2093bfc20763a0d1d3d33c2b7623d3b04dd11a236f949ebc"
+    },
+    {
+      "bytes": 19692,
+      "path": "registered_inferential_tests.csv",
+      "sha256": "92530a8dd075acdce90ae8e619338b9a85e48b13a3619ea79509a17d2727ff0d"
+    },
+    {
+      "bytes": 5127,
+      "path": "registered_significance_results.csv",
+      "sha256": "bee356bf415e1dbbc7dbd136742d0d8c937129316914063cd44e37bcea0eb65f"
+    },
+    {
+      "bytes": 9001398,
+      "path": "robust_optimality_regions.csv",
+      "sha256": "62abb95dac4a1f22767f1e1c3dd5682b4ff6ef4a110a379eb053ae4a82072006"
+    },
+    {
+      "bytes": 7103,
+      "path": "source_validation.csv",
+      "sha256": "fa9c7314b4a80cebf18016e6a78cdaf26e54676eab8477c1edd858c9d0458daa"
+    },
+    {
+      "bytes": 13679,
+      "path": "source_validation.json",
+      "sha256": "e6726d0c70664d614ca5947661bf325cce5798455cadd590f7ef05b2f1639a11"
+    },
+    {
+      "bytes": 3472,
+      "path": "storage_calibration_tests.csv",
+      "sha256": "116901d87b1390f3d7c005a4779eb3b98b11c87d13504dd043d9886b37617b11"
+    },
+    {
+      "bytes": 2443,
+      "path": "synthesis_findings.md",
+      "sha256": "355d3b3358751bf676ff0e9a57fa8ae79390b69f8b39cf64aca8f1c3f734faa3"
+    },
+    {
+      "bytes": 34257,
+      "path": "within_model_effects.csv",
+      "sha256": "850e4d0de0b2dd3e2b0b8e72c5c32ada3b11f757ec89fa2c63c6d3021a3852ae"
+    }
+  ],
+  "notebook_source_sha256": "95cf3b4b1027a4a59ad9ebe2306cc38f660a8ac916384aa6fb953a32d9760745",
+  "schema_version": "cse407-cross-model-synthesis-v1-2026-08-05-1"
+}

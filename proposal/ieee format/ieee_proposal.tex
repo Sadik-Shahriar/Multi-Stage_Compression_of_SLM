@@ -59,7 +59,7 @@
 \maketitle
 
 \begin{abstract}
-The energy cost of language-model inference is a growing Green Computing concern. Small Language Models reduce model computation, but their Key--Value (KV) caches still grow with context length. This paper reports a multi-objective ablation of AWQ weight quantization, custom PyramidKV-style token eviction, and TurboQuant numerical KV quantization on Llama 3.2-3B-Instruct using an NVIDIA T4. Five core configurations were measured at 1024, 2048, and 4096 tokens with five energy repetitions, 10~Hz NVML monitoring, a fixed 64-token decode workload, and separate Needle-in-a-Haystack (NIAH) evaluation. At 4096 tokens, AWQ plus PyramidKV-style eviction had the lowest core mean energy ($529.30\pm20.02$~J), highest core throughput (20.34 decode tokens/s), and smallest core post-decode live cache (119~MiB). Core retrieval tied at 100\%, while exact-format compliance was lower than AWQ alone. The AWQ+TurboQuant custom-wrapper configuration used $913.48\pm2.11$~J and had a 696.5~MiB post-decode cache; its live cache included retained materialized higher-precision tensors, while its energy contrast with stock-attention C1 remains wrapper-confounded. Applying eviction before TurboQuant was associated with lower overhead ($659.50\pm21.35$~J) and a significant configuration-level interaction contrast. All core retrieval cases succeeded, creating a quality ceiling; this result is treated as provisional rather than universal quality neutrality. A second-model replication and harder retrieval evaluation remain future work.
+The energy cost of language-model inference is a growing Green Computing concern. This paper reports an implementation-aware ablation of AWQ weight quantization, custom PyramidKV-style token eviction, and TurboQuant numerical KV quantization on Llama 3.2-3B-Instruct and Qwen2.5-3B-Instruct using an NVIDIA T4. Each model was measured at 1024, 2048, and 4096 tokens with five energy blocks, 10~Hz NVML monitoring, and a fixed 64-token decode; a frozen hard-retrieval benchmark used 60 tokenizer-specific 4096-token scenarios per configuration. At 4096 tokens, Llama eviction used $529.30\pm20.02$~J and scored 37/60 versus 38/60 for its matched-wrapper AWQ control. Qwen eviction used $550.48\pm10.07$~J but scored 1/60 versus 48/60 for AWQ, while Qwen TQ-Ref preserved 49/60 retrieval at $812.28\pm13.11$~J. Raw, 82~W-clipped, and 70~W-clipped trace integrations preserved registered rankings and significance decisions. The accessible TurboQuant 0.2.0 path was numerically active but stored uint8 indices, materialized K/V, and used unfused execution. A CPU-only realization-gap analysis proved lower persistent-KV storage for declared ideal packed layouts, but retained energy as the conditional relation $E_{ideal}=E_{baseline}-\epsilon_{mem}\Delta_D+O_{net}$ rather than fabricating projected joules. The results show that energy savings do not imply quality preservation and that nominal precision must be separated from physical realization.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -79,7 +79,7 @@ This study operationally uses ``SLM'' for models below 7 billion parameters. Suc
 
 The research community has developed three main techniques to address this problem: weight quantization, token eviction, and KV-cache quantization. These techniques are usually studied separately. We found no prior study in the reviewed literature that evaluated their three-way composition on a sub-4B SLM while tracking real GPU power draw.
 
-This study addresses that gap through a reproducible case study of \mbox{Llama 3.2-3B-Instruct} on a single NVIDIA T4. Llama 3.2-3B is a sub-4B SLM with GQA, official AWQ support, and a tractable cache path that makes all three compression techniques feasible to implement and verify.
+This study addresses that gap through reproducible Llama 3.2-3B and Qwen2.5-3B case studies on a single NVIDIA T4. Their different GQA geometries provide a bounded portability test without treating architecture alone as a causal explanation.
 
 The problem is explicitly multi-objective. A configuration that minimizes energy may not minimize latency or memory, and the most compressed configuration may not preserve retrieval quality. The study therefore evaluates Pareto dominance across energy, latency, memory, throughput, and quality rather than assuming that maximum compression is automatically best.
 
@@ -111,13 +111,14 @@ The research problem is therefore the absence of an implementation-aware, multi-
 
 \subsection{Aim}
 
-The aim of this research was to conduct a multi-objective empirical evaluation of AWQ, PyramidKV-style eviction, and TurboQuant on \mbox{Llama 3.2-3B-Instruct}, determining how they individually and jointly affect energy, latency, memory, throughput, and retrieval quality on an NVIDIA T4.
+The aim was to evaluate AWQ, PyramidKV-style eviction, and TQ-Ref across Llama 3.2-3B and Qwen2.5-3B, then separate measured systems behavior from realized-reference storage and an explicitly counterfactual packed/fused realization.
 
 \begin{table}[htbp]
 \caption{Core and Sensitivity Configurations}
 \label{tab:configs}
 \centering\small
 \renewcommand{\arraystretch}{1}
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{@{}llll@{}}
 \toprule
 \textbf{Config} & \textbf{Weights} & \textbf{Eviction} & \textbf{KV Quant} \\
@@ -125,10 +126,10 @@ The aim of this research was to conduct a multi-objective empirical evaluation o
 C0 & FP16 & --- & --- \\
 C1 & AWQ 4-bit & --- & --- \\
 C2 & AWQ 4-bit & Pyramid-style & --- \\
-C3 & AWQ 4-bit & --- & TurboQuant 4-bit \\
-C4 & AWQ 4-bit & Pyramid-style & TurboQuant 4-bit \\
+C3-Ref & AWQ 4-bit & --- & TQ-Ref 4-bit numerical \\
+C4-Ref & AWQ 4-bit & Pyramid-style & TQ-Ref 4-bit numerical \\
 \bottomrule
-\end{tabular}
+\end{tabular}}
 \vspace{4pt}
 
 \small
@@ -136,7 +137,7 @@ C4 & AWQ 4-bit & Pyramid-style & TurboQuant 4-bit \\
 \toprule
 \textbf{Sensitivity} & \textbf{Values at 4096 tokens} \\
 \midrule
-TurboQuant bit width (C3 path) & 2, 3, 4 \\
+TQ-Ref bit width (C3-Ref path) & 2, 3, 4 \\
 Pyramid-style avg budget (C2 path) & 512, 1024, 1536 \\
 \bottomrule
 \end{tabular}
@@ -147,20 +148,20 @@ Pyramid-style avg budget (C2 path) & 512, 1024, 1536 \\
 
 The executed Llama case study had the following objectives:
 \begin{enumerate}
-  \item \textbf{Implement and validate} C0 (FP16), C1 (AWQ), C2 (AWQ + PyramidKV-style eviction), C3 (AWQ + TurboQuant), and C4 (all three), with structural gates proving that the requested cache operations execute.
+  \item \textbf{Implement and validate} C0 (FP16), C1/C1-W (AWQ controls), C2 (AWQ + PyramidKV-style eviction), C3-Ref (AWQ + TQ-Ref), and C4-Ref (all three), with structural gates proving that the requested cache operations execute.
   \item \textbf{Measure energy efficiency} through prefill, decode, and total joules; idle-adjusted energy; and decode joules per token at 1024, 2048, and 4096 tokens.
   \item \textbf{Measure runtime performance} through prefill latency, decode latency, and throughput under an identical 64-token teacher-forced decode workload.
   \item \textbf{Measure memory efficiency} through peak VRAM, post-prefill memory, post-decode memory, actual cache bytes, and logical compression ratio.
   \item \textbf{Evaluate quality} using randomized NIAH prompts, reporting retrieval correctness separately from exact-format compliance.
   \item \textbf{Analyze compression sensitivity} using TurboQuant bit widths of 2, 3, and 4 and pyramidal average budgets of 512, 1024, and 1536 at 4096 tokens.
-  \item \textbf{Quantify exploratory configuration non-additivity} for C4 without treating the contrast as a clean factorial estimator, because C1 uses stock attention.
+  \item \textbf{Quantify exploratory configuration non-additivity} for C4-Ref without treating the historical Llama contrast as a clean factorial estimator, because stock C1 and the wrapped paths differ.
   \item \textbf{Test differences} with paired procedures, confidence intervals, effect sizes, and multiple-comparison correction.
   \item \textbf{Identify Pareto-optimal choices} for energy-, latency-, memory-, and quality-constrained deployment scenarios.
 \end{enumerate}
 
 \subsection{Focus}
 
-This study keeps the model and hardware fixed---Llama 3.2-3B on one T4---so that observed differences arise within one software and hardware setting rather than from switching devices or models. Five core configurations cover the main ablation; two smaller studies add depth by varying TurboQuant bit widths and pyramidal budgets at 4096 tokens only, without creating a full factorial grid.
+This study keeps hardware fixed to one T4 but replicates the five-path ablation on Llama 3.2-3B and Qwen2.5-3B. Effects are computed within model first; absolute joules, coincident block numbers, and tokenizer-specific prompts are not treated as cross-model paired observations.
 
 We measure several things at once: energy, latency, memory, throughput, and retrieval quality. No single weighted score decides what is best. Instead, a configuration wins on Pareto grounds: it is better if it improves one metric without hurting another. Different deployment scenarios will favor different trade-offs.
 
@@ -169,7 +170,7 @@ We measure several things at once: energy, latency, memory, throughput, and retr
 \section{Contributions}
 % ============================================================
 
-This research makes three focused contributions. \textbf{First}, it provides an implementation-aware hardware-energy case study of AWQ, custom pyramidal KV eviction, and TurboQuant numerical KV quantization composed on a sub-4B SLM. \textbf{Second}, it measures configuration interaction rather than assuming independent compression gains, including focused bit-width and retention-budget sensitivity. \textbf{Third}, it distinguishes nominal precision, logical token retention, actual live cache storage, and peak runtime memory, and produces reproducible notebooks, validation artifacts, power traces, and CSV results.
+This research makes three focused contributions. \textbf{First}, it provides cross-model hardware-energy evidence for AWQ, custom pyramidal eviction, and numerical TQ-Ref on two sub-4B SLMs. \textbf{Second}, it combines hard retrieval, matched-wrapper controls, trace-cap sensitivity, and uncertainty-aware within-model contrasts rather than assuming compression gains transfer across models. \textbf{Third}, it separates measured systems behavior, realized TQ-Ref storage, and ideal packed/fused counterfactuals through calibrated persistent-memory accounting, phase-specific logical byte demand, and symbolic energy break-even regions.
 
 
 % ============================================================
@@ -184,7 +185,7 @@ Researchers have studied various ways to compress language models. This section 
 
 \textbf{KV Cache Quantization:} Zandieh et al.\ \cite{zandieh_turboquant_2025} proposed TurboQuant, which uses random rotation and an optimized scalar codebook without calibration data. Liu et al.\ \cite{liu_kivi_2023} offered KIVI as a 2-bit alternative. Salfati \cite{salfati_quantization_2026} showed that preserving dimensions through quantization can outperform rank reduction, with a growing advantage for GQA. These results motivate both TurboQuant and the executed bit-width sensitivity analysis.
 
-\textbf{Compound Methods:} Zhang et al.\ \cite{zhang_rdkv_2026} jointly allocate eviction and quantization through a rate-distortion formulation and report strong long-context accuracy and throughput. ThinKV \cite{ramachandran_thinkv_2026} likewise uses hybrid quantization and eviction for reasoning models. These methods demonstrate that joint compression is important, but neither supplies the sub-4B T4 energy ablation of AWQ, custom PyramidKV-style eviction, and TurboQuant reported here. The present C4 stack remains sequential rather than a reproduction of either joint optimizer.
+\textbf{Compound Methods:} Zhang et al.\ \cite{zhang_rdkv_2026} jointly allocate eviction and quantization through a rate-distortion formulation and report strong long-context accuracy and throughput. ThinKV \cite{ramachandran_thinkv_2026} likewise uses hybrid quantization and eviction for reasoning models. These methods demonstrate that joint compression is important, but neither supplies the sub-4B T4 energy ablation of AWQ, custom PyramidKV-style eviction, and TQ-Ref reported here. The present C4-Ref stack remains sequential rather than a reproduction of either joint optimizer.
 
 \textbf{Energy Measurement:} Argerich et al.\ \cite{argerich_watt_2026} published Watt Counts (2026), a large benchmark covering 5,000+ LLM inference experiments. They established that T4 GPUs draw about 12W idle and up to 82W at peak, and selected 10 Hz (100 ms) polling via pynvml as the best accuracy--overhead trade-off after evaluating rates from 1 Hz to 200 Hz. Table~\ref{tab:comparison} summarizes selected related work.
 
@@ -220,27 +221,28 @@ As Table~\ref{tab:comparison} shows, the reviewed work does not cover all four d
 \section{Research Questions}
 % ============================================================
 
-The main research question is: when AWQ, PyramidKV-style eviction, and TurboQuant are applied individually and together on Llama 3.2-3B, how do their energy, latency, memory, throughput, and retrieval-quality trade-offs change with context length on a T4 GPU?
+The main research question is: when AWQ, PyramidKV-style eviction, and numerical TQ-Ref are applied individually and together on Llama 3.2-3B and Qwen2.5-3B, how do their energy, latency, memory, throughput, and hard-retrieval trade-offs change on a T4 GPU, and which findings transfer across models?
 
-This breaks down into three specific sub-questions:
+This breaks down into four specific sub-questions:
 
 \begin{enumerate}
 \item \textbf{RQ1:} How do the five core configurations affect prefill and decode energy, latency, throughput, peak and persistent memory, and NIAH retrieval at 1024, 2048, and 4096 tokens?
 
-\item \textbf{RQ2:} How do TurboQuant bit width and pyramidal average retention budget change numerical distortion and the energy--quality--memory trade-off, and what interaction appears in C4?
+\item \textbf{RQ2:} How do TQ-Ref bit width and pyramidal average retention budget change numerical distortion and the energy--quality--memory trade-off, and what interaction appears in C4-Ref?
 
 \item \textbf{RQ3:} Which configurations are Pareto-optimal for energy-, latency-, memory-, and quality-constrained deployment scenarios?
+\item \textbf{RQ4:} How do within-model effects, hard retrieval, and realization gaps differ between Llama and Qwen without treating their separate sessions or tokenizer-specific prompts as paired observations?
 \end{enumerate}
 
-Based on the literature and implementation-aware pilot observations, the Llama study evaluates the following directional hypotheses:
+Based on the literature and implementation-aware pilot observations, the historical Llama systems matrix evaluated the following directional hypotheses; the Qwen replication tests portability rather than retroactively changing them:
 
 \textbf{H1 (AWQ context effect):} The energy advantage of AWQ over FP16 increases with context length.
 
 \textbf{H2 (pyramidal-eviction long-context benefit):} At 4096 tokens, C2 reduces decode energy per token and increases throughput relative to C1 while keeping retrieval accuracy within five percentage points.
 
-\textbf{H3 (reference-configuration overhead):} The unfused TurboQuant 0.2.0 configuration C3 increases decode latency and energy relative to C1 at the tested contexts; wrapper and kernel profiling are required to isolate the mechanism.
+\textbf{H3 (reference-configuration overhead):} The unfused TurboQuant 0.2.0 configuration C3-Ref increases decode latency and energy relative to C1 at the tested contexts; wrapper and kernel profiling are required to isolate the mechanism.
 
-\textbf{H4 (compound configuration pattern):} At 4096 tokens, C4 uses less energy and lower latency than C3 but more energy and lower throughput than C2, producing a non-zero configuration interaction contrast.
+\textbf{H4 (compound configuration pattern):} At 4096 tokens, C4-Ref uses less energy and lower latency than C3-Ref but more energy and lower throughput than C2, producing a non-zero configuration interaction contrast.
 
 \textbf{H5 (Context-dependent ranking):} The relative efficiency ranking changes with context length, with eviction-based configurations becoming more beneficial as context grows.
 
@@ -254,30 +256,32 @@ For each directional hypothesis, the corresponding null states that the specifie
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{methodology_diagram.png}
-\caption{Methodological framework of the multi-objective empirical ablation study and parameter sensitivity analysis on Llama 3.2-3B-Instruct.}
+\caption{Methodological framework for the two-model empirical ablation, hard-retrieval evaluation, trace robustness, and CPU-only realization-gap synthesis.}
 \label{fig:methodology}
 \end{figure}
 
-The experiment ran on a single NVIDIA T4 in Google Colab with PyTorch 2.11.0, Transformers 5.12.1, GPTQModel 7.1.0, and TurboQuant 0.2.0, as illustrated in Fig.~\ref{fig:methodology}. Model revisions and the TurboQuant package-source hash were recorded. Five core configurations (C0--C4, Table~\ref{tab:configs}) were tested at 1024, 2048, and 4096 tokens with five measured energy blocks per condition. The FP16 and AWQ checkpoints were measured in separate model-resident phases to avoid repeated 3B-model reloads; within the AWQ phase, context and configuration order were randomized. This split-plot constraint means C0 comparisons are descriptive, while C1--C4 block comparisons are paired.
+Both model experiments ran on a single NVIDIA T4 in Google Colab with PyTorch 2.11.0, Transformers 5.12.1, GPTQModel 7.1.0, and TurboQuant 0.2.0, as illustrated in Fig.~\ref{fig:methodology}. Model revisions and the TurboQuant package-source hash were recorded. Llama used C0, stock C1, C2, C3-Ref, and C4-Ref for its historical context matrix; Qwen used Q0, matched-wrapper Q1-W, Q2, Q3-Ref, and Q4-Ref. Both systems matrices covered 1024, 2048, and 4096 tokens with five measured blocks per condition. Llama also added a separate-session five-block C1-W control at 4096. Qwen Q0 occupied a separate model-resident phase, while its AWQ paths shared the validated Qwen wrapper.
 
-Two focused studies at 4096 tokens varied TurboQuant numerical codebook width (2, 3, and 4 bits) and pyramidal average budget (512, 1024, and 1536). The 1024-budget C2 and 4-bit C3 core rows served as sensitivity baselines. In total, the run produced 75 core and 20 sensitivity energy measurements, 225 core and 60 sensitivity quality cases, and 95 raw power traces.
+Each systems run produced 75 core and 20 sensitivity energy rows with 95 raw traces. Historical Llama quality contained 225 easy core and 60 sensitivity rows, while the accepted hard follow-up produced 300 rows across C0, C1-W, C2, C3-Ref, and C4-Ref. Qwen produced 300 hard core and 60 sensitivity-quality rows. The hard endpoint uses 60 deterministic semantic scenarios at 10\%, 50\%, and 90\% depth; Llama and Qwen tokenize and pad them independently to exactly 4096 tokens.
 
 \textbf{Environment and energy:} The FP16 baseline used \texttt{unsloth/Llama-3.2-3B-Instruct}; AWQ used \texttt{casperhansen/llama-3.2-3b-instruct-awq}. GPU power was sampled at 10~Hz via pynvml \cite{argerich_watt_2026} and trapezoidally integrated over measured timestamps. Raw traces, temperature, clocks, throttling flags, power limits, allocated VRAM, and NVML memory were persisted. The model-resident median idle powers were 29.116~W for FP16 and 30.183~W for AWQ.
 
-\textbf{Metrics:} Energy used a fixed 64-token teacher-forced decode so that measured work was identical across configurations. Quality used deterministic randomized NIAH prompts at three depths (10\%, 50\%, and 90\%) with five seeds; retrieval correctness and exact-format compliance were scored separately. Memory was reported as peak allocated VRAM, post-prefill and post-decode memory, logical retained FP16 bytes, and deduplicated live cache storage. Sequential post-compression perplexity was outside the computational scope of this run; a prefill-only loss would not capture the modified decode cache.
+\textbf{Metrics:} Energy used a fixed 64-token teacher-forced decode so that measured work was identical across configurations. Historical easy quality used five seeds at each of three depths; the primary hard endpoint used 20 independent scenarios per depth, or 60 per configuration. Retrieval correctness and exact-format compliance were scored separately. Memory was reported as peak allocated VRAM, post-prefill and post-decode memory, logical retained FP16 bytes, and deduplicated live cache storage. Sequential post-compression perplexity was outside the computational scope; a prefill-only loss would not capture the modified decode cache.
 
-\textbf{Implementation and validation:} C2--C4 used a unified custom Llama attention wrapper to attend to full prompt K/V before storing either full or selected state. The PyramidKV-style path used a 32-token observation window, kernel-5 average pooling, per-KV-head top-$k$ selection, and a linear $\beta=20$ layer budget; it was not the official KVCache-Factory implementation. C1 retained the stock Llama attention path, so C1--C4 contrasts can include wrapper overhead in addition to compression effects. Every row checked layer count, retained lengths, requested budget, TurboQuant bit width, index dtype and range, residual length, and materialized cache shapes. All seven validation paths and all 380 primary result rows passed. TurboQuant 0.2.0 stored one uint8 index per coordinate at every tested bit width and retained materialized K/V; its nominal bit setting is therefore treated as numerical precision, not packed physical storage.
+\textbf{Implementation and validation:} C2, C3-Ref, and C4-Ref used a custom Llama attention wrapper; Q1-W through Q4-Ref used a separately validated Qwen adapter that passed stock-versus-wrapper parity before measurement. The PyramidKV-style path used a 32-token observation window, kernel-5 average pooling, per-KV-head top-$k$ selection, and a linear $\beta=20$ layer budget; it was not the official KVCache-Factory implementation. Every path checked layer count, retained lengths, requested budget, TQ-Ref bit width, index dtype and range, residual length, active decode use, and alias-deduplicated storage. TurboQuant 0.2.0 stored one uint8 index per coordinate at every tested bit width and retained materialized K/V; its nominal bit setting is numerical precision, not packed physical storage.
 
-\textbf{Analysis:} C1--C4 comparisons at 4096 tokens used paired $t$-tests on five common blocks with 95\% confidence intervals, paired effect sizes, and Holm correction across 20 metric contrasts. A difference-in-differences contrast quantified configuration-level non-additivity, but is not a clean factorial estimator because C1 did not use the custom wrapper. Pareto dominance used lower energy and live cache together with higher throughput and retrieval. Uncertainty plots report sample standard deviations, not confidence intervals.
+\textbf{Analysis:} Registered within-session comparisons used paired $t$-tests and Wilcoxon checks on five common blocks with 95\% confidence intervals, effect sizes, and Holm correction. The historical Llama difference-in-differences contrast remains wrapper-confounded; Qwen uses Q1-W as its matched baseline. Hard quality uses Wilson intervals and paired depth-stratified bootstrap contrasts. Cross-model energy and quality are resampled independently because neither model nor major sessions share a sampling unit.
+
+\textbf{Cross-model and counterfactual synthesis:} The Qwen replication used Q0, Q1-W, Q2, Q3-Ref, and Q4-Ref under the same semantic hard scenarios but independent tokenizer materialization. A local CPU reference execution of Notebook~09 verified all source manifests, canonical shards/CSV correspondence, and 195 raw traces before analysis; the final reproducibility package reserves authority for the pending Colab CPU rerun. Cross-model effects used independent resampling; pairing was retained only inside registered sessions and within-depth scenario IDs. The ideal packed layout was calibrated against retained FP bytes and uint8 TQ payload/category bytes. Prefill and decode logical demand were modeled separately. Projected energy was not point-identified: break-even requires $O_{net}<\epsilon_{mem}\Delta_D$, with nonnegative energy and explicit quality-equivalence conditions.
 
 
 % ============================================================
 \section{Results and Findings}
 % ============================================================
 
-\subsection{Run Integrity}
+\subsection{Evidence-Bundle Integrity}
 
-The executed notebook completed without a runtime exception or failed assertion. The artifact bundle contains 75 unique core energy rows, 20 sensitivity energy rows, 225 core quality rows, 60 sensitivity quality rows, and one raw trace for each of the 95 measured energy runs. All rows share experiment fingerprint \texttt{8d27af8c9ee94de3} and passed their structural gate. Reintegrating every power trace reproduced the corresponding prefill and decode joules to floating-point precision. The mean sampling interval was 0.0988~s, with no non-positive interval or gap above 0.2~s.
+The historical Llama systems bundle (fingerprint \texttt{8d27af8c9ee94de3}) contains 75 core energy, 20 sensitivity energy, 225 easy-quality, 60 sensitivity-quality, and 95 trace rows. The Llama hard/control bundle (\texttt{106a561c07c62937}) adds 300 hard-quality rows, five C1-W energy rows, and five traces. The Qwen bundle (\texttt{861d89617e53034d}) contains 75 core energy, 20 sensitivity energy, 300 hard-quality, 60 sensitivity-quality, and 95 trace rows. Local provisional synthesis \texttt{b19adce0924b4203} passed 36 source gates, reconstructed all 195 traces, rehashed sources after analysis, and produced an exact 41-file inventory. The three measurement-source bundles are authoritative; the synthesis fingerprint will be replaced by the pending Colab execution.
 
 \subsection{Core Energy and Runtime Results}
 
@@ -295,42 +299,42 @@ Table~\ref{tab:core4096} summarizes the principal 4096-token results. C2 (AWQ pl
 C0 & $701.08\pm8.12$  & 377.53 & 11.34 & 455.00 \\
 C1 & $631.25\pm5.05$  & 311.95 & 13.77 & 455.00 \\
 C2 & $529.30\pm20.02$ & 211.32 & 20.34 & 119.00 \\
-C3 & $913.48\pm2.11$  & 559.63 & 7.66  & 696.50 \\
-C4 & $659.50\pm21.35$ & 333.00 & 12.53 & 187.25 \\
+C3-Ref & $913.48\pm2.11$  & 559.63 & 7.66  & 696.50 \\
+C4-Ref & $659.50\pm21.35$ & 333.00 & 12.53 & 187.25 \\
 \bottomrule
 \end{tabular}}
 \end{table}
 
-C3 (AWQ+TurboQuant) was the most expensive path at every context. At 4096, it consumed 44.7\% more energy, decoded 44.4\% more slowly, and used 53.1\% more post-decode live cache storage than C1. This is consistent with H3 for the tested unfused reference configuration, but the contrast does not isolate TurboQuant from custom-wrapper overhead and does not apply to the fused algorithm described in the TurboQuant paper. C1 and C4 did not differ significantly in total energy after correction ($p_{\mathrm{Holm}}=0.2465$), although C4 retained a much smaller cache.
+C3-Ref (AWQ+TQ-Ref) was the most expensive path at every context. At 4096, it consumed 44.7\% more energy, decoded 44.4\% more slowly, and used 53.1\% more post-decode live cache storage than C1. This is consistent with H3 for the tested unfused reference configuration, but the contrast does not isolate TQ-Ref from custom-wrapper overhead and does not apply to a fused production realization. C1 and C4-Ref did not differ significantly in total energy after correction ($p_{\mathrm{Holm}}=0.2465$), although C4-Ref retained a much smaller cache.
 
 Configuration ranking changed with context, as shown in Fig.~\ref{fig:core-results}. C0 had the lowest mean energy at 1024 tokens, C1 at 2048, and C2 at 4096. AWQ alone was 10.1\% worse than FP16 at 1024 but approximately 9--10\% better at 2048 and 4096. These trends descriptively support H1 and H5; they are not paired confirmatory tests because C0 occupied a separate model-resident phase.
 
 \begin{figure*}[htbp]
 \centering
 \includegraphics[width=\textwidth]{llama_core_results.png}
-\caption{Core energy, deduplicated live cache storage, and fixed-work decode throughput across context lengths. Error bars on energy are sample standard deviations over five blocks.}
+\caption{Historical Llama core energy, deduplicated live cache storage, and fixed-work decode throughput. Legacy plotted labels C3/C4 correspond to C3-Ref/C4-Ref. Error bars are sample SD over five blocks.}
 \label{fig:core-results}
 \end{figure*}
 
 \subsection{Cache Storage and TurboQuant Realization}
 
-C2 reduced the 4096-token live cache from 455~MiB to 119~MiB, a 73.8\% reduction relative to C1. C4 reduced the cache to 187.25~MiB, but remained 57.4\% larger than C2 because TurboQuant added index, norm, residual, and materialized-view storage.
+C2 reduced the 4096-token live cache from 455~MiB to 119~MiB, a 73.8\% reduction relative to C1. C4-Ref reduced the cache to 187.25~MiB, but remained 57.4\% larger than C2 because TQ-Ref added index, norm, residual, and materialized-view storage.
 
-The TurboQuant bit width did not represent physical packed width in version 0.2.0. For 2-, 3-, and 4-bit settings, the implementation stored one uint8 index per coordinate and retained materialized K/V. Consequently, all three bit-width conditions had the same physical cache size. C3's 696.5~MiB live cache was larger than the unquantized 455~MiB cache. The valid interpretation is therefore a numerical codebook and runtime-overhead study, not a demonstration of packed 2--4-bit cache storage.
+The TQ-Ref bit width did not represent physical packed width in version 0.2.0. For 2-, 3-, and 4-bit settings, the implementation stored one uint8 index per coordinate and retained materialized K/V. Consequently, all three bit-width conditions had the same physical cache size. C3-Ref's 696.5~MiB live cache was larger than the unquantized 455~MiB cache. The valid interpretation is therefore a numerical codebook and runtime-overhead study, not a demonstration of packed 2--4-bit cache storage.
 
 \subsection{Compound Interaction}
 
-C4 consumed $659.50\pm21.35$~J, between C2 and C3. It used 253.98~J less energy than C3 ($p_{\mathrm{Holm}}=0.000206$), but 130.21~J more than C2 ($p_{\mathrm{Holm}}=0.00620$). The reported configuration contrast was
+C4-Ref consumed $659.50\pm21.35$~J, between C2 and C3-Ref. It used 253.98~J less energy than C3-Ref ($p_{\mathrm{Holm}}=0.000206$), but 130.21~J more than C2 ($p_{\mathrm{Holm}}=0.00620$). The reported configuration contrast was
 \begin{equation}
-I=(C4-C3)-(C2-C1),
+I=(C4\text{-Ref}-C3\text{-Ref})-(C2-C1),
 \end{equation}
-Total-energy contrast was $-152.03$~J (95\% CI: $-187.11$ to $-116.96$~J; Holm-adjusted $p=0.00109$). Decode-energy and decode-time contrasts were also significant. The pattern supports H4 and is consistent with an ``energy shield'': C4 applies TurboQuant after retaining fewer tokens. Because C1 did not use the custom wrapper, the contrast is not an uncontaminated factorial estimate and cannot attribute the entire value solely to cache-operation interaction. C4 was not preferable to eviction alone.
+Total-energy contrast was $-152.03$~J (95\% CI: $-187.11$ to $-116.96$~J; Holm-adjusted $p=0.00109$). Decode-energy and decode-time contrasts were also significant. The pattern supports H4 and is consistent with an ``energy shield'': C4-Ref applies TQ-Ref after retaining fewer tokens. Because C1 did not use the custom wrapper, the contrast is not an uncontaminated factorial estimate and cannot attribute the entire value solely to cache-operation interaction. C4-Ref was not preferable to eviction alone.
 
-\subsection{Retrieval and Format Quality}
+\subsection{Historical Easy Retrieval and Format Quality}
 
-Every one of the 225 core NIAH cases retrieved the requested code. Exact-format compliance was lower: 188/225 responses (83.6\%) returned only the requested case-sensitive code. Retrieval and formatting were intentionally scored separately, so an answer containing the correct code with additional text counted as retrieved but not format-compliant.
+Every one of the 225 historical easy-NIAH cases retrieved the requested code. Exact-format compliance was lower: 188/225 responses (83.6\%) returned only the requested case-sensitive code. These rows are retained as historical behavior evidence, not the primary quality endpoint.
 
-The 100\% core retrieval rate supports the narrow statement that no tested core condition lost a needle on this prompt set. It does not establish general quality neutrality. The filler corpus was repetitive and produced a complete ceiling, leaving no core quality discrimination and zero sample SD across seed-level retrieval scores. H2's five-percentage-point retrieval criterion was met on the observed sample, but a harder retrieval evaluation is required before making a broad preservation claim. In C4, the fixed 64-token energy decode eventually quantized all 28 layers, whereas shorter quality generations left the smallest-budget layer inside TurboQuant's unquantized 128-token residual window; quality and energy therefore observed slightly different realized C4 cache states.
+The 100\% rate establishes only that the historical prompt set had a ceiling. It is superseded for quality claims by the frozen hard60 endpoint reported below. In C4-Ref, the fixed 64-token energy decode eventually quantized all 28 layers, whereas shorter quality generations could leave the smallest-budget layer inside TQ-Ref's 128-token residual window; quality and energy therefore observed slightly different realized cache states.
 
 \subsection{Sensitivity Findings}
 
@@ -341,28 +345,67 @@ TurboQuant distortion changed monotonically with precision. Averaged over sample
 \begin{figure*}[htbp]
 \centering
 \includegraphics[width=\textwidth]{llama_sensitivity.png}
-\caption{4096-token pyramidal retention-budget and TurboQuant numerical bit-width sensitivity. Energy and retrieval bars show sample SD; symmetric quality bars can extend beyond the bounded 0--100\% scale and should be interpreted only as dispersion.}
+\caption{Historical 4096-token retention-budget and TQ-Ref numerical-bit sensitivity. Legacy plotted C3-TQ2/C3-TQ3 labels correspond to C3-Ref-TQ2/C3-Ref-TQ3. Bars show sample SD.}
 \label{fig:sensitivity}
 \end{figure*}
 
-\subsection{Pareto Findings}
+\subsection{Historical Easy-Benchmark Pareto Findings}
 
-The requested core energy--quality frontier with uncertainty is shown in Fig.~\ref{fig:pareto}. Among C0--C4 at 4096 tokens, C2 was the only nondominated point under mean total energy and retrieval because all core configurations achieved 100\% retrieval and C2 had the lowest energy. C2 was also the only core empirical mean frontier point when adding higher throughput and lower live cache as objectives. Figure~\ref{fig:system-tradeoffs} shows that it simultaneously occupied the favorable region of both core systems projections.
+The historical easy-benchmark frontier is shown in Fig.~\ref{fig:pareto}. C2 was its only mean energy--retrieval point because all historical configurations achieved 100\% retrieval. This ceiling-based result is not the current hard-quality frontier: under hard60, Llama C0, C1-W, and C2 are point-frontier members, while Qwen Q0 and Q2 are members.
 
 The plotted Pareto result is numerically correct for the five core configurations, but its quality dimension is uninformative because of the retrieval ceiling. Across all executed sensitivity conditions, the 512-budget path had slightly lower mean energy and a smaller cache than default C2; default C2 and the 512-budget path remain different trade-offs when throughput is included. If exact-format compliance is substituted and sensitivity rows are admitted, the 512- and 1536-budget paths form the secondary frontier. These sensitivity conclusions are descriptive because their energy differences were not inferentially tested.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=\linewidth]{llama_pareto_uncertainty.png}
-\caption{4096-token energy--retrieval Pareto frontier. Horizontal and vertical bars are sample SD over five energy blocks and five seed-level retrieval aggregates. The zero vertical bars reflect a benchmark ceiling, not zero population uncertainty.}
+\caption{Historical easy-benchmark 4096-token Pareto frontier. Legacy plotted C3/C4 labels denote C3-Ref/C4-Ref. Zero vertical bars reflect a benchmark ceiling, not zero population uncertainty.}
 \label{fig:pareto}
 \end{figure}
 
 \begin{figure*}[htbp]
 \centering
 \includegraphics[width=\textwidth]{llama_system_tradeoffs.png}
-\caption{4096-token throughput--energy and persistent-cache--peak-memory projections.}
+\caption{Historical 4096-token throughput--energy and persistent-cache--peak-memory projections. Legacy plotted C3/C4 labels denote C3-Ref/C4-Ref.}
 \label{fig:system-tradeoffs}
+\end{figure*}
+
+\subsection{Cross-Model Hard Retrieval and Energy}
+
+Table~\ref{tab:crossmodel4096} replaces the historical easy-retrieval ceiling with the frozen 60-scenario hard endpoint. Llama's eviction effect was $-1.7$ percentage points relative to C1-W (depth-stratified bootstrap 95\% interval: $-5.0$ to $0.0$ points). Qwen's eviction effect was $-78.3$ points (95\% interval: $-86.7$ to $-68.3$ points). Their descriptive difference was $-76.7$ points (95\% interval: $-86.7$ to $-66.7$ points), but model architecture is not isolated from adapter, session, and tokenizer differences.
+
+\begin{table}[htbp]
+\caption{4096-Token Raw Energy and Hard Retrieval}
+\label{tab:crossmodel4096}
+\centering\small
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{@{}lrrl@{}}
+\toprule
+\textbf{Path} & \textbf{Llama J / pass} & \textbf{Qwen J / pass} & \textbf{Tier} \\
+\midrule
+FP16 & 701.08 / 47 & 616.78 / 53 & measured \\
+AWQ control & 639.86 / 38 & 621.75 / 48 & measured \\
+Eviction & 529.30 / 37 & 550.48 / 1 & measured \\
+TQ-Ref & 913.48 / 37 & 812.28 / 49 & realized ref. \\
+Eviction+TQ-Ref & 659.50 / 37 & 628.69 / 1 & realized ref. \\
+\bottomrule
+\end{tabular}}
+\vspace{2pt}
+\begin{minipage}{\columnwidth}\footnotesize Energy is mean raw joules ($n=5$); pass is strict retrieval out of 60. Llama AWQ-control energy is a separate-session C1-W measurement and is descriptive relative to historical systems rows.\end{minipage}
+\end{table}
+
+Qwen Q2 reduced mean energy by 71.27~J relative to Q1-W, but the Holm-adjusted total-energy result narrowly missed 0.05 ($p=0.06556$) and retrieval collapsed. Q3-Ref retained Q1-W-like retrieval but added 190.53~J, with significant energy and throughput penalties. For both models, raw, 82~W-clipped, and 70~W-clipped rankings and registered significance decisions were stable; clipped integrations are sensitivity analyses rather than hardware-cap reruns.
+
+\subsection{Ideal-TQ Realization Gap}
+
+The aligned packed-memory model reproduced accepted retained-FP bytes and uint8 logical payloads before projecting nominal 2/3/4-bit storage. At four bits, projected post-decode persistent KV was 131.14~MiB for Llama TQ-only and 42.15~MiB for Qwen TQ-only, versus 455~MiB and 146.25~MiB retained FP state, respectively. Compound ideal footprints were 41.89~MiB for Llama and 13.46~MiB for Qwen. These are persistent-KV results under a perfectly packed layout, not peak-VRAM measurements.
+
+The phase model counted full-prompt prefill reads, retained-state packing reads/writes, growing decode reads, residual traffic, and residual-to-packed transitions. It models compulsory/logical demand, not exact DRAM traffic. Because no justified finite domains were available for $\epsilon_{mem}$ and $O_{net}$, ideal joules and fused latency were not numerically projected. Point, conservative, and possible quality frontiers were therefore reported as symbolic all/some/none regions over quality threshold, realization overhead, and bounded implementation-quality change.
+
+\begin{figure*}[htbp]
+\centering
+\includegraphics[width=\textwidth]{cross_model_pareto.pdf}
+\caption{Measured energy--quality frontier inputs (left) and conservative zero-overhead robust ideal-frontier classes (right). Legacy plotted Llama C3/C4 source labels denote C3-Ref/C4-Ref. Projected energy remains conditional.}
+\label{fig:crossmodel-pareto}
 \end{figure*}
 
 
@@ -372,7 +415,7 @@ The plotted Pareto result is numerically correct for the five core configuration
 
 The dominant practical result is that the eviction configuration, not numerical KV quantization, provided the clearest core T4 trade-off in this implementation. C2 was associated with lower energy, higher throughput, and lower cache storage simultaneously at 4096 tokens. This pattern is consistent with reduced decode memory traffic, but no hardware memory-traffic counters were collected. AWQ also showed a context-dependent crossover, but kernel-level profiling would be required to establish its mechanism.
 
-The TurboQuant result illustrates why nominal algorithmic precision must be separated from realized systems behavior. The reference package preserved the paper's rotation and codebook idea, and its measured distortion improved with bit width, but its live object graph retained materialized higher-precision tensors. In the tested implementation, quantization was associated with additional work and storage rather than a realized systems saving. C4's lower cost than C3 is consistent with applying that path after eviction, but wrapper and kernel profiling are needed to establish the causal mechanism.
+The TQ-Ref result illustrates why nominal algorithmic precision must be separated from realized systems behavior. The reference package preserved the paper's rotation and codebook idea, and its measured distortion improved with bit width, but its live object graph retained materialized higher-precision tensors. In the tested implementation, quantization was associated with additional work and storage rather than a realized systems saving. C4-Ref's lower cost than C3-Ref is consistent with applying that path after eviction, but wrapper and kernel profiling are needed to establish the causal mechanism.
 
 This sequential interaction is not equivalent to RDKV's rate--distortion allocation or ThinKV's thought-adaptive joint policy. A direct joint-method baseline was not available under the present Llama/T4 software constraints. The appropriate comparison is conceptual and empirical: the results show why joint allocation can matter, but do not claim to outperform those systems.
 
@@ -381,22 +424,22 @@ This sequential interaction is not equivalent to RDKV's rate--distortion allocat
 \section{Threats to Validity and Ongoing Work}
 % ============================================================
 
-\textbf{Retrieval ceiling:} The core NIAH set was too easy to distinguish configurations. A harder distractor corpus, more seeds, and bounded binomial or bootstrap intervals are required. Until then, quality claims are limited to the observed prompts.
+\textbf{Retrieval scope:} The historical easy NIAH set had a ceiling, so the primary endpoint is now the frozen hard 60-scenario set with Wilson and depth-stratified bootstrap uncertainty. Each model has tokenizer-specific exact 4096-token prompts; semantic matching does not make tokenized inputs identical.
 
 \textbf{Power telemetry:} Although all traces integrated consistently, the artifact audit found instantaneous NVML samples above the reported 70~W enforced limit, including isolated values above 100~W. Such excursions may reflect the difference between instantaneous telemetry and an averaged power cap, but they are suspicious for a T4. A post-hoc 70~W clipping audit changed core group means by approximately 0.6--2.2\% and did not alter rankings; including sensitivity groups raised the maximum change to approximately 2.4\%. Absolute joules should nevertheless be reported with this caveat, and raw-versus-capped robustness should accompany the final analysis.
 
-\textbf{Statistical power, wrapper, and ordering:} Five blocks provide limited distributional evidence. The large C1--C2, C1--C3, C2--C4, and C3--C4 configuration differences remained clear after Holm correction, while C1--C4 did not. C1 used stock attention while C2--C4 used the custom wrapper, so comparisons to C1 include wrapper effects and the interaction contrast is not a clean factorial estimator. C0 was measured in a separate phase, making FP16 comparisons and context-crossover claims descriptive. Sensitivity differences were also descriptive.
+\textbf{Statistical power, wrapper, and ordering:} Five blocks provide limited distributional evidence. The large C1--C2, C1--C3-Ref, C2--C4-Ref, and C3-Ref--C4-Ref configuration differences remained clear after Holm correction, while C1--C4-Ref did not. C1 used stock attention while C2/C3-Ref/C4-Ref used the custom wrapper, so comparisons to C1 include wrapper effects and the interaction contrast is not a clean factorial estimator. C0 was measured in a separate phase, making FP16 comparisons and context-crossover claims descriptive. Sensitivity differences were also descriptive.
 
-\textbf{External validity:} The current evidence covers one Llama-family SLM, one T4, batch size one, three contexts up to 4096, a custom PyramidKV-style implementation, and one unfused TurboQuant implementation. The fixed teacher-forced decode controls work but is not an end-to-end natural generation workload. Replication on Qwen2.5-3B-Instruct is planned to test architectural generalization. The 8192-token condition remains excluded because pilot runs exceeded free-tier T4 memory.
+\textbf{External validity:} The evidence covers two 3B models, one T4, batch size one, contexts up to 4096, model-specific adapters, custom PyramidKV-style eviction, and one unfused TQ-Ref implementation. One major session per experiment and unmatched Llama/Qwen baseline structure prevent architecture-only causal attribution. The fixed teacher-forced decode is not an end-to-end natural generation workload.
 
-\textbf{Reproducibility:} Critical model and software versions were recorded, but the Colab installation emitted dependency-conflict and optional TorchAO-extension warnings. These did not block the run, yet a containerized environment would provide stronger future reproducibility.
+\textbf{Reproducibility and realization:} Critical versions, manifests, raw traces, source hashes, and final inventories were recorded. Notebook~08 required two in-session repair cells that are preserved inline; its persisted evidence is hash-consistent, but neither its experiment fingerprint nor artifact manifest cryptographically binds the executed notebook or repair-cell source. The local provisional Notebook~09 run discloses that direct live tensor dumps were not preserved; post-hoc shape/dtype evidence uses runtime-asserted contracts plus persisted aggregate/category bytes. A clean Drive-mounted Colab version is reserved for the authoritative synthesis rerun. Ideal storage is analytical and must not be described as measured peak VRAM, energy, power, or latency.
 
 
 % ============================================================
 \section{Conclusion}
 % ============================================================
 
-The completed Llama 3.2-3B case study demonstrates that compression techniques with favorable nominal ratios can have very different physical energy outcomes. Among the five core configurations at 4096 tokens, AWQ plus PyramidKV-style eviction produced the clearest observed systems trade-off relative to C1, using $529.30\pm20.02$~J with a 119~MiB post-decode cache. The unfused TurboQuant configuration increased energy and storage, while applying it after eviction was associated with substantially lower overhead than TurboQuant alone. These provisional single-session findings support implementation-aware, multi-objective evaluation rather than assuming additive compression benefits. Final causal, quality, and generalization claims remain contingent on a matched wrapper control, harder retrieval testing, and the planned Qwen replication.
+Across Llama 3.2-3B and Qwen2.5-3B, compression did not produce a universal energy--quality winner. Llama eviction reduced energy with little observed hard-retrieval change, whereas Qwen eviction reduced mean energy but collapsed retrieval. TQ-Ref preserved Qwen AWQ-like retrieval only at substantial measured energy and realized-storage overhead; prior eviction reduced that overhead but inherited eviction failure. These findings support implementation-aware, model-specific evaluation rather than additive compression assumptions. The ideal analysis proves conditional persistent-KV savings for declared packed layouts, while energy remains governed by $O_{net}<\epsilon_{mem}\Delta_D$ and quality equivalence. Production-kernel measurements are required before claiming packed/fused energy, latency, peak-VRAM, or power benefits.
 
 
 % ============================================================

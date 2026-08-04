@@ -1,0 +1,13 @@
+family,comparison,depth,n,gain_n01,loss_n10,paired_difference,p_exact,p_bonferroni
+core_bonferroni_12,Q2-Q1-W,all,60,0,47,-0.7833333333333333,1.4210854715202004e-14,1.7053025658242404e-13
+core_bonferroni_12,Q2-Q1-W,0.1,20,0,19,-0.95,3.814697265625e-06,4.57763671875e-05
+core_bonferroni_12,Q2-Q1-W,0.5,20,0,11,-0.55,0.0009765625,0.01171875
+core_bonferroni_12,Q2-Q1-W,0.9,20,0,17,-0.85,1.52587890625e-05,0.00018310546875
+core_bonferroni_12,Q3-Ref-Q1-W,all,60,1,0,0.016666666666666666,1.0,1.0
+core_bonferroni_12,Q3-Ref-Q1-W,0.1,20,1,0,0.05,1.0,1.0
+core_bonferroni_12,Q3-Ref-Q1-W,0.5,20,0,0,0.0,1.0,1.0
+core_bonferroni_12,Q3-Ref-Q1-W,0.9,20,0,0,0.0,1.0,1.0
+core_bonferroni_12,Q4-Ref-Q1-W,all,60,0,47,-0.7833333333333333,1.4210854715202004e-14,1.7053025658242404e-13
+core_bonferroni_12,Q4-Ref-Q1-W,0.1,20,0,19,-0.95,3.814697265625e-06,4.57763671875e-05
+core_bonferroni_12,Q4-Ref-Q1-W,0.5,20,0,11,-0.55,0.0009765625,0.01171875
+core_bonferroni_12,Q4-Ref-Q1-W,0.9,20,0,17,-0.85,1.52587890625e-05,0.00018310546875

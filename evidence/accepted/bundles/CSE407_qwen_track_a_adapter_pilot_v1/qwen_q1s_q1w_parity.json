@@ -1,0 +1,108 @@
+{
+  "passed": true,
+  "schema_version": "track-a-qwen-adapter-pilot-v1-2026-08-04-1",
+  "fingerprint": "91def77c920729e9",
+  "atol": 0.005,
+  "rtol": 0.005,
+  "rows": [
+    {
+      "scenario_id": "d10-s00",
+      "input_ids_sha256": "3264e81d937019283a11072a81530040518e0db5d02c713082985f58339b29cb",
+      "max_abs_logit_difference": 0.0,
+      "logits_allclose": true,
+      "top1_agreement": true,
+      "greedy_token_ids_equal": true,
+      "greedy_responses_equal": true,
+      "full_layer_cache_lengths_equal": true,
+      "absence_of_eviction_tq_state": true,
+      "stock_output_token_ids": [
+        32,
+        20,
+        22,
+        19,
+        11250,
+        17,
+        22,
+        151645
+      ],
+      "wrapped_output_token_ids": [
+        32,
+        20,
+        22,
+        19,
+        11250,
+        17,
+        22,
+        151645
+      ],
+      "stock_response": "A574-N27",
+      "wrapped_response": "A574-N27"
+    },
+    {
+      "scenario_id": "d50-s00",
+      "input_ids_sha256": "39f4572a840a60eaf9040cb1a9aefe1b1212819ad5791a306ba39fa194de2f5b",
+      "max_abs_logit_difference": 0.0,
+      "logits_allclose": true,
+      "top1_agreement": true,
+      "greedy_token_ids_equal": true,
+      "greedy_responses_equal": true,
+      "full_layer_cache_lengths_equal": true,
+      "absence_of_eviction_tq_state": true,
+      "stock_output_token_ids": [
+        33,
+        21,
+        20,
+        22,
+        15843,
+        22,
+        24,
+        151645
+      ],
+      "wrapped_output_token_ids": [
+        33,
+        21,
+        20,
+        22,
+        15843,
+        22,
+        24,
+        151645
+      ],
+      "stock_response": "B657-K79",
+      "wrapped_response": "B657-K79"
+    },
+    {
+      "scenario_id": "d90-s00",
+      "input_ids_sha256": "e8999e3a2fe28abb091087a5307d044b3017ba3c9dbfe4e357e3c49efebb028d",
+      "max_abs_logit_difference": 0.0,
+      "logits_allclose": true,
+      "top1_agreement": true,
+      "greedy_token_ids_equal": true,
+      "greedy_responses_equal": true,
+      "full_layer_cache_lengths_equal": true,
+      "absence_of_eviction_tq_state": true,
+      "stock_output_token_ids": [
+        32,
+        16,
+        20,
+        15,
+        28242,
+        23,
+        24,
+        151645
+      ],
+      "wrapped_output_token_ids": [
+        32,
+        16,
+        20,
+        15,
+        28242,
+        23,
+        24,
+        151645
+      ],
+      "stock_response": "A150-Q89",
+      "wrapped_response": "A150-Q89"
+    }
+  ]
+}

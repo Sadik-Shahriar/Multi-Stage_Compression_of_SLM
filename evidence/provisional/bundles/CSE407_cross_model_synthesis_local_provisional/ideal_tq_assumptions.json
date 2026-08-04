@@ -1,0 +1,62 @@
+{
+  "bootstrap": {
+    "frequency_interpretation": "resampling selection stability only",
+    "repetitions": 2000,
+    "seed": 909407
+  },
+  "energy_model": {
+    "epsilon_mem_domain": null,
+    "equation": "E_ideal = E_baseline - epsilon_mem * Delta_D + O_net",
+    "numerical_energy_projection_allowed": false,
+    "o_net_domain": null
+  },
+  "evidence_boundary": {
+    "ideal": "analytical perfectly packed/fused persistent-KV reference envelope",
+    "measured": "accepted FP16/AWQ/eviction/TQ-Ref systems rows and traces",
+    "realized_reference": "numerically active uint8-indexed materialized-KV unfused TQ-Ref",
+    "shape_provenance": "reconstructed_from_runtime_asserted_contract_and_persisted_aggregate_bytes"
+  },
+  "excluded_claims": [
+    "measured ideal kernel",
+    "exact DRAM traffic",
+    "total peak VRAM",
+    "projected latency",
+    "lower instantaneous power",
+    "universal best configuration"
+  ],
+  "model_geometry": {
+    "llama": {
+      "head_dim": 128,
+      "kv_heads": 8,
+      "layers": 28,
+      "model": "llama"
+    },
+    "qwen": {
+      "head_dim": 128,
+      "kv_heads": 2,
+      "layers": 36,
+      "model": "qwen"
+    }
+  },
+  "phase_dataflow": {
+    "decode": "logical compulsory reads/writes; ideal reconstruction remains in registers/shared memory",
+    "decode_tokens": 64,
+    "hardware_dram_traffic_identified": false,
+    "prefill": "full prompt attention precedes eviction/quantized persistence"
+  },
+  "quality_model": {
+    "delta_impl_domain": "-wilson_low <= delta_impl <= 1-wilson_high so the full shifted quality interval remains in [0,1]",
+    "implementation_quality_change_outside_equivalence": "unidentified",
+    "unchanged_quality_requires_strict_output_equivalence": true
+  },
+  "schema_version": "cse407-cross-model-synthesis-v1-2026-08-05-1",
+  "storage_layout": {
+    "alignment_bytes": 1,
+    "batch": 1,
+    "fp_bytes": 2,
+    "layout_claim": "perfect_byte_packed_reference_envelope_not_allocator_claim",
+    "metadata_bytes_per_layer": 0,
+    "norm_bytes": 4,
+    "residual_tokens": 128
+  }
+}
