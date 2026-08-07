@@ -68,17 +68,24 @@ Project/
   `track-a-qwen-full-reference-v1-2026-08-04-1`, fingerprint `861d89617e53034d`
 - **evidence/accepted/bundles/CSE407_qwen_track_a_reference_v1/** — immutable accepted A4 evidence;
   artifact manifest `975cb8f19405f9d7e4267bc4a8143ead943c853776c6ba88b8697695ac78c1c9`
-- **09_cross_model_synthesis_v1_colab.ipynb** — clean Colab-ready CPU-only A5
-  notebook; Drive execution is pending
-- **evidence/provisional/bundles/CSE407_cross_model_synthesis_local_provisional/** — validated local reference
-  output, fingerprint `b19adce0924b4203`; not authoritative Colab evidence
-- Prior Colab artifacts use a flat `/content/drive/MyDrive/CSE407_*` layout;
-  Notebook 09 resolves this artifact base separately from the source tree
+- **09_cross_model_synthesis_v1_colab.ipynb** — CPU-only A5 synthesis source;
+  its validated local output remains provisional under fingerprint
+  `b19adce0924b4203`
+- **evidence/provisional/bundles/CSE407_cross_model_synthesis_local_provisional/** — read-only
+  41-file provisional synthesis used for current figures; all proof gates passed,
+  but it has not been promoted to accepted evidence
+- **Notebook 09B visualization run** — completed in the connected Colab runtime
+  using only the public project ZIP via `gdown`; no Drive mount or `MyDrive`
+  dependency. Eight figures (16 PNG/PDF files) passed under visualization
+  fingerprint `53ead4e6db45d2a8`; archive SHA-256
+  `e718e64193f2b162f674d87d5654935ba1f879fa5064243e4e30c3493ae0eb88`
 
 ## Experiment Delivery Rule
 - All new experiment implementations must be self-contained Google Colab
   `.ipynb` notebooks with clear Markdown cells, numbered run order, validation
-  gates, and isolated Drive output paths.
+  gates, and isolated output paths. Drive must be optional; public `gdown`
+  acquisition plus a downloadable `/content` archive is the current portable
+  pattern for CPU-only derived analysis.
 - Do not create standalone `.py` files as experiment runners.
 - Track A notebooks live under `experiments/track_a_failsafe_colab/`.
 
@@ -134,6 +141,12 @@ Project/
   evidence; it proves only conditional persistent-memory results and uses an
   indexed non-traffic-overhead versus modeled compulsory-byte-demand break-even
   model
+- Notebook 09B visualizes measured TQ-Ref overhead, context scaling, Wilson
+  quality intervals, measured/realized/ideal storage, ideal 2/3/4-bit component
+  scaling, modeled phase demand, symbolic energy break-even, and the measured
+  energy-quality-memory frontier. Ideal energy remains
+  `E_ideal = E_baseline - epsilon_mem * Delta_D + O_net`; no numerical ideal
+  joules, latency, throughput, power, or peak-VRAM value is identified.
 
 ## Firecrawl
 - CLI v1.19.19 installed
@@ -146,6 +159,9 @@ Project/
 - Preserve/export the executed Notebook 07 copy for the reproducibility package
 - Keep `evidence/accepted/bundles/CSE407_qwen_track_a_reference_v1/` immutable; Notebook 08 required two
   in-session repair cells, now preserved inline in the exported notebook
-- Run `09_cross_model_synthesis_v1_colab.ipynb` in a Colab CPU runtime and
-  independently accept the resulting `CSE407_cross_model_synthesis_v1/` bundle
+- Download and preserve the completed Colab visualization ZIP and the edited
+  Notebook 09B before the ephemeral runtime disconnects
+- Keep figures labeled as derived from provisional synthesis fingerprint
+  `b19adce0924b4203` until A5 synthesis is independently promoted or rerun from
+  a canonical source
 - Complete final paper formatting, figure placement, and reproducibility package

@@ -1,0 +1,181 @@
+model,pair,context,phase,block,overhead_pct
+llama,TQ-only,1024,Prefill,0,34.75777421568132
+llama,TQ-only,1024,Prefill,1,33.87608687037391
+llama,TQ-only,1024,Prefill,2,25.650774518580416
+llama,TQ-only,1024,Prefill,3,30.824234129087575
+llama,TQ-only,1024,Prefill,4,22.899900435375475
+llama,TQ-only,1024,Decode,0,49.3052355508677
+llama,TQ-only,1024,Decode,1,26.49926913791668
+llama,TQ-only,1024,Decode,2,16.242330132979724
+llama,TQ-only,1024,Decode,3,48.192794571324185
+llama,TQ-only,1024,Decode,4,53.31954417807169
+llama,TQ-only,1024,Total,0,47.08515288450524
+llama,TQ-only,1024,Total,1,27.423307306439746
+llama,TQ-only,1024,Total,2,17.349379211968657
+llama,TQ-only,1024,Total,3,45.69346846297778
+llama,TQ-only,1024,Total,4,49.33885860854242
+llama,TQ-only,2048,Prefill,0,19.644784768490155
+llama,TQ-only,2048,Prefill,1,22.822519609289348
+llama,TQ-only,2048,Prefill,2,25.00699400295756
+llama,TQ-only,2048,Prefill,3,17.865413199368945
+llama,TQ-only,2048,Prefill,4,17.216672285066842
+llama,TQ-only,2048,Decode,0,60.86312378969302
+llama,TQ-only,2048,Decode,1,49.17471212844592
+llama,TQ-only,2048,Decode,2,40.83464137965536
+llama,TQ-only,2048,Decode,3,40.965282857415346
+llama,TQ-only,2048,Decode,4,54.86994269891781
+llama,TQ-only,2048,Total,0,47.74999192601085
+llama,TQ-only,2048,Total,1,40.75986737791491
+llama,TQ-only,2048,Total,2,36.15076929304212
+llama,TQ-only,2048,Total,3,33.86896675030478
+llama,TQ-only,2048,Total,4,42.41519545535365
+llama,TQ-only,4096,Prefill,0,10.949288023549828
+llama,TQ-only,4096,Prefill,1,10.153751864414337
+llama,TQ-only,4096,Prefill,2,10.428289355276208
+llama,TQ-only,4096,Prefill,3,11.131690399164384
+llama,TQ-only,4096,Prefill,4,11.462325371741096
+llama,TQ-only,4096,Decode,0,79.85172467226757
+llama,TQ-only,4096,Decode,1,76.04420373200719
+llama,TQ-only,4096,Decode,2,80.93875190271358
+llama,TQ-only,4096,Decode,3,80.97477126800256
+llama,TQ-only,4096,Decode,4,79.2967494866904
+llama,TQ-only,4096,Total,0,44.98654395384314
+llama,TQ-only,4096,Total,1,43.011230316445165
+llama,TQ-only,4096,Total,2,45.02374782964993
+llama,TQ-only,4096,Total,3,45.37379895079723
+llama,TQ-only,4096,Total,4,45.19061837509774
+llama,Eviction + TQ,1024,Prefill,0,27.399271296865617
+llama,Eviction + TQ,1024,Prefill,1,34.27015542909875
+llama,Eviction + TQ,1024,Prefill,2,14.542393395324618
+llama,Eviction + TQ,1024,Prefill,3,18.85489742451125
+llama,Eviction + TQ,1024,Prefill,4,9.94723051094378
+llama,Eviction + TQ,1024,Decode,0,46.83315851218178
+llama,Eviction + TQ,1024,Decode,1,46.76720117799628
+llama,Eviction + TQ,1024,Decode,2,58.36605336272068
+llama,Eviction + TQ,1024,Decode,3,49.8655353144535
+llama,Eviction + TQ,1024,Decode,4,37.969029806487
+llama,Eviction + TQ,1024,Total,0,44.168994137495616
+llama,Eviction + TQ,1024,Total,1,45.027340315842274
+llama,Eviction + TQ,1024,Total,2,51.7215964418348
+llama,Eviction + TQ,1024,Total,3,45.44844817674841
+llama,Eviction + TQ,1024,Total,4,33.59344245661958
+llama,Eviction + TQ,2048,Prefill,0,12.05777375847466
+llama,Eviction + TQ,2048,Prefill,1,11.190497008708718
+llama,Eviction + TQ,2048,Prefill,2,4.585591726415673
+llama,Eviction + TQ,2048,Prefill,3,4.316565340320818
+llama,Eviction + TQ,2048,Prefill,4,13.387077853544906
+llama,Eviction + TQ,2048,Decode,0,21.54100594296517
+llama,Eviction + TQ,2048,Decode,1,45.61338783371201
+llama,Eviction + TQ,2048,Decode,2,55.70710756571776
+llama,Eviction + TQ,2048,Decode,3,35.5512735250207
+llama,Eviction + TQ,2048,Decode,4,28.173916973748558
+llama,Eviction + TQ,2048,Total,0,18.91785512256168
+llama,Eviction + TQ,2048,Total,1,35.91203012778332
+llama,Eviction + TQ,2048,Total,2,38.924111210079566
+llama,Eviction + TQ,2048,Total,3,25.722319796954178
+llama,Eviction + TQ,2048,Total,4,24.00887958833079
+llama,Eviction + TQ,4096,Prefill,0,0.9079886238744024
+llama,Eviction + TQ,4096,Prefill,1,3.899299397831639
+llama,Eviction + TQ,4096,Prefill,2,2.708091603971292
+llama,Eviction + TQ,4096,Prefill,3,1.2146789198771062
+llama,Eviction + TQ,4096,Prefill,4,4.7839359443243765
+llama,Eviction + TQ,4096,Decode,0,36.112053285589774
+llama,Eviction + TQ,4096,Decode,1,45.06781785002039
+llama,Eviction + TQ,4096,Decode,2,68.66228858735367
+llama,Eviction + TQ,4096,Decode,3,73.08837925539417
+llama,Eviction + TQ,4096,Decode,4,68.92139701087194
+llama,Eviction + TQ,4096,Total,0,15.81917489475129
+llama,Eviction + TQ,4096,Total,1,20.28547399411687
+llama,Eviction + TQ,4096,Total,2,28.240012202655308
+llama,Eviction + TQ,4096,Total,3,29.21563248792981
+llama,Eviction + TQ,4096,Total,4,30.174735556130365
+qwen,TQ-only,1024,Prefill,0,6.202579498503431
+qwen,TQ-only,1024,Prefill,1,5.126238070303626
+qwen,TQ-only,1024,Prefill,2,11.435639642287144
+qwen,TQ-only,1024,Prefill,3,6.133293744086267
+qwen,TQ-only,1024,Prefill,4,9.659849157591173
+qwen,TQ-only,1024,Decode,0,43.19572862951727
+qwen,TQ-only,1024,Decode,1,19.896374109423107
+qwen,TQ-only,1024,Decode,2,24.912131729630723
+qwen,TQ-only,1024,Decode,3,17.034100707595798
+qwen,TQ-only,1024,Decode,4,19.678304263873958
+qwen,TQ-only,1024,Total,0,37.94243275741635
+qwen,TQ-only,1024,Total,1,18.13299039944848
+qwen,TQ-only,1024,Total,2,23.30684331799906
+qwen,TQ-only,1024,Total,3,15.682161421294738
+qwen,TQ-only,1024,Total,4,18.45806962132538
+qwen,TQ-only,2048,Prefill,0,7.243308135603985
+qwen,TQ-only,2048,Prefill,1,4.961729902574758
+qwen,TQ-only,2048,Prefill,2,5.8799594525618515
+qwen,TQ-only,2048,Prefill,3,0.7212748577203665
+qwen,TQ-only,2048,Prefill,4,11.57414548209517
+qwen,TQ-only,2048,Decode,0,37.46938886518083
+qwen,TQ-only,2048,Decode,1,53.60336238204919
+qwen,TQ-only,2048,Decode,2,39.94187419142845
+qwen,TQ-only,2048,Decode,3,53.76223081401222
+qwen,TQ-only,2048,Decode,4,41.69647083003981
+qwen,TQ-only,2048,Total,0,30.665020585235137
+qwen,TQ-only,2048,Total,1,41.59081154669618
+qwen,TQ-only,2048,Total,2,31.735843331775776
+qwen,TQ-only,2048,Total,3,40.577337961309716
+qwen,TQ-only,2048,Total,4,34.58324682108938
+qwen,TQ-only,4096,Prefill,0,5.968162191197113
+qwen,TQ-only,4096,Prefill,1,4.459599517858043
+qwen,TQ-only,4096,Prefill,2,6.31546252448906
+qwen,TQ-only,4096,Prefill,3,5.310022813252751
+qwen,TQ-only,4096,Prefill,4,5.173148487153069
+qwen,TQ-only,4096,Decode,0,48.040855587736154
+qwen,TQ-only,4096,Decode,1,63.65686239428507
+qwen,TQ-only,4096,Decode,2,39.16932445244981
+qwen,TQ-only,4096,Decode,3,49.74008056241083
+qwen,TQ-only,4096,Decode,4,67.78782033622672
+qwen,TQ-only,4096,Total,0,28.725288842349546
+qwen,TQ-only,4096,Total,1,34.65098972331427
+qwen,TQ-only,4096,Total,2,24.838263045506444
+qwen,TQ-only,4096,Total,3,28.73723356271545
+qwen,TQ-only,4096,Total,4,36.99410052364328
+qwen,Eviction + TQ,1024,Prefill,0,14.996913727879718
+qwen,Eviction + TQ,1024,Prefill,1,15.399199213565979
+qwen,Eviction + TQ,1024,Prefill,2,8.192725738066455
+qwen,Eviction + TQ,1024,Prefill,3,14.374433726839065
+qwen,Eviction + TQ,1024,Prefill,4,5.427813730912452
+qwen,Eviction + TQ,1024,Decode,0,36.12217365537528
+qwen,Eviction + TQ,1024,Decode,1,25.695481797855773
+qwen,Eviction + TQ,1024,Decode,2,35.297156992740454
+qwen,Eviction + TQ,1024,Decode,3,24.101796967233895
+qwen,Eviction + TQ,1024,Decode,4,21.30538241249014
+qwen,Eviction + TQ,1024,Total,0,33.28420593716975
+qwen,Eviction + TQ,1024,Total,1,24.351024823332494
+qwen,Eviction + TQ,1024,Total,2,31.511364353939445
+qwen,Eviction + TQ,1024,Total,3,22.91048174269141
+qwen,Eviction + TQ,1024,Total,4,19.10997468029927
+qwen,Eviction + TQ,2048,Prefill,0,0.36772639630754556
+qwen,Eviction + TQ,2048,Prefill,1,5.079115125668013
+qwen,Eviction + TQ,2048,Prefill,2,5.014629138458233
+qwen,Eviction + TQ,2048,Prefill,3,1.3607573127652792
+qwen,Eviction + TQ,2048,Prefill,4,3.309882269588227
+qwen,Eviction + TQ,2048,Decode,0,31.790206797938954
+qwen,Eviction + TQ,2048,Decode,1,40.50307362016317
+qwen,Eviction + TQ,2048,Decode,2,47.40644183878069
+qwen,Eviction + TQ,2048,Decode,3,18.163531101178645
+qwen,Eviction + TQ,2048,Decode,4,45.72796407142433
+qwen,Eviction + TQ,2048,Total,0,22.985542781408018
+qwen,Eviction + TQ,2048,Total,1,30.59010909289949
+qwen,Eviction + TQ,2048,Total,2,35.4380108110775
+qwen,Eviction + TQ,2048,Total,3,13.669944832608493
+qwen,Eviction + TQ,2048,Total,4,33.47944676663287
+qwen,Eviction + TQ,4096,Prefill,0,-2.053347131575861
+qwen,Eviction + TQ,4096,Prefill,1,2.94532613344827
+qwen,Eviction + TQ,4096,Prefill,2,0.22283196713544415
+qwen,Eviction + TQ,4096,Prefill,3,1.380903892863365
+qwen,Eviction + TQ,4096,Prefill,4,0.8510487776008807
+qwen,Eviction + TQ,4096,Decode,0,36.00331950924816
+qwen,Eviction + TQ,4096,Decode,1,25.68370938945879
+qwen,Eviction + TQ,4096,Decode,2,31.949042574436156
+qwen,Eviction + TQ,4096,Decode,3,31.22243061540668
+qwen,Eviction + TQ,4096,Decode,4,26.096025057042944
+qwen,Eviction + TQ,4096,Total,0,15.27125809934078
+qwen,Eviction + TQ,4096,Total,1,13.832002697709394
+qwen,Eviction + TQ,4096,Total,2,14.552690225226934
+qwen,Eviction + TQ,4096,Total,3,14.942632144225815
+qwen,Eviction + TQ,4096,Total,4,12.483457616023964

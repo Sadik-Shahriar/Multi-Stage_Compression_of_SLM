@@ -1,0 +1,111 @@
+{
+  "schema": "cse407-cross-model-visualization-v1-2026-08-07-1",
+  "source_fingerprint": "b19adce0924b4203",
+  "files": [
+    {
+      "path": "fig01_measured_tq_overhead.pdf",
+      "bytes": 48342,
+      "sha256": "a5eb9f1465c2369c1dafc5975e7c8e2a10ea84a7ed6e25c502500cd75b0a1cc9"
+    },
+    {
+      "path": "fig01_measured_tq_overhead.png",
+      "bytes": 413401,
+      "sha256": "0e488b723703d1ff73e19df2224b997dfa6a4b93baa69a9c50a30393deaa5efd"
+    },
+    {
+      "path": "fig02_measured_context_scaling.pdf",
+      "bytes": 45327,
+      "sha256": "16c9228783088dc8bc87ba23196d25cafacdf8432efe1a2dee7dd159e7bc120a"
+    },
+    {
+      "path": "fig02_measured_context_scaling.png",
+      "bytes": 592345,
+      "sha256": "5e1a7e2e632ed4058e167d3b4b0950c40bb0b94cf33f7cb317ff56ea168967c6"
+    },
+    {
+      "path": "fig03_retrieval_wilson.pdf",
+      "bytes": 26957,
+      "sha256": "bdc01c09bd2c9c54d6219a54a4939941fce261daea11051b0ec3c15c4cf53891"
+    },
+    {
+      "path": "fig03_retrieval_wilson.png",
+      "bytes": 178300,
+      "sha256": "4e0a7c8841995e1511afdc9376862d130bbb952c024c4b71c59d8b9c1c2d5fa2"
+    },
+    {
+      "path": "fig04_storage_realization_gap.pdf",
+      "bytes": 29364,
+      "sha256": "d82ff246f3c0074a26ba6299554153b4a5caeec2ff335b36831898b3a035d3e6"
+    },
+    {
+      "path": "fig04_storage_realization_gap.png",
+      "bytes": 196700,
+      "sha256": "a00ec3fb6a405600412a46a23a166fc74e4eb251fe9d3555d9a71e9b1cc4a379"
+    },
+    {
+      "path": "fig05_ideal_packed_components.pdf",
+      "bytes": 28126,
+      "sha256": "db6f647fce2a727abdf341de856626adc084b08ccd018bf0d0a958a8ec729860"
+    },
+    {
+      "path": "fig05_ideal_packed_components.png",
+      "bytes": 260800,
+      "sha256": "e2356026dbf081d76dd64990f0f90af1e4cb9324135b77aa2e964c3b8bb5d43a"
+    },
+    {
+      "path": "fig06_modeled_phase_byte_demand.pdf",
+      "bytes": 32043,
+      "sha256": "fcb9111500cf951917532c575d1d37b6ba91c2e684e2e82f27bf706432e82165"
+    },
+    {
+      "path": "fig06_modeled_phase_byte_demand.png",
+      "bytes": 368195,
+      "sha256": "99656e35af0a22e45e30b1dca646c164a1e264a398411bd9c1b8ae52fb924862"
+    },
+    {
+      "path": "fig07_symbolic_energy_break_even.pdf",
+      "bytes": 28062,
+      "sha256": "4be58704ad3c7f106659171a6f10fd50c41ca0f3972db46b16321f79db3e37a0"
+    },
+    {
+      "path": "fig07_symbolic_energy_break_even.png",
+      "bytes": 191879,
+      "sha256": "1f199d64eb12de38c1e346f1921726231067e45cda98b496df649c3e0e661426"
+    },
+    {
+      "path": "fig08_measured_pareto_energy_quality_memory.pdf",
+      "bytes": 31213,
+      "sha256": "568a12790dd3e18a2bad11c95423fb2e3f9970948c2d5c95085cb1099e417eda"
+    },
+    {
+      "path": "fig08_measured_pareto_energy_quality_memory.png",
+      "bytes": 182172,
+      "sha256": "e7f097217838a986f61fc54b048cbe4a4158956a1170ed8647f1fcf69d4d3dab"
+    },
+    {
+      "path": "measured_tq_overhead_blocks.csv",
+      "bytes": 8835,
+      "sha256": "62e31a5d654763ff3f8e872f1322709c0f97177f5433ab04fc4665ec1fdd7ae3"
+    },
+    {
+      "path": "symbolic_break_even_boundaries.csv",
+      "bytes": 1313,
+      "sha256": "187e0e64e355ea4cf8767dad657e0e58c2d431dc123648a194e1feaaff0da395"
+    },
+    {
+      "path": "visualization_findings.md",
+      "bytes": 1886,
+      "sha256": "6f0c4ea21e60b51b745d6736812eaeb1f92994a4be3382aeedf3a43d12f6ac19"
+    },
+    {
+      "path": "visualization_metrics.json",
+      "bytes": 990,
+      "sha256": "0d32c11be011c860efb78a033d1d3d784a00d49a47ce30da9cfbf70c39cfaeee"
+    },
+    {
+      "path": "visualization_protocol.json",
+      "bytes": 884,
+      "sha256": "c924f59b3795d9896fd9f33ddd854c2cdeeeefb56649590bdfa8864f52b57219"
+    }
+  ]
+}

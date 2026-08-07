@@ -27,15 +27,19 @@ history. The executed protocol supersedes them:
   Q1-W, but retrieval fell from 48/60 to 1/60. Q3-Ref retained 49/60 retrieval
   but used `812.28 +/- 13.11 J`. Q4-Ref also retrieved only 1/60.
 - Raw, 82 W, and 70 W core/sensitivity rankings and registered significance
-  decisions were stable. The next task is CPU-only cross-model synthesis.
-- A local Notebook 09 reference run completed under provisional fingerprint
-  `b19adce0924b4203`, but the authoritative Google Colab CPU execution is still
-  pending. Use `09_cross_model_synthesis_v1_colab.ipynb`; register only its new
-  Drive output and fingerprint as final A5 evidence.
+  decisions were stable.
+- A local Notebook 09 synthesis completed under provisional fingerprint
+  `b19adce0924b4203`. Its 41-file output passed the registered proof gates but
+  remains provisional rather than accepted A5 evidence.
+- A Drive-independent Notebook 09B visualization run completed in Colab from
+  that immutable provisional bundle. It used the public project ZIP through
+  `gdown`, produced eight figures in PNG/PDF, preserved the source hashes, and
+  passed under visualization fingerprint `53ead4e6db45d2a8`. This figure run does
+  not promote the source synthesis or create new measurements.
 
 ## Registered Ideal-Realization Extension
 
-Notebook 09 must add a realization-gap analysis that keeps empirical evidence,
+Notebook 09 added a realization-gap analysis that keeps empirical evidence,
 the measured TQ-Ref object graph, and an ideal packed/fused counterfactual
 separate. This extension is analytical and CPU-only; it is not a substitute for
 a production-kernel experiment.
@@ -108,7 +112,9 @@ fractions are not probabilities without a justified distribution.
 **Execution format:** All new experiments must be self-contained Google Colab
 `.ipynb` notebooks with explanatory Markdown cells. Standalone `.py` experiment
 runners are not permitted. Keep each track in a dedicated notebook folder with
-numeric run-order prefixes and isolated Drive artifact paths.
+numeric run-order prefixes and isolated artifact paths. CPU-only derived
+notebooks should support public `gdown` input and downloadable `/content` output
+without requiring a Google Drive mount.
 
 ---
 

@@ -1,0 +1,30 @@
+{
+  "source_fingerprint": "b19adce0924b4203",
+  "measured_tq_overhead_4096_total_pct": {
+    "llama_tq-only": 44.71718788516664,
+    "llama_eviction_plus_tq": 24.74700582711673,
+    "qwen_tq-only": 30.7891751395058,
+    "qwen_eviction_plus_tq": 14.216408156505377
+  },
+  "four_bit_decode_storage": {
+    "llama": {
+      "matched_non_tq_mib": 455.0,
+      "realized_tq_ref_mib": 696.5,
+      "ideal_packed_mib": 131.140625,
+      "ideal_vs_matched_fp_ratio": 0.2882211538461538,
+      "ideal_vs_realized_ratio": 0.188285175879397
+    },
+    "qwen": {
+      "matched_non_tq_mib": 146.25,
+      "realized_tq_ref_mib": 223.875,
+      "ideal_packed_mib": 42.15234375,
+      "ideal_vs_matched_fp_ratio": 0.2882211538461538,
+      "ideal_vs_realized_ratio": 0.188285175879397
+    }
+  },
+  "ideal_energy_identification": {
+    "equation": "E_ideal = E_baseline - epsilon_mem * Delta_D + O_net",
+    "numerical_parameter_domain_declared": false,
+    "numerical_ideal_energy_available": false
+  }
+}

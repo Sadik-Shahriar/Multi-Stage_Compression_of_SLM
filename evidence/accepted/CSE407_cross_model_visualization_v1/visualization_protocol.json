@@ -1,0 +1,19 @@
+{
+  "schema": "cse407-cross-model-visualization-v1-2026-08-07-1",
+  "source_bundle": "CSE407_cross_model_synthesis_local_provisional",
+  "source_fingerprint": "b19adce0924b4203",
+  "input_acquisition": "public Google Drive file downloaded with gdown; no Drive mount",
+  "evidence_status": "derived from provisional synthesis; does not promote source evidence",
+  "figure_count": 8,
+  "figure_stems": [
+    "fig01_measured_tq_overhead",
+    "fig02_measured_context_scaling",
+    "fig03_retrieval_wilson",
+    "fig04_storage_realization_gap",
+    "fig05_ideal_packed_components",
+    "fig06_modeled_phase_byte_demand",
+    "fig07_symbolic_energy_break_even",
+    "fig08_measured_pareto_energy_quality_memory"
+  ],
+  "ideal_claim_boundary": "ideal persistent-KV and logical byte-demand envelope only; numerical ideal energy, latency, throughput, power, and peak VRAM are unidentified"
+}

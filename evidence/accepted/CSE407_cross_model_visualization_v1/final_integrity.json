@@ -1,0 +1,12 @@
+{
+  "schema": "cse407-cross-model-visualization-v1-2026-08-07-1",
+  "passed": true,
+  "visualization_fingerprint": "53ead4e6db45d2a8",
+  "source_fingerprint": "b19adce0924b4203",
+  "source_unchanged": true,
+  "figures": 8,
+  "figure_files": 16,
+  "output_files_before_final_integrity": 22,
+  "ideal_numerical_energy_claimed": false,
+  "completed_at_utc": "2026-08-07T07:42:58.954090+00:00"
+}

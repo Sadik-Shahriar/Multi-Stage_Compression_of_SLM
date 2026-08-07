@@ -34,14 +34,16 @@ standalone `.py` files as experiment runners.
    traces; all manifest, shard/CSV, reintegration, analysis, and final-integrity
     checks passed. Treat the local mirror at
     `evidence/accepted/bundles/CSE407_qwen_track_a_reference_v1/` as immutable.
-10. Run `09_cross_model_synthesis_v1_colab.ipynb` in a Google Colab CPU runtime.
-    It mounts Drive and resolves the source tree separately from the established
-    flat artifact base `/content/drive/MyDrive`, where prior `CSE407_*` bundles
-    were written. It validates dependencies and fails if the flat output
-    `/content/drive/MyDrive/CSE407_cross_model_synthesis_v1/` already exists. The prior
-    local output is preserved separately as
+10. `09_cross_model_synthesis_v1_colab.ipynb` produced the validated provisional
+    41-file synthesis at
     `evidence/provisional/bundles/CSE407_cross_model_synthesis_local_provisional/`
-    and is not authoritative.
+    under fingerprint `b19adce0924b4203`. It remains provisional rather than
+    accepted A5 evidence.
+11. The connected Colab notebook was rebuilt as Drive-independent Notebook 09B.
+    It downloads the public project ZIP with `gdown`, validates the provisional
+    synthesis read-only, and writes only to
+    `/content/CSE407_cross_model_visualization_v1/`. Eight figures and 16
+    PNG/PDF files passed under visualization fingerprint `53ead4e6db45d2a8`.
 
 ## Safety Rules
 
@@ -57,7 +59,8 @@ standalone `.py` files as experiment runners.
   trace files by basename rather than rewriting their original Colab paths.
 - Treat `evidence/accepted/bundles/CSE407_llama_power_robustness_v1/` as immutable derived evidence.
 - Keep every future experiment in this notebook folder with a numeric run-order
-  prefix and a separate Drive artifact directory.
+  prefix and a separate artifact directory. Do not require a Drive mount for
+  portable CPU-only derived analysis.
 - Notebook 07 writes only to `CSE407_qwen_track_a_adapter_pilot_v1/`. It fails
   closed if that directory is nonempty; preserve failed attempts and advance the
   protocol version rather than mixing sessions.
@@ -71,6 +74,7 @@ standalone `.py` files as experiment runners.
   `861d89617e53034d` does not cryptographically bind the repair-cell source.
 - Qwen TQ-Ref remains numerical, materialized-K/V, and unfused; do not present
   its 2/3/4-bit settings as physically packed cache measurements.
-- The Colab Notebook 09 writes only to `CSE407_cross_model_synthesis_v1/`. Ideal packed
-  storage is analytical, modeled byte demand is not measured DRAM traffic, and
-  ideal energy/latency are not point-identified.
+- Notebook 09B writes only to `CSE407_cross_model_visualization_v1/` under
+  `/content` and packages a downloadable ZIP. The source synthesis is never
+  modified. Ideal packed storage is analytical, modeled byte demand is not
+  measured DRAM traffic, and ideal energy/latency are not point-identified.

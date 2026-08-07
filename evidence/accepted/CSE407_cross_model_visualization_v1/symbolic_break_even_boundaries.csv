@@ -1,0 +1,9 @@
+model,projected_variant,nominal_tq_bits,baseline_variant,baseline_energy_mean_j,delta_d_bytes,ideal_energy_expression,break_even_o_net_expression
+llama,llama_ideal_tq2,2,C1,631.2452935271053,25147465728,631.24529352710533 - epsilon_mem * 25147465728 + O_net,O_net < epsilon_mem * 25147465728
+llama,llama_ideal_tq3,3,C1,631.2452935271053,23283326976,631.24529352710533 - epsilon_mem * 23283326976 + O_net,O_net < epsilon_mem * 23283326976
+llama,llama_ideal_tq4,4,C1,631.2452935271053,21419188224,631.24529352710533 - epsilon_mem * 21419188224 + O_net,O_net < epsilon_mem * 21419188224
+llama,llama_ideal_eviction_tq4,4,C2,529.29909481197,4957151552,529.29909481197001 - epsilon_mem * 4957151552 + O_net,O_net < epsilon_mem * 4957151552
+qwen,qwen_ideal_tq2,2,Q1-W,621.7506841736455,8083113984,621.75068417364548 - epsilon_mem * 8083113984 + O_net,O_net < epsilon_mem * 8083113984
+qwen,qwen_ideal_tq3,3,Q1-W,621.7506841736455,7483926528,621.75068417364548 - epsilon_mem * 7483926528 + O_net,O_net < epsilon_mem * 7483926528
+qwen,qwen_ideal_tq4,4,Q1-W,621.7506841736455,6884739072,621.75068417364548 - epsilon_mem * 6884739072 + O_net,O_net < epsilon_mem * 6884739072
+qwen,qwen_ideal_eviction_tq4,4,Q2,550.4829479052696,1593120848,550.48294790526961 - epsilon_mem * 1593120848 + O_net,O_net < epsilon_mem * 1593120848
