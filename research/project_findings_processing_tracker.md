@@ -25,7 +25,7 @@ Status labels:
 | Block | Status | Principal sources | Output section |
 |---|---|---|---|
 | Project scope, protocol, registry, and research questions | PROCESSED | `AGENTS.md`, `research/experiment_registry.json`, `research/research_plan.md`, course requirements | Sections 1-5 |
-| Proposal and literature state | PENDING | `proposal/proposal.md`, `proposal/literature_review.md`, `proposal/references.bib`, validation docs | Sections 6 and 18 |
+| Proposal and literature state | PROCESSED | `proposal/proposal.md`, `proposal/literature_review.md`, `proposal/references.bib`, validation docs | Sections 6 and 18 |
 | Llama v5 systems experiment | PROCESSED | accepted v5 environment/results, registry, Notebook 00/legacy provenance | Sections 7-8 |
 | Failed hard-retrieval pilots | PROCESSED | Notebooks 01-04, discarded pilot summaries, session completion plan | Section 9 |
 | Llama hard-quality and matched control | PROCESSED | accepted Notebook 05 bundle and final integrity | Section 10 |

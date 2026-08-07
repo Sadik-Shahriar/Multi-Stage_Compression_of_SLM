@@ -298,7 +298,38 @@ packaging work but do not alter the evidence.
 
 ## 6. Literature, Proposal, and Design Evolution
 
-### 6.1 Proposal-stage design
+### 6.1 Related Works (Literature Review)
+
+Researchers have studied various ways to compress language models. This section reviews the most relevant work across weight quantization, token eviction, KV cache quantization, compound methods, and energy measurement.
+
+**Weight Quantization:** Lin et al. developed AWQ, which protects activation-salient weights and enables low-bit deployment when paired with suitable kernels. Frantar et al. proposed GPTQ as a second-order alternative. The broader SLMQuant benchmark shows that compression behavior does not transfer uniformly from large models to SLMs, motivating direct measurement on Llama 3.2-3B.
+
+**Token Eviction:** Zhang et al. showed that only about 20% of tokens in the KV cache actually matter, which they called the Heavy Hitter Oracle (H2O). Li et al. built on this with SnapKV, which uses a short observation window to figure out which tokens can be safely removed, achieving large memory savings at 16K context. Cai et al. improved further with PyramidKV, which uses a pyramidal budget across layers and beats SnapKV by 5–15% NIAH accuracy.
+
+**KV Cache Quantization:** Zandieh et al. proposed TurboQuant, which uses random rotation and an optimized scalar codebook without calibration data. Liu et al. offered KIVI as a 2-bit alternative. Salfati showed that preserving dimensions through quantization can outperform rank reduction, with a growing advantage for GQA. These results motivate both TurboQuant and the executed bit-width sensitivity analysis.
+
+**Compound Methods:** Zhang et al. jointly allocate eviction and quantization through a rate-distortion formulation (RDKV) and report strong long-context accuracy and throughput. ThinKV likewise uses hybrid quantization and eviction for reasoning models. These methods demonstrate that joint compression is important, but neither supplies the sub-4B T4 energy ablation of AWQ, custom PyramidKV-style eviction, and TQ-Ref reported here. The present C4-Ref stack remains sequential rather than a reproduction of either joint optimizer.
+
+**Energy Measurement:** Argerich et al. published Watt Counts (2026), a large benchmark covering 5,000+ LLM inference experiments. They established that T4 GPUs draw about 12W idle and up to 82W at peak, and selected 10 Hz (100 ms) polling via pynvml as the best accuracy–overhead trade-off after evaluating rates from 1 Hz to 200 Hz.
+
+| Work | Wt.Q | Evict | KVQ | Energy |
+|---|---|---|---|---|
+| AWQ | ✓ | - | - | - |
+| GPTQ | ✓ | - | - | - |
+| SLMQuant | ✓ | - | - | - |
+| H2O | - | ✓ | - | - |
+| SnapKV | - | ✓ | - | - |
+| PyramidKV | - | ✓ | - | - |
+| TurboQuant | - | - | ✓ | - |
+| KIVI | - | - | ✓ | - |
+| RDKV | - | ✓ | ✓ | - |
+| ThinKV | - | ✓ | ✓ | - |
+| Watt Counts | - | - | - | ✓ |
+| **This Work** | **✓** | **✓** | **✓** | **✓** |
+
+As the table shows, the reviewed work does not cover all four dimensions together, especially at the SLM scale with real hardware energy measurement.
+
+### 6.2 Proposal-stage design
 
 The canonical proposal is a genuine planning artifact, not a description of the
 final experiment. It targeted Qwen3-4B because an earlier model comparison favored
