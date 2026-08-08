@@ -1,0 +1,106 @@
+<mxfile host="app.diagrams.net" agent="opencode" version="24.7.0">
+  <diagram id="paper-methodology" name="Paper Methodology">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="b1" value="1 &#xb7; Setup" style="swimlane;startSize=22;fillColor=#f5f5f5;strokeColor=#a0a0a0;html=1;fontStyle=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="50" y="40" width="1200" height="110" as="geometry"/>
+        </mxCell>
+        <mxCell id="t4" value="&lt;b&gt;Hardware&lt;/b&gt;&lt;br&gt;NVIDIA T4 (16 GB) &#183; Google Colab&lt;br&gt;GPU power sampled at 10 Hz (NVML)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#a0a0a0;" vertex="1" parent="b1">
+          <mxGeometry x="20" y="34" width="300" height="56" as="geometry"/>
+        </mxCell>
+        <mxCell id="ll" value="&lt;b&gt;Llama 3.2-3B-Instruct&lt;/b&gt;&lt;br&gt;28 layers &#183; GQA 3:1 &lt;br&gt;FP16 + AWQ checkpoints" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="b1">
+          <mxGeometry x="340" y="34" width="400" height="56" as="geometry"/>
+        </mxCell>
+        <mxCell id="qw" value="&lt;b&gt;Qwen2.5-3B-Instruct&lt;/b&gt;&lt;br&gt;36 layers &#183; GQA 8:1&lt;br&gt;FP16 + AWQ checkpoints" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="b1">
+          <mxGeometry x="760" y="34" width="400" height="56" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="b2" value="2 &#xb7; Configurations (run on both models)" style="swimlane;startSize=22;fillColor=#dae8fc;strokeColor=#6c8ebf;html=1;fontStyle=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="50" y="190" width="1200" height="150" as="geometry"/>
+        </mxCell>
+        <mxCell id="c0" value="&lt;b&gt;C0 / Q0&lt;/b&gt;&lt;br&gt;FP16 baseline" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;" vertex="1" parent="b2">
+          <mxGeometry x="20" y="34" width="200" height="56" as="geometry"/>
+        </mxCell>
+        <mxCell id="c1" value="&lt;b&gt;C1 / Q1-W&lt;/b&gt;&lt;br&gt;AWQ 4-bit" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d4e3fc;strokeColor=#6c8ebf;" vertex="1" parent="b2">
+          <mxGeometry x="240" y="34" width="200" height="56" as="geometry"/>
+        </mxCell>
+        <mxCell id="c2" value="&lt;b&gt;C2 / Q2&lt;/b&gt;&lt;br&gt;+ token eviction" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d4e3fc;strokeColor=#6c8ebf;" vertex="1" parent="b2">
+          <mxGeometry x="460" y="34" width="200" height="56" as="geometry"/>
+        </mxCell>
+        <mxCell id="c3" value="&lt;b&gt;C3-Ref / Q3-Ref&lt;/b&gt;&lt;br&gt;+ TQ-Ref" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d4e3fc;strokeColor=#6c8ebf;" vertex="1" parent="b2">
+          <mxGeometry x="680" y="34" width="200" height="56" as="geometry"/>
+        </mxCell>
+        <mxCell id="c4" value="&lt;b&gt;C4-Ref / Q4-Ref&lt;/b&gt;&lt;br&gt;compound: eviction then TQ-Ref" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffd9d9;strokeColor=#b85450;" vertex="1" parent="b2">
+          <mxGeometry x="900" y="34" width="220" height="56" as="geometry"/>
+        </mxCell>
+        <mxCell id="a01" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;fontSize=9;" edge="1" parent="b2" source="c0" target="c1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="a12" value="+ eviction" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;fontSize=9;" edge="1" parent="b2" source="c1" target="c2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="a13" value="+ TQ-Ref" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;fontSize=9;" edge="1" parent="b2" source="c1" target="c3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="a24" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;fontSize=9;" edge="1" parent="b2" source="c2" target="c4">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="a34" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;fontSize=9;" edge="1" parent="b2" source="c3" target="c4">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="b2note" value="TQ-Ref = TurboQuant 0.2.0 reference path (numerically active, but retains materialized K/V &#8212; not a packed kernel). Same 60 frozen scenarios and 3 contexts for both models." style="text;html=1;align=center;fontSize=11;fontColor=#444444;verticalAlign=middle;" vertex="1" parent="b2">
+          <mxGeometry x="20" y="104" width="1160" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="b3" value="3 &#xb7; Measurements (what we recorded)" style="swimlane;startSize=22;fillColor=#d5e8d4;strokeColor=#82b366;html=1;fontStyle=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="50" y="380" width="1200" height="180" as="geometry"/>
+        </mxCell>
+        <mxCell id="m1" value="&lt;b&gt;Energy&lt;/b&gt;&lt;br&gt;10 Hz power traces &#8594; trapezoidal integration (joules)&lt;br&gt;prefill vs decode separated &#183; contexts 1024 / 2048 / 4096&lt;br&gt;fixed 64-token decode &#183; 5 repeated blocks" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5f0d0;strokeColor=#82b366;" vertex="1" parent="b3">
+          <mxGeometry x="20" y="34" width="360" height="94" as="geometry"/>
+        </mxCell>
+        <mxCell id="m2" value="&lt;b&gt;Quality&lt;/b&gt;&lt;br&gt;frozen hard-retrieval benchmark (calibrated over 4 pilots)&lt;br&gt;60 scenarios per config &#183; exact code from 4096-token doc&lt;br&gt;depths 10% / 50% / 90% + format &amp; NLL diagnostics" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5f0d0;strokeColor=#82b366;" vertex="1" parent="b3">
+          <mxGeometry x="400" y="34" width="360" height="94" as="geometry"/>
+        </mxCell>
+        <mxCell id="m3" value="&lt;b&gt;Systems&lt;/b&gt;&lt;br&gt;persistent KV cache (MiB) &#183; peak VRAM (MiB)&lt;br&gt;decode throughput (tokens/s) &#183; per-phase runtime" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5f0d0;strokeColor=#82b366;" vertex="1" parent="b3">
+          <mxGeometry x="780" y="34" width="360" height="94" as="geometry"/>
+        </mxCell>
+        <mxCell id="b3note" value="Every step gated: wrapper logit-parity checks before measuring, schema + fingerprint + manifest integrity after measuring." style="text;html=1;align=center;fontSize=11;fontColor=#444444;verticalAlign=middle;" vertex="1" parent="b3">
+          <mxGeometry x="20" y="136" width="1160" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="b4" value="4 &#xb7; Analysis" style="swimlane;startSize=22;fillColor=#ffe6cc;strokeColor=#d79b00;html=1;fontStyle=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="50" y="600" width="1200" height="140" as="geometry"/>
+        </mxCell>
+        <mxCell id="s1" value="&lt;b&gt;Registered statistics&lt;/b&gt;&lt;br&gt;paired t-tests + Holm correction (energy) &#183; McNemar + Bonferroni (quality)&lt;br&gt;Wilson intervals &#183; depth-stratified bootstrap &#183; Pareto frontier (energy &#215; quality &#215; memory)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe0b3;strokeColor=#d79b00;" vertex="1" parent="b4">
+          <mxGeometry x="20" y="34" width="560" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="s2" value="&lt;b&gt;Robustness&lt;/b&gt;&lt;br&gt;same traces re-integrated with power samples clipped at 82 W and 70 W&lt;br&gt;energy rankings and significance decisions checked for stability" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe0b3;strokeColor=#d79b00;" vertex="1" parent="b4">
+          <mxGeometry x="600" y="34" width="560" height="80" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="b5" value="5 &#xb7; Evidence" style="swimlane;startSize=22;fillColor=#e1d5e7;strokeColor=#9673a6;html=1;fontStyle=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="50" y="780" width="1200" height="120" as="geometry"/>
+        </mxCell>
+        <mxCell id="o1" value="&lt;b&gt;Measured trade-offs for every configuration on both models&lt;/b&gt;&lt;br&gt;joules &#183; retrieval rate &#183; KV storage &#183; throughput &#8594; energy&#8211;quality&#8211;memory Pareto analysis + cross-model comparison" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eee0f5;strokeColor=#9673a6;" vertex="1" parent="b5">
+          <mxGeometry x="20" y="34" width="1160" height="56" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="e1" value="same models, same stack" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;fontSize=9;" edge="1" parent="1" source="b1" target="b2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e2" value="run all five configs" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;fontSize=9;" edge="1" parent="1" source="b2" target="b3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e3" value="registered comparisons" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;fontSize=9;" edge="1" parent="1" source="b3" target="b4">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="e4" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;strokeWidth=1.5;" edge="1" parent="1" source="b4" target="b5">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

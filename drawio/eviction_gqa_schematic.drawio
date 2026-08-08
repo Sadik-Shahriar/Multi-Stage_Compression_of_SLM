@@ -1,0 +1,134 @@
+<mxfile host="app.diagrams.net" agent="opencode" version="24.7.0">
+  <diagram id="pyramidal-gqa" name="Eviction &amp; GQA Schematic">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1500" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="L" value="Pyramidal eviction budget — per-layer retained tokens (mean 1,024 / layer)" style="swimlane;startSize=24;fillColor=#f3f3f3;strokeColor=#808080;html=1;fontStyle=1;whiteSpace=wrap;" vertex="1" parent="1">
+          <mxGeometry x="20" y="40" width="560" height="600" as="geometry"/>
+        </mxCell>
+        <mxCell id="b1" value="&lt;b&gt;Early layers&lt;/b&gt;&lt;br&gt;keep up to ~1,966 tokens" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="L">
+          <mxGeometry x="90" y="44" width="380" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="b2" value="&lt;b&gt;Layers ~8–14&lt;/b&gt;&lt;br&gt;≈ 1,450 tokens" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#c5dcf9;strokeColor=#6c8ebf;" vertex="1" parent="L">
+          <mxGeometry x="130" y="136" width="300" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="b3" value="&lt;b&gt;Layers ~15–21&lt;/b&gt;&lt;br&gt;≈ 1,030 tokens · ≈ mean 1,024" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#a9cbf5;strokeColor=#6c8ebf;" vertex="1" parent="L">
+          <mxGeometry x="170" y="228" width="220" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="b4" value="&lt;b&gt;Deep layers&lt;/b&gt;&lt;br&gt;keep only ~82 tokens" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#8fb5ea;strokeColor=#6c8ebf;" vertex="1" parent="L">
+          <mxGeometry x="210" y="320" width="140" height="60" as="geometry"/>
+        </mxCell>
+        <mxCell id="a1" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="L" source="b1" target="b2">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="a2" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="L" source="b2" target="b3">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="a3" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="L" source="b3" target="b4">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="Lnote" value="Dropped tokens are freed from the KV cache after prefill. The deeper the layer, the tighter the budget — a funnel of persistence: generous retention in shallow layers, aggressive compression in deep ones." style="text;html=1;align=center;fontSize=11;fontColor=#333333;verticalAlign=middle;fillColor=#ffffff;strokeColor=#cccccc;rounded=1;whiteSpace=wrap;" vertex="1" parent="L">
+          <mxGeometry x="20" y="430" width="520" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="Lavg" value="avg budget = 1,024 tokens / layer" style="text;html=1;align=center;fontSize=12;fontStyle=4;fontColor=#6c8ebf;" vertex="1" parent="L">
+          <mxGeometry x="20" y="536" width="520" height="22" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="LL" value="Llama 3.2-3B · GQA 3:1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalAlign=top;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="640" y="40" width="360" height="340" as="geometry"/>
+        </mxCell>
+        <mxCell id="lq1" value="Q" style="ellipse;whiteSpace=wrap;html=1;fillColor=#6c8ebf;strokeColor=#ffffff;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="LL">
+          <mxGeometry x="80" y="90" width="48" height="48" as="geometry"/>
+        </mxCell>
+        <mxCell id="lq2" value="Q" style="ellipse;whiteSpace=wrap;html=1;fillColor=#6c8ebf;strokeColor=#ffffff;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="LL">
+          <mxGeometry x="156" y="90" width="48" height="48" as="geometry"/>
+        </mxCell>
+        <mxCell id="lq3" value="Q" style="ellipse;whiteSpace=wrap;html=1;fillColor=#6c8ebf;strokeColor=#ffffff;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="LL">
+          <mxGeometry x="232" y="90" width="48" height="48" as="geometry"/>
+        </mxCell>
+        <mxCell id="lk" value="1 KV head" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;fontStyle=1;" vertex="1" parent="LL">
+          <mxGeometry x="130" y="230" width="100" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="lq1k" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="LL" source="lq1" target="lk">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="lq2k" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="LL" source="lq2" target="lk">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="lq3k" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="LL" source="lq3" target="lk">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="Llbl" value="3 query heads &#8594; 1 KV head&lt;br&gt;&lt;br&gt;(24 Q / 8 KV heads total)&lt;br&gt;Evicting one KV head affects&lt;br&gt;only 3 query heads &#8212; modest damage" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#333333;" vertex="1" parent="LL">
+          <mxGeometry x="20" y="286" width="320" height="52" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="QW" value="Qwen2.5-3B · GQA 8:1" style="rounded=1;stroke=1;html=1;fillColor=#fff2cc;strokeColor=#d6b656;verticalAlign=top;startStyle=1;fontStyle=1;whiteSpace=wrap;fontStyle=1;" vertex="1" parent="1">
+          <mxGeometry x="1040" y="40" width="400" height="340" as="geometry"/>
+        </mxCell>
+        <mxCell id="wq1" value="Q" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d6b656;strokeColor=#ffffff;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="QW">
+          <mxGeometry x="30" y="90" width="36" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="wq2" value="Q" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d6b656;strokeColor=#ffffff;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="QW">
+          <mxGeometry x="76" y="90" width="36" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="wq3" value="Q" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d6b656;strokeColor=#ffffff;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="QW">
+          <mxGeometry x="122" y="90" width="36" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="wq4" value="Q" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d6b656;strokeColor=#ffffff;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="QW">
+          <mxGeometry x="168" y="90" width="36" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="wq5" value="Q" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d6b656;strokeColor=#ffffff;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="QW">
+          <mxGeometry x="214" y="90" width="36" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="wq6" value="Q" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d6b656;strokeColor=#ffffff;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="QW">
+          <mxGeometry x="260" y="90" width="36" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="wq7" value="Q" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d6b656;strokeColor=#ffffff;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="QW">
+          <mxGeometry x="306" y="90" width="36" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="wq8" value="Q" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d6b656;strokeColor=#ffffff;fontColor=#ffffff;fontStyle=1;" vertex="1" parent="QW">
+          <mxGeometry x="352" y="90" width="36" height="36" as="geometry"/>
+        </mxCell>
+        <mxCell id="wk" value="1 KV head" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d6b656;fontStyle=1;" vertex="1" parent="QW">
+          <mxGeometry x="150" y="230" width="100" height="44" as="geometry"/>
+        </mxCell>
+        <mxCell id="wq1k" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="QW" source="wq1" target="wk">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="wq2k" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="QW" source="wq2" target="wk">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="wq3k" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="QW" source="wq3" target="wk">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="wq4k" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="QW" source="wq4" target="wk">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="wq5k" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="QW" source="wq5" target="wk">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="wq6k" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="QW" source="wq6" target="wk">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="wq7k" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="QW" source="wq7" target="wk">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="wq8k" style="edgeStyle=orthogonalEdgeStyle;rounded=1;html=1;endArrow=classic;" edge="1" parent="QW" source="wq8" target="wk">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="Wlbl" value="8 query heads → 1 KV head&lt;br&gt;(16 Q / 2 KV total)&lt;br&gt;Evicting one KV head strips attention&lt;br&gt;from ALL 8 query heads — catastrophic" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#7f4f00;" vertex="1" parent="QW">
+          <mxGeometry x="30" y="286" width="340" height="52" as="geometry"/>
+        </mxCell>
+        <mxCell id="warn" value="!" style="shape=triangle;direction=north;html=1;fillColor=#ffcc00;strokeColor=#b00000;fontColor=#b00000;fontStyle=1;fontSize=16;rotatable=0;" vertex="1" parent="QW">
+          <mxGeometry x="356" y="40" width="26" height="30" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="TAKE" value="&lt;b&gt;Measured result:&lt;/b&gt; the same eviction design (avg 1,024 tokens/layer) is nearly harmless on Llama (−1/60 scenarios) yet collapses Qwen retrieval (48/60 &#8594; 1/60): a shared KV head is a single point of failure for every query head that uses it." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontColor=#7c4a00;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="640" y="420" width="800" height="70" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

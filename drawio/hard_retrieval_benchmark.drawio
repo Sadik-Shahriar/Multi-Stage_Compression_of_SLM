@@ -1,0 +1,108 @@
+<mxfile host="app.diagrams.net" agent="opencode" version="24.7.0">
+  <diagram id="hard-retrieval-benchmark" name="Diagram 3 - Hard-Retrieval Frozen Benchmark">
+    <mxGraphModel dx="1400" dy="900" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="800" math="0" shadow="0" adaptiveColors="auto">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <mxCell id="title" value="Diagram 3 &#183; Hard-Retrieval Frozen Benchmark &#8212; 4096-token context layout" style="text;html=1;align=center;fontSize=15;fontStyle=1;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="40" y="20" width="1320" height="26" as="geometry"/>
+        </mxCell>
+        <mxCell id="subtitle" value="Frozen scenario &#183; the document is padded to exactly 4096 tokens per model (tokenizer-specific) &#183; the model must extract one exact activation code" style="text;html=1;align=center;fontSize=12;fontStyle=2;fontColor=#666666;" vertex="1" parent="1">
+          <mxGeometry x="40" y="50" width="1320" height="20" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="haystackLabel" value="&lt;b&gt;Haystack&lt;/b&gt; &#183; distractor activation-code records (&#8776; 3.4k tokens), padded to exactly 4,096 tokens" style="text;html=1;align=center;fontSize=11;fontColor=#555555;whiteSpace=wrap;" vertex="1" parent="haystackBox">
+          <mxGeometry x="30" y="16" width="1010" height="18" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="prefixBox" value="&lt;b&gt;Prefix&lt;/b&gt;&lt;br&gt;system prompt &amp; instructions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="40" y="204" width="128" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="haystackBox" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f7f7f7;strokeColor=#b0b0b0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="168" y="204" width="1072" height="50" as="geometry"/>
+        </mxCell>
+        <mxCell id="suffixBox" value="&lt;b&gt;Suffix&lt;/b&gt;&lt;br&gt;generation trigger" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8d5e7;strokeColor=#8a7dc0;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1240" y="204" width="120" height="50" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="pin10stem" value="" style="rounded=0;fillColor=#e74c3c;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="169" y="124" width="6" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="pin10head" value="" style="ellipse;fillColor=#e74c3c;strokeColor=#a02121;" vertex="1" parent="1">
+          <mxGeometry x="158" y="96" width="28" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="label10" value="10% depth" style="text;html=1;align=center;fontSize=11;fontStyle=1;fontColor=#e74c3c;" vertex="1" parent="1">
+          <mxGeometry x="112" y="74" width="120" height="16" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="pin50" value="" style="rounded=0;fillColor=#2980b9;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="697" y="124" width="6" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="pin50head" value="" style="ellipse;fillColor=#2980b9;strokeColor=#1a5276;" vertex="1" parent="1">
+          <mxGeometry x="686" y="96" width="28" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="label50" value="50% depth" style="text;html=1;align=center;fontSize=11;fontStyle=1;fontColor=#2980b9;" vertex="1" parent="1">
+          <mxGeometry x="580" y="74" width="240" height="16" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="pin90" value="" style="rounded=0;fillColor=#27ae60;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1225" y="124" width="6" height="80" as="geometry"/>
+        </mxCell>
+        <mxCell id="pin90head" value="" style="ellipse;fillColor=#27ae60;strokeColor=#1e8449;" vertex="1" parent="1">
+          <mxGeometry x="1214" y="96" width="28" height="28" as="geometry"/>
+        </mxCell>
+        <mxCell id="label90" value="90% depth" style="text;html=1;align=center;fontSize=11;fontStyle=1;fontColor=#27ae60;" vertex="1" parent="1">
+          <mxGeometry x="1168" y="74" width="120" height="16" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="ruler" value="" style="rounded=0;fillColor=#9b9b9b;strokeColor=#9b9b9b;" vertex="1" parent="1">
+          <mxGeometry x="40" y="276" width="1320" height="2" as="geometry"/>
+        </mxCell>
+        <mxCell id="tick40" value="" style="rounded=0;fillColor=#9b9b9b;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="39" y="273" width="2" height="8" as="geometry"/>
+        </mxCell>
+        <mxCell id="tick172" value="" style="rounded=0;fillColor=#9b9b9b;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="171" y="273" width="2" height="8" as="geometry"/>
+        </mxCell>
+        <mxCell id="tick700" value="" style="rounded=0;fillColor=#9b9b9b;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="699" y="273" width="2" height="8" as="geometry"/>
+        </mxCell>
+        <mxCell id="tick1228" value="" style="rounded=0;fillColor=#9b9b9b;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1227" y="273" width="2" height="8" as="geometry"/>
+        </mxCell>
+        <mxCell id="tick1360" value="" style="rounded=0;fillColor=#9b9b9b;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1359" y="273" width="2" height="8" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="tok0" value="0" style="text;html=1;align=center;fontSize=10;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="26" y="282" width="30" height="14" as="geometry"/>
+        </mxCell>
+        <mxCell id="tok410" value="410" style="text;html=1;align=center;fontSize=10;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="152" y="282" width="40" height="14" as="geometry"/>
+        </mxCell>
+        <mxCell id="tok2048" value="2,048" style="text;html=1;align=center;fontSize=10;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="680" y="282" width="40" height="14" as="geometry"/>
+        </mxCell>
+        <mxCell id="tok3686" value="3,686" style="text;html=1;align=center;fontSize=10;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="1208" y="282" width="40" height="14" as="geometry"/>
+        </mxCell>
+        <mxCell id="tok4096" value="4,096" style="text;html=1;align=center;fontSize=10;fontColor=#555555;" vertex="1" parent="1">
+          <mxGeometry x="1340" y="282" width="40" height="14" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="legend" value="Legend: blue = prefix (system prompt + instructions) &#183; light gray = haystack with distractor activation-code records &#183; purple = suffix (generation trigger) &#183; red / blue / green pins = target needle code placed at 10% / 50% / 90% depth" style="text;html=1;align=center;fontSize=11;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="40" y="312" width="1320" height="18" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="stats" value="Frozen benchmark: 60 scenarios per configuration = 20 scenarios per depth &#183; exact 4,096-token tokenizer-specific document &#183; retrieval and format correctness scored separately (Section&#160;5)" style="text;html=1;align=center;fontSize=10;fontStyle=2;fontColor=#777777;" vertex="1" parent="1">
+          <mxGeometry x="40" y="336" width="1320" height="16" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="callout" value="&lt;b&gt;Evaluation:&lt;/b&gt; exact output format and code retrieval&lt;br&gt;&lt;br&gt;&#8226;&#160;The answer must contain the exact target code &#8212; no substitution, no similar-looking value.&lt;br&gt;&#8226;&#160;The response must also match the required output format exactly.&lt;br&gt;&#8226;&#160;A scenario passes only if &lt;b&gt;both&lt;/b&gt; code and format are correct; wrong code or wrong format = fail." style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3cc;strokeColor=#d9a339;fontColor=#5c4300;fontSize=12;spacingLeft=16;spacingTop=14;" vertex="1" parent="1">
+          <mxGeometry x="40" y="400" width="1320" height="150" as="geometry"/>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
