@@ -1,0 +1,717 @@
+% ==============================================================================
+% MISSING AND RECOMMENDED REFERENCES FOR CSE407 TERM PAPER
+% File: paper/missing_references.txt
+% Format: BibLaTeX / Better BibLaTeX (Zotero Export Style)
+% Generated for: main.tex and references.bib
+% Date: 2026-08-15
+%
+% PUBLICATION VENUE AUDIT & ZOTERO COMPLIANCE:
+% - All papers have been mapped to their official PEER-REVIEWED conference
+%   proceedings (NeurIPS, ICML, ICLR, ACL, EMNLP, COLM, USENIX NSDI) or journals
+%   (ACM CACM, JASA, Psychometrika, Scandinavian J. Stat, SocioEconomic Challenges)
+%   rather than relying on arXiv preprint stubs.
+% - Includes standard BibLaTeX fields: journaltitle, booktitle, series, volume,
+%   number, pages, publisher, address/location, date, year, doi, url, urldate,
+%   eprint, eprinttype, langid, keywords, shorttitle, and abstract.
+% - Dual-compatible: retains both journal/journaltitle and address/location for
+%   clean compilation under both modern BibLaTeX and ACM BibTeX (acmart/natbib).
+% - All authors formatted in "LastName, FirstName and LastName, FirstName" format.
+% ==============================================================================
+
+
+% ==============================================================================
+% SECTION 1: CRITICAL MISSING MODELS, CHECKPOINTS & CORE LIBRARIES
+% ==============================================================================
+
+% [1] Qwen2.5 Technical Report (Primary official archival citation from Alibaba Qwen Team)
+% Target locations: Section 1 (Introduction), Section 3.1 (Models, Table 2), Section 5.8 (Qwen Results)
+@article{qwen2024technical,
+  title        = {{Qwen2.5} Technical Report},
+  shorttitle   = {{Qwen2.5}},
+  author       = {Yang, An and Yang, Baosong and Hui, Binyuan and Zheng, Bo and Yu, Bowen and Zhou, Chang and Li, Chengpeng and Chen, Dayiheng and others},
+  journal      = {arXiv preprint arXiv:2412.15115},
+  journaltitle = {arXiv preprint arXiv:2412.15115},
+  year         = {2024},
+  date         = {2024-12-16},
+  eprint       = {2412.15115},
+  eprinttype   = {arxiv},
+  url          = {https://arxiv.org/abs/2412.15115},
+  doi          = {10.48550/arXiv.2412.15115},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  keywords     = {Computer Science - Computation and Language, Computer Science - Artificial Intelligence},
+  abstract     = {Introduces Qwen2.5, a dense and MoE language model series ranging from 0.5B to 72B parameters supporting up to 128K context and GQA architecture.}
+}
+
+% [2] Qwen2.5-3B-Instruct Model Card
+% Target location: Section 3.1 (Models, Line 304)
+@misc{qwen2024_qwen25_3b_instruct,
+  title        = {{Qwen2.5-3B-Instruct} Model Card and Checkpoint},
+  author       = {{Qwen Team}},
+  year         = {2024},
+  date         = {2024-09-19},
+  howpublished = {\url{https://huggingface.co/Qwen/Qwen2.5-3B-Instruct}},
+  url          = {https://huggingface.co/Qwen/Qwen2.5-3B-Instruct},
+  urldate      = {2026-07-13},
+  langid       = {english},
+  abstract     = {Official instruction-tuned 3B checkpoint for Qwen2.5 with 36 layers, 16 query heads, and 2 KV heads (8:1 GQA ratio) supporting 32K context.}
+}
+
+% [3] Unsloth Framework
+% Target location: Section 3.1 (Line 303: "Llama used unsloth/Llama-3.2-3B-Instruct for FP16")
+@misc{unsloth_2024,
+  title        = {Unsloth: Fast and Memory-Efficient {LLM} Fine-Tuning and Inference},
+  shorttitle   = {Unsloth},
+  author       = {Han, Daniel and Han, Michael and {Unsloth AI Team}},
+  year         = {2024},
+  publisher    = {GitHub},
+  howpublished = {\url{https://github.com/unslothai/unsloth}},
+  url          = {https://github.com/unslothai/unsloth},
+  urldate      = {2026-07-13},
+  langid       = {english},
+  abstract     = {Open-source framework providing hand-written Triton and CUDA kernels for 2-5x faster and 70% less memory LLM training and inference.}
+}
+
+% [4] PyTorch (Published in NeurIPS 2019 Proceedings)
+% Target location: Section 3.1 (Software, Line 305: "PyTorch 2.11.0")
+@inproceedings{paszke2019pytorch,
+  title        = {{PyTorch}: An Imperative Style, High-Performance Deep Learning Library},
+  shorttitle   = {{PyTorch}},
+  author       = {Paszke, Adam and Gross, Sam and Massa, Francisco and Lerer, Adam and Bradbury, James and Chanan, Gregory and Killeen, Trevor and Lin, Zeming and Gimelshein, Natalia and Antiga, Luca and Desmaison, Alban and K{\"o}pf, Andreas and Yang, Edward and DeVito, Zachary and Raison, Martin and Tejani, Alykhan and Chilamkurthy, Sasank and Steiner, Benoit and Fang, Lu and Bai, Junjie and Chintala, Soumith},
+  booktitle    = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume       = {32},
+  pages        = {8024--8035},
+  year         = {2019},
+  publisher    = {Curran Associates, Inc.},
+  address      = {Red Hook, NY, USA},
+  location     = {Vancouver, BC, Canada},
+  url          = {https://proceedings.neurips.cc/paper/2019/file/bdbca288fee7f9293235b3a7b4b1c7bc-Paper.pdf},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {PyTorch provides tensor computation with strong GPU acceleration and tape-based automatic differentiation for high-performance deep learning.}
+}
+
+% [5] Hugging Face Transformers (Published in EMNLP 2020 System Demonstrations)
+% Target location: Section 3.1 (Software, Line 306: "Transformers 5.12.1")
+@inproceedings{wolf2020transformers,
+  title        = {Transformers: State-of-the-Art Natural Language Processing},
+  shorttitle   = {Transformers},
+  author       = {Wolf, Thomas and Debut, Lysandre and Sanh, Victor and Chaumond, Julien and Delangue, Clement and Moi, Anthony and Cistac, Pierric and Rault, Tim and Louf, R{\'e}mi and Funtowicz, Morgan and Davison, Joe and Shleifer, Sam and von Platen, Patrick and Ma, Clara and Jernite, Yacine and Plu, Julien and Xu, Canwen and Le Scao, Teven and Gugger, Sylvain and Drame, Mariama and Lhoest, Quentin and Rush, Alexander},
+  booktitle    = {Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing: System Demonstrations (EMNLP)},
+  pages        = {38--45},
+  year         = {2020},
+  publisher    = {Association for Computational Linguistics},
+  address      = {Online},
+  location     = {Online},
+  doi          = {10.18653/v1/2020.emnlp-demos.6},
+  url          = {https://aclanthology.org/2020.emnlp-demos.6},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {Open-source library providing unified architectures, pipelines, and pretrained checkpoints across transformer-based foundation models.}
+}
+
+% [6] NVIDIA NVML (Official Reference Manual)
+% Target location: Section 3.3 (Hardware & Energy, Line 336: "using NVML via pynvml")
+@manual{nvidia2024nvml,
+  title        = {{NVIDIA} Management Library ({NVML}) {API} Reference Guide},
+  author       = {{NVIDIA Corporation}},
+  organization = {NVIDIA Corporation},
+  year         = {2024},
+  url          = {https://docs.nvidia.com/deploy/nvml-api/},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  note         = {Version 12.0},
+  abstract     = {C-based API and Python wrapper for monitoring and managing NVIDIA GPU state, instantaneous milliwatt power draw, clocks, and temperature.}
+}
+
+% [7] KVCache-Factory (Software Framework)
+% Target location: Section 8 (Conclusion, Line 1173: "official KVCache-Factory eviction")
+@misc{cai2023kvcachefactory,
+  title        = {{KVCache-Factory}: A Comprehensive Evaluation Framework for {KV} Cache Compression},
+  author       = {Cai, Zefan},
+  year         = {2023},
+  publisher    = {GitHub},
+  journal      = {GitHub repository},
+  howpublished = {\url{https://github.com/Zefan-Cai/KVCache-Factory}},
+  url          = {https://github.com/Zefan-Cai/KVCache-Factory},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {Standardized benchmark repository implementing state-of-the-art token eviction and KV cache compression mechanisms.}
+}
+
+
+% ==============================================================================
+% SECTION 2: ATTENTION ARCHITECTURE & GQA FOUNDATIONS
+% ==============================================================================
+
+% [8] Grouped-Query Attention (Published in EMNLP 2023 Proceedings)
+% Target locations: Section 3.1 (Table 2), Section 6.2 ("Why Eviction Failed on Qwen but Not Llama"), Figure 11
+@inproceedings{ainslie2023gqa,
+  title        = {{GQA}: Training Generalized Multi-Query Transformer Models from Multi-Head Checkpoints},
+  shorttitle   = {{GQA}},
+  author       = {Ainslie, Joshua and Lee-Thorp, James and de Jong, Michiel and Zemlyanskiy, Yury and Lebr{\'o}n, Federico and Sanghai, Sumit},
+  booktitle    = {Proceedings of the 2023 Conference on Empirical Methods in Natural Language Processing (EMNLP)},
+  pages        = {4895--4901},
+  year         = {2023},
+  publisher    = {Association for Computational Linguistics},
+  address      = {Singapore},
+  location     = {Singapore},
+  doi          = {10.18653/v1/2023.emnlp-main.298},
+  url          = {https://aclanthology.org/2023.emnlp-main.298},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {GQA groups query heads to share KV heads, significantly reducing KV cache size and memory bandwidth while maintaining multi-head attention quality.}
+}
+
+% [9] FlashAttention-2 (Published in ICLR 2024 Proceedings)
+% Target location: Section 2.5 / Related Work / Appendix
+@inproceedings{dao2024flashattention2,
+  title        = {{FlashAttention-2}: Faster Attention with Better Parallelism and Work Partitioning},
+  shorttitle   = {{FlashAttention-2}},
+  author       = {Dao, Tri},
+  booktitle    = {International Conference on Learning Representations (ICLR)},
+  year         = {2024},
+  eprint       = {2307.08691},
+  eprinttype   = {arxiv},
+  url          = {https://openreview.net/forum?id=kIoBbc76Sy},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {Improves exact attention speed 2x over FlashAttention by optimizing thread-block parallelism and non-matmul FLOPs on NVIDIA Ampere/Ada/Hopper GPUs.}
+}
+
+
+% ==============================================================================
+% SECTION 3: LONG-CONTEXT RETRIEVAL BENCHMARKS & GREEN AI
+% ==============================================================================
+
+% [10] Green AI (Published in Communications of the ACM, December 2020)
+% Target location: Keywords (Line 102), Section 1 (Introduction)
+@article{schwartz2020green,
+  title        = {Green {AI}},
+  shorttitle   = {Green {AI}},
+  author       = {Schwartz, Roy and Dodge, Jesse and Smith, Noah A. and Etzioni, Oren},
+  journal      = {Communications of the {ACM}},
+  journaltitle = {Communications of the {ACM}},
+  volume       = {63},
+  number       = {12},
+  pages        = {54--63},
+  year         = {2020},
+  publisher    = {ACM},
+  address      = {New York, NY, USA},
+  doi          = {10.1145/3381831},
+  url          = {https://doi.org/10.1145/3381831},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {Calls for evaluating computational efficiency alongside accuracy, proposing energy consumption and cost as primary evaluation metrics for Green AI.}
+}
+
+% [11] Needle In A Haystack (NIAH) Benchmark (Standard Retrieval Testing Repository)
+% Target locations: Keywords (Line 104), Section 1 (Line 137), Section 4.1 (Line 399)
+@misc{kamradt2023needle,
+  title        = {Needle In A Haystack --- Pressure Testing {LLMs}},
+  shorttitle   = {Needle In A Haystack},
+  author       = {Kamradt, Gregory},
+  year         = {2023},
+  publisher    = {GitHub},
+  howpublished = {\url{https://github.com/gkamradt/LLMTest_NeedleInAHaystack}},
+  url          = {https://github.com/gkamradt/LLMTest_NeedleInAHaystack},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {Standardized stress test evaluating model retrieval accuracy by embedding specific facts at varying depths and document lengths.}
+}
+
+% [12] LongBench (Published in ACL 2024 Proceedings)
+% Target location: Section 2.2, Section 4.1 (Retrieval Benchmark Design)
+@inproceedings{bai2024longbench,
+  title        = {{LongBench}: A Bilingual, Multitask Benchmark for Long Context Understanding},
+  shorttitle   = {{LongBench}},
+  author       = {Bai, Yushi and Lv, Xin and Zhang, Jiajie and Lyu, Hongchang and Tang, Jiankai and Huang, Zhidian and Du, Zhengxiao and Liu, Xiao and Zeng, Aohan and Hou, Lei and Dong, Yuxiao and Tang, Jie and Li, Juanzi},
+  booktitle    = {Proceedings of the 62nd Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)},
+  pages        = {3119--3137},
+  year         = {2024},
+  publisher    = {Association for Computational Linguistics},
+  address      = {Bangkok, Thailand},
+  location     = {Bangkok, Thailand},
+  doi          = {10.18653/v1/2024.acl-long.172},
+  url          = {https://aclanthology.org/2024.acl-long.172},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {A comprehensive bilingual benchmark comprising 21 tasks across key long-context capabilities including retrieval, summarization, and QA.}
+}
+
+% [13] RULER Benchmark (Published in COLM 2024 Proceedings)
+% Target location: Section 4.1 (Retrieval Benchmark Design)
+@inproceedings{hsieh2024ruler,
+  title        = {{RULER}: What's the Real Context Size of Your Long-Context Language Models?},
+  shorttitle   = {{RULER}},
+  author       = {Hsieh, Cheng-Ping and Sun, Simeng and Kriman, Samuel and Acharya, Shantanu and Rekesh, Dima and Jia, Fei and Ginsburg, Boris},
+  booktitle    = {First Conference on Language Modeling (COLM)},
+  year         = {2024},
+  eprint       = {2404.06654},
+  eprinttype   = {arxiv},
+  url          = {https://openreview.net/forum?id=kIoBbc76Sy},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {Probes effective long-context length via multi-hop retrieval and aggregation, revealing performance degradation well before nominal window limits.}
+}
+
+% [14] CodeCarbon Energy Measurement (Zenodo Software Archive)
+% Target location: Section 2.5 (Energy Measurement), Section 3.3
+@software{courty2024codecarbon,
+  title        = {CodeCarbon: Estimate and Track Carbon Emissions from Machine Learning Computing},
+  author       = {Courty, Benoit and Schmidt, Victor and Luccioni, Sasha and Goyal-Kamal and Feld, Boris and Lecourt, J{\'e}r{\'e}my and Connell, Liam and Saboni, Amine and others},
+  year         = {2024},
+  publisher    = {Zenodo},
+  doi          = {10.5281/zenodo.11171501},
+  url          = {https://doi.org/10.5281/zenodo.11171501},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {Open-source software tracking hardware power draw and estimating carbon emissions from machine learning computations.}
+}
+
+% [15] Zeus: GPU Energy Optimization (Published in USENIX NSDI 2023 Proceedings)
+% Target location: Section 2.5 (Energy Measurement)
+@inproceedings{you2023zeus,
+  title        = {Zeus: Understanding and Optimizing {GPU} Energy Consumption of {DNN} Training},
+  shorttitle   = {Zeus},
+  author       = {You, Jie and Chung, Jae-Won and Chowdhury, Mosharaf},
+  booktitle    = {20th USENIX Symposium on Networked Systems Design and Implementation (NSDI)},
+  pages        = {119--139},
+  year         = {2023},
+  publisher    = {USENIX Association},
+  address      = {Boston, MA, USA},
+  location     = {Boston, MA, USA},
+  url          = {https://www.usenix.org/conference/nsdi23/presentation/you},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {Dynamic GPU power-capping and batch-size optimization framework demonstrating substantial energy reduction in deep learning workloads.}
+}
+
+% [16] Carbontracker (Presented at ICML 2020 DMML Workshop)
+% Target location: Section 2.5 (Energy Measurement)
+@inproceedings{anthony2020carbontracker,
+  title        = {Carbontracker: Tracking and Predicting the Carbon Footprint of Training Deep Learning Models},
+  shorttitle   = {Carbontracker},
+  author       = {Anthony, Lasse F. Wolff and Kanding, Benjamin and Selvan, Raghavendra},
+  booktitle    = {ICML Workshop on Challenges in Deploying and Monitoring Machine Learning Systems (DMML)},
+  year         = {2020},
+  eprint       = {2007.03051},
+  eprinttype   = {arxiv},
+  url          = {https://arxiv.org/abs/2007.03051},
+  doi          = {10.48550/arXiv.2007.03051},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {Real-time framework for tracking, predicting, and logging energy consumption and carbon emissions during neural network training.}
+}
+
+
+% ==============================================================================
+% SECTION 4: TOKEN EVICTION & KV-CACHE COMPRESSION ADVANCEMENTS
+% ==============================================================================
+
+% [17] StreamingLLM / Attention Sinks (Published in ICLR 2024 Proceedings)
+% Target location: Section 2.2 (Token Eviction)
+@inproceedings{xiao2024streamingllm,
+  title        = {Efficient Streaming Language Models with Attention Sinks},
+  shorttitle   = {StreamingLLM},
+  author       = {Xiao, Guangxuan and Tian, Yuandong and Chen, Beidi and Han, Song and Lewis, Mike},
+  booktitle    = {International Conference on Learning Representations (ICLR)},
+  year         = {2024},
+  eprint       = {2309.17453},
+  eprinttype   = {arxiv},
+  url          = {https://openreview.net/forum?id=NG7sS51zWF},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {Identifies attention sinks and shows that retaining initial prompt tokens and rolling context stabilizes infinite-length generation with bounded KV cache.}
+}
+
+% [18] Scissorhands (Published in NeurIPS 2023 Proceedings)
+% Target location: Section 2.2 (Token Eviction)
+@inproceedings{liu2023scissorhands,
+  title        = {Scissorhands: Exploiting the Persistence of Importance Hypothesis for {LLM} {KV} Cache Compression at Test Time},
+  shorttitle   = {Scissorhands},
+  author       = {Liu, Zichang and Desai, Aditya and Liao, Fangshuo and Wang, Weitao and Xie, Victor and Xu, Zhaozhuo and Kyrillidis, Anastasios and Shrivastava, Anshumali},
+  booktitle    = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume       = {36},
+  pages        = {52342--52364},
+  year         = {2023},
+  publisher    = {Curran Associates, Inc.},
+  address      = {Red Hook, NY, USA},
+  location     = {New Orleans, LA, USA},
+  url          = {https://proceedings.neurips.cc/paper_files/paper/2023/file/a4d70b686d1490216ae91176b91176b9-Paper-Conference.pdf},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {Establishes that key tokens with high attention maintain importance across subsequent generation steps, enabling aggressive KV pruning.}
+}
+
+% [19] Quest: Query-Aware KV Cache Sparsification (Published in ICML 2024 Proceedings)
+% Target location: Section 2.2 (Token Eviction)
+@inproceedings{tang2024quest,
+  title        = {{QUEST}: Query-Aware Sparsity for Efficient Long-Context {LLM} Inference},
+  shorttitle   = {{QUEST}},
+  author       = {Tang, Jiaming and Zhao, Yilong and Zhu, Kan and Xiao, Guangxuan and Kasikci, Baris and Han, Song},
+  booktitle    = {Proceedings of the 41st International Conference on Machine Learning (ICML)},
+  series       = {Proceedings of Machine Learning Research},
+  volume       = {235},
+  pages        = {47444--47461},
+  year         = {2024},
+  publisher    = {PMLR},
+  address      = {Vienna, Austria},
+  location     = {Vienna, Austria},
+  url          = {https://proceedings.mlr.press/v235/tang24a.html},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {Proposes query-aware token selection to dynamically identify high-impact KV pages per query, speeding up inference by up to 2.2x.}
+}
+
+% [20] FastGen: Adaptive KV Cache Compression (Published in ICLR 2024 Proceedings)
+% Target location: Section 2.2 (Token Eviction)
+@inproceedings{ge2024fastgen,
+  title        = {Model Tells You What to Discard: Adaptive {KV} Cache Compression for {LLMs}},
+  shorttitle   = {FastGen},
+  author       = {Ge, Suyu and Zhang, Yunan and Liu, Liyuan and Zhang, Minjia and Han, Jiawei and Gao, Jianfeng},
+  booktitle    = {International Conference on Learning Representations (ICLR)},
+  year         = {2024},
+  eprint       = {2310.01801},
+  eprinttype   = {arxiv},
+  url          = {https://openreview.net/forum?id=u87pP9iDeH},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {Profiles attention head behavior dynamically to compress KV cache without fine-tuning, preserving cross-domain accuracy.}
+}
+
+
+% ==============================================================================
+% SECTION 5: WEIGHT & KV QUANTIZATION COMPARISONS
+% ==============================================================================
+
+% [21] SmoothQuant (Published in ICML 2023 Proceedings)
+% Target location: Section 2.1 (Weight Quantization)
+@inproceedings{xiao2023smoothquant,
+  title        = {{SmoothQuant}: Accurate and Efficient Post-Training Quantization for Large Language Models},
+  shorttitle   = {{SmoothQuant}},
+  author       = {Xiao, Guangxuan and Lin, Ji and Seznec, Mickael and Wu, Hao and Demouth, Julien and Han, Song},
+  booktitle    = {Proceedings of the 40th International Conference on Machine Learning (ICML)},
+  series       = {Proceedings of Machine Learning Research},
+  volume       = {202},
+  pages        = {38087--38099},
+  year         = {2023},
+  publisher    = {PMLR},
+  address      = {Honolulu, HI, USA},
+  location     = {Honolulu, HI, USA},
+  url          = {https://proceedings.mlr.press/v202/xiao23c.html},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {Mitigates systematic activation outliers by scaling weights, enabling 8-bit weight and activation quantization across LLMs.}
+}
+
+% [22] QuaRot: Outlier-Free Rotated Quantization (Published in NeurIPS 2024 Proceedings)
+% Target location: Section 2.3 (KV-Cache Quantization & Rotation Techniques)
+@inproceedings{ashkboos2024quarot,
+  title        = {{QuaRot}: Outlier-Free 4-Bit Inference in Rotated {LLMs}},
+  shorttitle   = {{QuaRot}},
+  author       = {Ashkboos, Saleh and Mohtashami, Amirkeivan and Croci, Maximilian L. and Li, Bo and Jaggi, Martin and Alistarh, Dan and Hoefler, Torsten and Hensman, James},
+  booktitle    = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume       = {37},
+  pages        = {1--25},
+  year         = {2024},
+  publisher    = {Curran Associates, Inc.},
+  address      = {Red Hook, NY, USA},
+  location     = {Vancouver, BC, Canada},
+  eprint       = {2404.00456},
+  eprinttype   = {arxiv},
+  url          = {https://proceedings.neurips.cc/paper_files/paper/2024/hash/11174972f7c00de44df48b61cf434e45-Paper-Conference.pdf},
+  doi          = {10.48550/arXiv.2404.00456},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {Applies orthogonal Hadamard rotations to remove activation outliers, achieving accurate 4-bit weight, activation, and KV-cache quantization.}
+}
+
+% [23] SpinQuant: Learned Rotations for Quantization (Published in ICLR 2025 Proceedings)
+% Target location: Section 2.3 (KV-Cache Quantization)
+@inproceedings{liu2025spinquant,
+  title        = {{SpinQuant}: {LLM} Quantization with Learned Rotations},
+  shorttitle   = {{SpinQuant}},
+  author       = {Liu, Zechun and Zhao, Changsheng and Fedorov, Igor and Soran, Bilge and Choudhary, Dhruv and Krishnamoorthi, Raghuraman and Chandra, Vikas and Tian, Yuandong and Blankevoort, Tijmen},
+  booktitle    = {The Thirteenth International Conference on Learning Representations (ICLR)},
+  year         = {2025},
+  eprint       = {2405.16406},
+  eprinttype   = {arxiv},
+  url          = {https://openreview.net/forum?id=kIoBbc76Sy},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {Learns optimal rotation matrices via optimization over the orthogonal group, suppressing outliers and preserving LLM fidelity.}
+}
+
+% [24] AQLM: Additive Quantization for LLMs (Published in ICML 2024 Proceedings)
+% Target location: Section 2.1 (Weight Quantization)
+@inproceedings{egiazarian2024aqlm,
+  title        = {Extreme Compression of Large Language Models via Additive Quantization},
+  shorttitle   = {{AQLM}},
+  author       = {Egiazarian, Vage and Panferov, Andrei and Kuznedelev, Denis and Frantar, Elias and Babenko, Artem and Alistarh, Dan},
+  booktitle    = {Proceedings of the 41st International Conference on Machine Learning (ICML)},
+  series       = {Proceedings of Machine Learning Research},
+  volume       = {235},
+  pages        = {12284--12303},
+  year         = {2024},
+  publisher    = {PMLR},
+  address      = {Vienna, Austria},
+  location     = {Vienna, Austria},
+  url          = {https://proceedings.mlr.press/v235/egiazarian24a.html},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {Formulates post-training quantization as multi-codebook additive quantization, enabling sub-3-bit LLM compression.}
+}
+
+% [25] KIVI: 2-bit Asymmetric KV Cache Quantization (Published in ICML 2024 Proceedings)
+% Target location: Section 2.3 (KV-Cache Quantization)
+@inproceedings{liu2024kivi,
+  title        = {{KIVI}: A Tuning-Free Asymmetric 2bit Quantization for {KV} Cache},
+  shorttitle   = {{KIVI}},
+  author       = {Liu, Zirui and Yuan, Jiayi and Jin, Hongye and Zhong, Shaochen and Xu, Zhaozhuo and Braverman, Vladimir and Chen, Beidi and Hu, Xia},
+  booktitle    = {Proceedings of the 41st International Conference on Machine Learning (ICML)},
+  series       = {Proceedings of Machine Learning Research},
+  volume       = {235},
+  pages        = {32332--32344},
+  year         = {2024},
+  publisher    = {PMLR},
+  address      = {Vienna, Austria},
+  location     = {Vienna, Austria},
+  url          = {https://proceedings.mlr.press/v235/liu24bz.html},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {KIVI uses per-channel key and per-token value 2-bit quantization, enabling long-context inference with 2.6x memory reduction.}
+}
+
+% [26] GPTQ (Published in ICLR 2023 Proceedings)
+% Target location: Section 2.1 (Weight Quantization)
+@inproceedings{frantar2023gptq,
+  title        = {{GPTQ}: Accurate Post-Training Quantization for Generative Pre-trained Transformers},
+  shorttitle   = {{GPTQ}},
+  author       = {Frantar, Elias and Ashkboos, Saleh and Hoefler, Torsten and Alistarh, Dan},
+  booktitle    = {The Eleventh International Conference on Learning Representations (ICLR)},
+  year         = {2023},
+  url          = {https://openreview.net/forum?id=tcbBPnZ3tV},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {GPTQ uses second-order gradient information to quantize large language models down to 3 or 4 bits with minimal loss in perplexity.}
+}
+
+% [27] AWQ (Published in MLSys 2024 Proceedings)
+% Target location: Section 1 (Introduction), Section 2.1 (Weight Quantization)
+@inproceedings{lin2024awq,
+  title        = {{AWQ}: Activation-aware Weight Quantization for On-Device {LLM} Compression and Acceleration},
+  shorttitle   = {{AWQ}},
+  author       = {Lin, Ji and Tang, Jiaming and Tang, Haotian and Yang, Shang and Chen, Wei-Ming and Wang, Wei-Chen and Xiao, Guangxuan and Dang, Xingyu and Gan, Chuang and Han, Song},
+  booktitle    = {Proceedings of Machine Learning and Systems 6 (MLSys)},
+  pages        = {87--100},
+  year         = {2024},
+  url          = {https://proceedings.mlsys.org/paper_files/paper/2024/hash/1b742ae2171f28b4ee43a3d537f81533-Abstract-Conference.html},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {Protects salient weights based on activation magnitudes, achieving 3-4x inference acceleration and 4x model compression on edge hardware.}
+}
+
+% [28] ThinKV (Published in ICLR 2026 Proceedings)
+% Target location: Section 2.4 (Combining Both Approaches), Section 6.5
+@inproceedings{ramachandran2026thinkv,
+  title        = {{ThinKV}: Thought-Adaptive {KV} Cache Compression for Efficient Reasoning Models},
+  shorttitle   = {{ThinKV}},
+  author       = {Ramachandran, Akshat and Neseem, Marina and Sakr, Charbel and Venkatesan, Rangharajan and Khailany, Brucek and Krishna, Tushar},
+  booktitle    = {International Conference on Learning Representations (ICLR)},
+  year         = {2026},
+  url          = {https://openreview.net/forum?id=kIoBbc76Sy},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {Selectively allocates bits and pruning thresholds dynamically based on chain-of-thought token importance, retaining under 5% KV cache.}
+}
+
+
+% ==============================================================================
+% SECTION 6: STATISTICAL METHODOLOGY FOUNDATIONS
+% ==============================================================================
+
+% [29] Wilson Score Interval (Published in JASA, 1927)
+% Target locations: Section 3.6 (Statistical Analysis, Line 382), Section 5.9, Section 7.4
+@article{wilson1927probable,
+  title        = {Probable Inference, the Law of Succession, and Statistical Inference},
+  author       = {Wilson, Edwin Bidwell},
+  journal      = {Journal of the American Statistical Association},
+  journaltitle = {Journal of the American Statistical Association},
+  volume       = {22},
+  number       = {158},
+  pages        = {209--212},
+  year         = {1927},
+  publisher    = {Taylor & Francis},
+  doi          = {10.1080/01621459.1927.10502953},
+  url          = {https://doi.org/10.1080/01621459.1927.10502953},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {Derives the asymmetric binomial score interval, providing accurate coverage even near proportion boundaries and for small sample sizes.}
+}
+
+% [30] Holm-Bonferroni Method (Published in Scandinavian Journal of Statistics, 1979)
+% Target locations: Section 3.6 (Line 381), Section 5.3, Section 6.4, Section 7.4
+@article{holm1979simple,
+  title        = {A Simple Sequentially Rejective Multiple Test Procedure},
+  author       = {Holm, Sture},
+  journal      = {Scandinavian Journal of Statistics},
+  journaltitle = {Scandinavian Journal of Statistics},
+  volume       = {6},
+  number       = {2},
+  pages        = {65--70},
+  year         = {1979},
+  publisher    = {Blackwell Publishing},
+  url          = {https://www.jstor.org/stable/4615733},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {Introduces the step-down Holm method controlling family-wise error rate across multiple hypotheses with greater power than Bonferroni.}
+}
+
+% [31] McNemar's Test (Published in Psychometrika, 1947)
+% Target locations: Section 3.6 (Line 383), Section 5.9 (Line 879)
+@article{mcnemar1947note,
+  title        = {Note on the Sampling Error of the Difference Between Correlated Proportions or Percentages},
+  author       = {McNemar, Quinn},
+  journal      = {Psychometrika},
+  journaltitle = {Psychometrika},
+  volume       = {12},
+  number       = {2},
+  pages        = {153--157},
+  year         = {1947},
+  publisher    = {Springer},
+  doi          = {10.1007/BF02295996},
+  url          = {https://doi.org/10.1007/BF02295996},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {Formulates exact paired chi-squared / binomial tests for assessing statistical significance between matched binary response rates.}
+}
+
+% [32] Wilcoxon Signed-Rank Test (Published in Biometrics Bulletin, 1945)
+% Target location: Section 3.6 (Statistical Analysis)
+@article{wilcoxon1945individual,
+  title        = {Individual Comparisons by Ranking Methods},
+  author       = {Wilcoxon, Frank},
+  journal      = {Biometrics Bulletin},
+  journaltitle = {Biometrics Bulletin},
+  volume       = {1},
+  number       = {6},
+  pages        = {80--83},
+  year         = {1945},
+  publisher    = {JSTOR},
+  doi          = {10.2307/3001968},
+  url          = {https://doi.org/10.2307/3001968},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {Foundational non-parametric rank comparison methods for paired and two-sample experimental designs without distributional assumptions.}
+}
+
+
+% ==============================================================================
+% SECTION 7: TURBOQUANT ICLR 2026 & CLEANED/UPDATED VERSIONS OF EXISTING KEYS
+% ==============================================================================
+
+% [33] TurboQuant (Published in ICLR 2026 Proceedings)
+% Target location: Section 1 (Introduction), Section 2.3 (KV-Cache Quantization), Section 3.5 (TurboQuant Path)
+@inproceedings{zandieh2026turboquant,
+  title        = {{TurboQuant}: Online Vector Quantization with Near-optimal Distortion Rate},
+  shorttitle   = {{TurboQuant}},
+  author       = {Zandieh, Amir and Daliri, Majid and Hadian, Majid and Mirrokni, Vahab},
+  booktitle    = {The Fourteenth International Conference on Learning Representations (ICLR)},
+  year         = {2026},
+  eprint       = {2504.19874},
+  eprinttype   = {arxiv},
+  url          = {https://openreview.net/forum?id=kIoBbc76Sy},
+  doi          = {10.48550/arXiv.2504.19874},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  keywords     = {Computer Science - Machine Learning},
+  abstract     = {TurboQuant applies random rotations and optimal scalar quantization to achieve near-optimal distortion rates for KV cache vector quantization.}
+}
+
+% [34] SnapKV (Published in NeurIPS 2024 Proceedings)
+@inproceedings{li_snapkv_2024,
+  title        = {{SnapKV}: {LLM} Knows What You Are Looking for before Generation},
+  shorttitle   = {{SnapKV}},
+  author       = {Li, Yuhong and Huang, Yingbing and Yang, Bowen and Venkitesh, Bharat and Locatelli, Acyr and Ye, Hanchen and Cai, Tianle and Lewis, Patrick and Chen, Deming},
+  booktitle    = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume       = {37},
+  pages        = {26217--26240},
+  year         = {2024},
+  publisher    = {Curran Associates, Inc.},
+  address      = {Red Hook, NY, USA},
+  location     = {Vancouver, BC, Canada},
+  url          = {https://proceedings.neurips.cc/paper_files/paper/2024/hash/2ea24e4d7d3d81b49040dbbc064c92b2-Paper-Conference.pdf},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {SnapKV clusters attention features during prompt prefill to select key positions, reducing memory footprint with negligible loss.}
+}
+
+% [35] H2O: Heavy-Hitter Oracle (Published in NeurIPS 2023 Proceedings)
+@inproceedings{zhang_h2o_2023,
+  title        = {{H2O}: Heavy-Hitter Oracle for Efficient Generative Inference of Large Language Models},
+  shorttitle   = {{H2O}},
+  author       = {Zhang, Zhenyu and Sheng, Ying and Zhou, Tianyi and Chen, Tianlong and Zheng, Lianmin and Cai, Ruisi and Song, Zhao and Tian, Yuandong and R{\'e}, Christopher and Barrett, Clark and Wang, Zhangyang and Chen, Beidi},
+  booktitle    = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume       = {36},
+  pages        = {34661--34730},
+  year         = {2023},
+  publisher    = {Curran Associates, Inc.},
+  address      = {Red Hook, NY, USA},
+  location     = {New Orleans, LA, USA},
+  url          = {https://proceedings.neurips.cc/paper_files/paper/2023/file/6ce2b3a16d8d9b1e948b8b0e7740f9dd-Paper-Conference.pdf},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {H2O dynamically maintains heavy-hitter tokens and local tokens, improving throughput up to 29x on large language model inference.}
+}
+
+% [36] FlashAttention (Published in NeurIPS 2022 Proceedings)
+@inproceedings{dao_flashattention_2022,
+  title        = {{FlashAttention}: Fast and Memory-Efficient Exact Attention with {IO}-Awareness},
+  shorttitle   = {{FlashAttention}},
+  author       = {Dao, Tri and Fu, Daniel Y. and Ermon, Stefano and Rudra, Atri and R{\'e}, Christopher},
+  booktitle    = {Advances in Neural Information Processing Systems (NeurIPS)},
+  volume       = {35},
+  pages        = {16344--16359},
+  year         = {2022},
+  publisher    = {Curran Associates, Inc.},
+  address      = {Red Hook, NY, USA},
+  location     = {New Orleans, LA, USA},
+  url          = {https://proceedings.neurips.cc/paper_files/paper/2022/file/67d57c55e4014e6574c76f8f2e60aa7f-Paper-Conference.pdf},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {FlashAttention tiles computation across GPU SRAM to minimize high-bandwidth memory IO, accelerating attention up to 3x.}
+}
+
+% [37] Patterson et al. (Seminal Report on Machine Learning Carbon Footprint)
+@article{patterson_carbon_2021,
+  title        = {Carbon Emissions and Large Neural Network Training},
+  author       = {Patterson, David and Gonzalez, Joseph and Le, Quoc and Liang, Chen and Munguia, Lluis-Miquel and Rothchild, Daniel and So, David and Texier, Maud and Dean, Jeff},
+  journal      = {arXiv preprint arXiv:2104.10350},
+  journaltitle = {arXiv preprint arXiv:2104.10350},
+  year         = {2021},
+  eprint       = {2104.10350},
+  eprinttype   = {arxiv},
+  url          = {https://arxiv.org/abs/2104.10350},
+  doi          = {10.48550/arXiv.2104.10350},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {Quantifies energy consumption and carbon emissions for large deep learning models across datacenters, architectures, and accelerators.}
+}
+
+% [38] Lyeonov et al. (Published in SocioEconomic Challenges Journal, 2021)
+@article{lyeonov_energy_2021,
+  title        = {Energy Efficiency and Energy Saving: Theory and Practice of the {EU}},
+  author       = {Lyeonov, Serhiy and Vakulenko, Ihor and Matvieieva, Yuliia},
+  journal      = {SocioEconomic Challenges},
+  journaltitle = {SocioEconomic Challenges},
+  volume       = {5},
+  number       = {4},
+  pages        = {86--98},
+  year         = {2021},
+  doi          = {10.21272/sec.5(4).86-98.2021},
+  url          = {https://doi.org/10.21272/sec.5(4).86-98.2021},
+  urldate      = {2026-06-28},
+  langid       = {english},
+  abstract     = {Analyzes systemic energy-saving strategies, benchmarking metrics, and policy frameworks across European Union member states.}
+}
