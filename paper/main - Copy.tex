@@ -13,7 +13,6 @@
 \usepackage{subcaption}
 \usepackage{multirow}
 \usepackage{float}   %% enables [H] specifier for exact figure placement
-\usepackage{placeins}
 
 %% ── BibTeX (acmart is incompatible with biblatex) ─────────────
 %% The references.bib is authored in BibLaTeX format (url, doi, abstract,
@@ -113,7 +112,7 @@ edge deployment, NVIDIA T4, needle-in-a-haystack}
 As language models become part of everyday applications, the energy needed to run
 them becomes a real concern. Most research focuses on making models more accurate,
 but less attention is paid to the power bill. When a model is used thousands of
-times per day, even small inefficiencies add up to large energy costs~\cite{strubell_energy_2019,patterson_carbon_nodate}.
+times per day, even small inefficiencies add up to large energy costs~\cite{strubell_energy_2019,patterson_carbon_nodate,schwartz2020green}.
 
 One of the main costs during inference (i.e., generating text from a prompt) is
 the Key-Value (KV) cache. When a transformer generates tokens one at a time, it
@@ -278,7 +277,7 @@ and robustness analysis.
 
 We tested two small language models. Table~\ref{tab:geometry} shows their key
 properties. They differ in number of layers, how their KV heads are organized
-(GQA ratio), and native context window. The much more aggressive GQA ratio of
+using Grouped-Query Attention (GQA)~\cite{ainslie2023gqa}, and native context window. The much more aggressive GQA ratio of
 Qwen (8:1 vs.\ Llama's 3:1) is relevant for understanding why eviction behaved
 so differently on the two models.
 
@@ -300,10 +299,12 @@ Native context      & 8K  & 32K \\
 \end{tabular}
 \end{table}
 
-Llama used \texttt{unsloth/Llama-3.2-3B-Instruct} for FP16 and the
-CasperHansen AWQ release for AWQ. Qwen used pinned
-revisions registered in the experiment registry. Software: PyTorch~2.11.0,
-Transformers~5.12.1, TurboQuant~0.2.0.
+Llama used \texttt{unsloth/Llama-3.2-3B-Instruct}~\cite{unsloth_2024} for FP16 and the
+CasperHansen AWQ release for AWQ. Qwen used the official Qwen2.5-3B-Instruct
+checkpoint~\cite{qwen2024technical,qwen2024_qwen25_3b_instruct}; all revisions
+were pinned in the experiment registry. We used PyTorch~2.11.0~\cite{paszke2019pytorch}
+and Transformers~5.12.1~\cite{wolf2020transformers}. TurboQuant~0.2.0 was the
+quantization reference implementation~\cite{zandieh_turboquant_2025,zandieh2026turboquant}.
 
 \subsection{Configurations}
 
@@ -333,7 +334,7 @@ Two sensitivity sweeps were also run at 4096 tokens: eviction budget (512, 1024,
 \subsection{Hardware and Energy Measurement}
 
 All experiments ran on a single NVIDIA T4 (16~GB) in Google Colab free tier.
-GPU power was sampled every 100~ms (10~Hz) using NVML via pynvml, following the
+GPU power was sampled every 100~ms (10~Hz) using NVML~\cite{nvidia2024nvml} via pynvml, following the
 methodology of Argerich et al.~\cite{argerich_watt_2026}. Energy was computed as
 the area under the power curve (trapezoidal integration) and reported separately
 for prefill and decode phases.
@@ -362,9 +363,9 @@ measurements were collected (Section~\ref{sec:adapter}).
 
 \subsection{The TurboQuant Reference Path}
 
-TurboQuant~\cite{zandieh_turboquant_2025} applies a random rotation to KV vectors
+TurboQuant~\cite{zandieh_turboquant_2025,zandieh2026turboquant} applies a random rotation to KV vectors
 and then quantizes each coordinate with an optimized scalar codebook. We used
-version~0.2.0. At this version, the implementation stores one uint8 index per
+version~0.2.0~\cite{zandieh2026turboquant}. At this version, the implementation stores one uint8 index per
 coordinate and \emph{keeps} the original (materialized) K/V tensors alongside
 the quantization state. This means the reference path is numerically active ---
 the compressed indices do affect computations --- but it does not reduce memory
@@ -378,9 +379,10 @@ implementation would achieve.
 \subsection{Statistical Analysis}
 
 Registered energy comparisons used paired $t$-tests on five common blocks, with
-95\% confidence intervals and Holm sequential correction. Hard retrieval quality
-used Wilson intervals at 60 scenarios per configuration and Bonferroni-adjusted
-exact McNemar tests for paired comparisons. Cross-model quality contrasts used
+95\% confidence intervals and Holm sequential correction~\cite{holm1979simple}. Hard retrieval quality
+used Wilson score intervals~\cite{wilson1927probable} at 60 scenarios per configuration and Bonferroni-adjusted
+exact McNemar tests~\cite{mcnemar1947note} for paired comparisons. Wilcoxon signed-rank tests~\cite{wilcoxon1945individual}
+were used for non-parametric energy comparisons. Cross-model quality contrasts used
 depth-stratified bootstrap resampling with 2000 iterations. Pareto frontier
 stability was assessed with 2000 bootstrap resamples of the empirical points.
 
@@ -396,7 +398,7 @@ attempts that failed before we got a working design.
 
 \subsection{Why We Needed a New Benchmark}
 
-Early Llama experiments used a simple needle-in-a-haystack task where the model
+Early Llama experiments used a simple needle-in-a-haystack~\cite{kamradt2023needle} task where the model
 had to find one code value hidden in a document. The problem was that all five
 configurations got 100\% accuracy. That looks great, but it actually means the
 task was too easy --- we could not tell which method was better or worse because
@@ -453,20 +455,22 @@ own tokenized 4096-token version using its own tokenizer and chat template.
 As shown in Figure~\ref{fig:hard_retrieval}, the target code appears at one of
 three controlled depths within each otherwise distractor-filled document.
 
-\begin{figure*}[htbp]
+\begin{figure*}[!t]
 \centering
-\includegraphics[width=\textwidth]{figures/hard_retrieval.png}
+\includegraphics[width=0.98\textwidth]{figures/hard_retrieval.png}
 \Description{A 4096-token document diagram shows target-code needles inserted at 10, 50, and 90 percent depth within distractor text, with strict exact-match evaluation.}
 \caption{Overview of the 4096-token frozen hard-retrieval benchmark, illustrating the 10\%, 50\%, and 90\% depth needle insertion points within the distractor haystack, and the strict evaluation criteria.}
 \label{fig:hard_retrieval}
 \end{figure*}
-\FloatBarrier
 
 
 %% ════════════════════════════════════════════════════════════════
 %%  5. RESULTS
 %% ════════════════════════════════════════════════════════════════
 \section{Results}
+
+We first report the measured energy and system trade-offs, then assess retrieval
+quality, cross-model behavior, and robustness to power-trace clipping.
 
 \subsection{TurboQuant Reference Energy Overhead by Phase}
 
@@ -1175,12 +1179,33 @@ and more context lengths to build a more general picture.
 
 
 %% ════════════════════════════════════════════════════════════════
+%%  GENERATIVE AI USAGE STATEMENT
+%% ════════════════════════════════════════════════════════════════
+\section*{Generative AI Usage Statement}
+
+Generative AI tools were used in the preparation of this work in two
+capacities: (1)~\emph{code generation}—AI-assisted code suggestions were
+used to accelerate the implementation of experiment notebooks, data
+processing pipelines, and visualization scripts; and (2)~\emph{reference
+matching and fact-checking}—AI tools were consulted to locate candidate
+citations and to cross-check factual claims against source material. In
+both cases, all AI-generated outputs were critically reviewed,
+independently verified, and validated by the authors before incorporation
+into the final work. No AI-generated text was accepted without human
+scrutiny, and the intellectual content, experimental design, analysis, and
+conclusions presented in this paper are entirely the work of the authors.
+
+%% ════════════════════════════════════════════════════════════════
 %%  REFERENCES
 %% ════════════════════════════════════════════════════════════════
 %% Print all BibTeX entries, including uncited background references.
 \nocite{*}
 \bibliographystyle{ACM-Reference-Format}
+\begingroup
+\sloppy
+\hbadness=10000
 \bibliography{references}
+\endgroup
 
 %% ════════════════════════════════════════════════════════════════
 %%  APPENDIX: IDEAL PACKED/FUSED TQ ANALYSIS
