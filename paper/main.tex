@@ -44,7 +44,7 @@
 %% ════════════════════════════════════════════════════════════════
 %%  TITLE AND AUTHORS
 %% ════════════════════════════════════════════════════════════════
-\title{Holistic Optimization of Small Language Models for Energy-Efficient Edge Inference: An Empirical Ablation Study}
+\title{Multi-Stage Compression of Small Language Models for Energy-Efficient Inference: An Empirical Systems Ablation}
 
 \author{Md. Sadik Shahriar}
 \email{shahriarsadik@gmail.com}
@@ -76,9 +76,9 @@
 %%  ABSTRACT
 %% ════════════════════════════════════════════════════════════════
 \begin{abstract}
-Deploying small language models (SLMs) on power-constrained edge hardware requires balancing energy consumption, memory footprint, decode throughput, and task accuracy. While individual compression techniques (such as 4-bit weight quantization, token eviction, and KV-cache quantization) are typically developed and evaluated in isolation or algorithmic simulation, real-world edge systems frequently stack these techniques sequentially. This paper presents an empirical systems study evaluating the physical interactions, operational boundaries, and software-to-hardware realization gaps of stacked compression pipelines on an NVIDIA T4 GPU across context lengths of 1024, 2048, and 4096 tokens, continuously sampling board power at 10~Hz via NVML. Retrieval fidelity is assessed using a calibrated 60-scenario hard-retrieval benchmark requiring exact-match key-value extraction from 4096-token documents across three document depths.
+Deploying small language models (SLMs) on power-constrained hardware requires balancing energy consumption, memory footprint, decode throughput, and task accuracy. Most compression techniques, such as 4-bit weight quantization, token eviction, and KV-cache quantization, are developed and evaluated in isolation, but practical systems stack them sequentially. In this paper, we measure the physical interactions, operating boundaries, and software-to-hardware realization gaps of stacked compression pipelines on an NVIDIA T4 GPU across context lengths of 1024, 2048, and 4096 tokens, logging board power at 10~Hz via NVML. We evaluate retrieval quality using a calibrated 60-scenario hard-retrieval benchmark that requires exact-match key-value extraction from 4096-token documents at three insertion depths.
 
-Our measurements demonstrate that compression efficiency and heuristic stability are strictly governed by attention geometry and sequence length rather than nominal compression ratios alone. On Llama~3.2-3B (3:1 GQA), stacking 4-bit AWQ with custom PyramidKV eviction establishes the optimal empirical frontier at 4096 tokens: reducing total energy consumption by 101.95~J (16.15\%), shrinking active KV cache storage by 73.8\% (from 455~MiB to 119~MiB), and accelerating decode throughput by 47.7\% (from 13.77 to 20.34~tok/s) while preserving accuracy (37/60 vs.\ 38/60 baseline). In stark contrast, applying the identical eviction policy to Qwen2.5-3B (8:1 GQA) causes hard-retrieval accuracy to collapse from 48/60 to 1/60, a failure that persists even after expanding the retention budget by 50\% (2/15 recovered). We also formally prove and measure a statistically significant compound shielding effect ($I < 0, p < 0.01$), where prior token eviction reduces the computational and memory bandwidth workload of downstream quantization routines. Finally, we quantify a substantial software-to-hardware realization gap in off-the-shelf reference quantization packages that eagerly retain uncompressed state. These empirical findings provide hardware-grounded boundary conditions for theoretical rate-distortion frameworks, such as ThinKV and RDKV, and provide actionable guidelines for edge system architects.
+Our measurements show that compression efficiency depends on attention head layouts and sequence length, not on theoretical compression ratios alone. On Llama~3.2-3B (3:1 GQA), combining 4-bit AWQ with custom PyramidKV eviction delivers the best overall result at 4096 tokens: total energy drops by 101.95~J (16.15\%), active KV cache storage drops by 73.8\% (from 455~MiB down to 119~MiB), decode throughput increases 47.7\% (from 13.77 to 20.34~tok/s), and retrieval accuracy remains within one scenario of baseline (37/60 vs.\ 38/60). However, applying the same eviction policy to Qwen2.5-3B (8:1 GQA) causes hard-retrieval accuracy to collapse from 48/60 to 1/60, a failure that persists even after increasing the retained token budget by 50\% (recovering only 2/15). We also measure and confirm a statistically significant negative interaction ($I < 0, p < 0.01$), where pruning tokens before quantization reduces the data volume processed by downstream quantization routines and shields against their runtime overhead. Finally, we document a major software-to-hardware realization gap in the TurboQuant reference package, which keeps uncompressed tensors in memory alongside discrete indices, increasing rather than decreasing physical memory. These measurements provide realistic hardware boundary conditions for theoretical rate-distortion frameworks like ThinKV and RDKV.
 \end{abstract}
 
 %% ── Keywords ───────────────────────────────────────────────────
@@ -93,38 +93,38 @@ edge deployment, NVIDIA T4, needle-in-a-haystack}
 %% ════════════════════════════════════════════════════════════════
 \section{Introduction}
 
-Deploying language models on power-constrained edge accelerators requires balancing energy consumption, memory footprint, decode throughput, and task accuracy~\cite{strubell_energy_2019,patterson_carbon_2021,schwartz2020green}. As language processing workloads shift toward local micro-servers and embedded accelerators, the memory bandwidth required by the Key-Value (KV) cache becomes the primary operational bottleneck~\cite{li2024survey}.
+Deploying small language models (SLMs) on resource-constrained hardware requires balancing energy consumption, memory footprint, decode throughput, and task accuracy~\cite{strubell_energy_2019,patterson_carbon_2021,schwartz2020green}. As inference workloads shift toward local micro-servers and low-power accelerators, the memory bandwidth required by the Key-Value (KV) cache becomes the primary operational bottleneck~\cite{li2024survey}.
 
-During autoregressive generation, transformers store past key and value vectors for every processed token. This cache grows linearly with sequence length. Because every newly decoded token requires loading the entire accumulated KV cache from DRAM, inference on bandwidth-limited edge hardware, such as the NVIDIA T4 (the standard micro-server baseline with a 70~W enforced power limit), becomes strictly memory bound during decoding. Small language models (SLMs) with sub-4B parameters offer a practical footprint for edge use cases~\cite{husom_sustainable_2025}. However, their physical energy scaling under multi-stage compression remains poorly characterized. Many compression studies evaluate individual techniques in isolation, rely on FLOP-based analytical models, or study large server-scale models with attention dynamics that differ fundamentally from compact edge SLMs~\cite{wang_slmquant_2025}.
+During autoregressive generation, transformers store past key and value vectors for every processed token. This cache grows linearly with sequence length. Because the GPU must reload this entire accumulated cache from DRAM for each newly decoded token, inference on bandwidth-limited hardware, such as the NVIDIA T4 (a low-power micro-server GPU operating under an enforced 70~W limit), becomes strictly memory bound during decoding. Small language models with sub-4B parameters offer a practical footprint for resource-constrained deployments~\cite{husom_sustainable_2025}. However, their physical energy scaling under multi-stage compression remains poorly characterized. Most prior compression studies evaluate individual techniques in isolation, rely on theoretical FLOP calculations, or evaluate large server-scale models with attention dynamics that differ from compact SLMs~\cite{wang_slmquant_2025}.
 
-To reduce memory traffic during generation, researchers have explored three primary compression paradigms:
+To reduce memory traffic during generation, researchers have explored three primary compression approaches:
 \begin{itemize}\raggedright
-  \item \textbf{Weight Quantization} (e.g., AWQ~\cite{lin_awq_2025}) compresses model parameters to low bit-widths (such as 4 bits), reducing static model memory and weight transfer during prefill and decode.
-  \item \textbf{Token Eviction} (e.g., PyramidKV~\cite{cai_pyramidkv_2025}, SnapKV~\cite{li_snapkv_2024}, H2O~\cite{zhang_h2o_2023}) prunes uninformative tokens from the cache based on attention scores, shrinking both the active memory footprint and dynamic memory read traffic during decoding.
-  \item \textbf{KV-Cache Quantization} (e.g., TurboQuant~\cite{zandieh2026turboquant}, KIVI~\cite{liu_kivi_2023}, JanusQuant~\cite{sun2026janusquant}) reduces the numerical precision of cached vectors to decrease byte usage per retained token.
+  \item \textbf{Weight Quantization} (such as AWQ~\cite{lin_awq_2025}) compresses model weights to low bit-widths (such as 4 bits), reducing static model memory and weight transfer during prefill and decode.
+  \item \textbf{Token Eviction} (such as PyramidKV~\cite{cai_pyramidkv_2025}, SnapKV~\cite{li_snapkv_2024}, and H2O~\cite{zhang_h2o_2023}) prunes uninformative tokens from the cache based on attention scores, shrinking active memory and dynamic memory read traffic during decoding.
+  \item \textbf{KV-Cache Quantization} (such as TurboQuant~\cite{zandieh2026turboquant}, KIVI~\cite{liu_kivi_2023}, and JanusQuant~\cite{sun2026janusquant}) reduces the numerical precision of stored key and value vectors to save memory per token.
 \end{itemize}
 
-Recent theoretical studies have proposed uniting token pruning with precision reduction. Frameworks like \textbf{RDKV}~\cite{zhang_rdkv_2026} formulate joint KV-cache compression using rate-distortion theory via reverse water-filling bit allocation, while \textbf{ThinKV}~\cite{ramachandran_thinkv_2026} develops dynamic token and bit allocation for reasoning trajectories. Although these formulations present compelling trade-offs in algorithmic simulation, physical hardware data on multi-stage compression on sub-4B models remains scarce. Systems practitioners currently lack empirical evidence on how independently implemented compression tools behave when stacked together sequentially, how attention head-sharing affects pruning reliability, and how much runtime overhead arises in physical deployment.
+Recently, theoretical frameworks like \textbf{RDKV}~\cite{zhang_rdkv_2026} and \textbf{ThinKV}~\cite{ramachandran_thinkv_2026} proposed combining token pruning with precision reduction using rate-distortion objectives. While these formulations show strong trade-offs in software simulation, physical hardware data on sub-4B models is still missing. In practical deployments, practitioners currently lack empirical evidence on how independently implemented compression tools behave when stacked together sequentially on physical silicon, how attention head-sharing affects pruning reliability, and how much runtime overhead arises in physical deployment.
 
-This paper presents an empirical systems study of these multi-stage interactions on physical silicon. We evaluate the sequential composition of AWQ 4-bit weight quantization, custom PyramidKV-style token eviction, and TurboQuant KV-cache quantization on two representative 3B-parameter models (Llama~3.2-3B-Instruct and Qwen2.5-3B-Instruct) on an NVIDIA T4 GPU, logging board-level power continuously at 10~Hz via NVML.
+In this paper, we present an empirical systems study of these multi-stage compression interactions on physical silicon. We evaluate the sequential composition of AWQ 4-bit weight quantization, custom PyramidKV token eviction, and TurboQuant KV-cache quantization on two representative 3B models (Llama~3.2-3B-Instruct and Qwen2.5-3B-Instruct) using an NVIDIA T4 GPU, logging board power continuously at 10~Hz via NVML.
 
 \paragraph{Research Questions.}
-We investigate four core questions:
+In this study, we investigate four core questions:
 \begin{enumerate}
   \item \textbf{RQ1 (Context Scaling and Multi-Stage Efficiency):} How do weight quantization, token eviction, and KV-cache quantization individually and sequentially affect physical GPU energy consumption and throughput across sequence lengths of 1024, 2048, and 4096 tokens?
-  \item \textbf{RQ2 (Cross-Architectural Robustness):} Does token eviction provide consistent trade-offs across different attention layouts (Llama's 3:1 vs.\ Qwen's 8:1 GQA), or does aggressive head sharing cause retrieval failures?
+  \item \textbf{RQ2 (Cross-Architectural Robustness):} Does token eviction provide consistent trade-offs across different attention layouts (Llama's 3:1 vs.\ Qwen's 8:1 GQA), or does aggressive head sharing cause retrieval failure?
   \item \textbf{RQ3 (Compound Interaction and Overhead Shielding):} When multiple compression stages are applied sequentially, do they compound additively or exhibit energetic shielding interactions?
   \item \textbf{RQ4 (Multi-Objective Pareto Optimization):} Which compression combinations form the non-dominated Pareto frontier when energy, retrieval accuracy, and persistent memory footprint are evaluated under bootstrap resampling?
 \end{enumerate}
 
 \paragraph{Key Contributions.}
-The contributions of this work are:
+The main empirical discoveries of this work are:
 \begingroup\raggedright
 \begin{enumerate}
-  \item \textbf{Hardware-Grounded Empirical Baselines:} We provide direct 10~Hz NVML physical energy measurements across two 3B models, three context lengths, and five compression configurations, establishing physical silicon baselines that ground theoretical joint compression models (such as RDKV and ThinKV).
-  \item \textbf{Cross-Architectural Eviction Sensitivity:} We identify a 76.7 percentage-point cross-model accuracy difference under token eviction. Eviction performs well on balanced GQA (Llama: 16.15\% energy reduction, 47.7\% throughput increase, 73.8\% memory reduction, and 37/60 vs.\ 38/60 baseline retrieval), but collapses under aggressive 8:1 GQA (Qwen: 1/60 retrieval), showing that GQA head sharing is a critical operational boundary.
-  \item \textbf{Compound Overhead Shielding:} We measure and statistically verify a negative interaction contrast ($I < 0, p < 0.01$) on both models, demonstrating that pruning tokens prior to quantization acts as an energy shield that reduces the data volume handled by subsequent quantization routines.
-  \item \textbf{Calibrated Benchmark and Pareto Analysis:} We design a calibrated 4096-token hard-retrieval benchmark (developed across four pilot iterations) and build a 3-objective Pareto frontier evaluated over 2000 bootstrap resamples with power capping checks.
+  \item \textbf{Limits of Sequential Stacking:} Stacking independent compression tools does not compound energy savings on physical hardware. On Llama~3.2-3B (3:1 GQA), single-stage token eviction combined with AWQ provides the strongest result: a 101.95~J (16.15\%) total energy reduction, a 47.7\% decode speedup (13.77 to 20.34~tok/s), a 73.8\% reduction in active KV cache footprint (from 455~MiB to 119~MiB), and retrieval accuracy within one test case of baseline (37/60 vs.\ 38/60). Adding sequential quantization on top degrades throughput and raises total energy.
+  \item \textbf{Attention Head-Sharing Sensitivity:} Eviction heuristics do not transfer reliably across attention layouts. The same eviction policy that succeeds on Llama causes retrieval accuracy to drop to 1/60 on Qwen2.5-3B (8:1 GQA). Expanding the retention budget by 50\% recovers only two cases (2/15), showing that heavy query-to-KV head sharing drives token selection errors rather than basic capacity limits.
+  \item \textbf{Upstream Overhead Shielding:} We measure and verify a negative interaction contrast ($I < 0, p < 0.01$) across both models. Pruning tokens before quantization cuts active cache volume by up to 73.8\%, reducing the data volume processed by downstream quantization routines and partially shielding against their runtime overhead.
+  \item \textbf{Software-to-Hardware Realization Gaps:} Off-the-shelf quantization libraries can diverge sharply from theoretical expectations. Because the TurboQuant reference package retains uncompressed FP16 tensors alongside discrete indices, it adds 31\% to 45\% net energy overhead and expands physical DRAM allocation. We provide symbolic break-even boundaries that define the exact compute-overhead thresholds required for custom fused kernels to achieve net energy savings.
 \end{enumerate}
 \endgroup
 
@@ -135,19 +135,19 @@ The contributions of this work are:
 \section{Related Work}
 
 \subsection{Weight Quantization}
-Weight quantization compresses floating-point model parameters into low-bit integers, reducing memory footprint and parameter transfer bandwidth. AWQ~\cite{lin_awq_2025} identifies activation-salient weight channels and protects them from quantization error during 4-bit compression. GPTQ~\cite{frantar_gptq_2023} uses layer-wise second-order error compensation. For compact models, SLMQuant~\cite{wang_slmquant_2025} showed that sub-4B architectures are more sensitive to aggressive quantization than larger models. This sensitivity highlights the need for direct hardware evaluation on specific SLMs rather than assuming trends from large-scale LLMs hold.
+Weight quantization compresses floating-point model parameters into low-bit integers, reducing static memory footprint and parameter transfer bandwidth. AWQ~\cite{lin_awq_2025} identifies activation-salient weight channels and protects them from quantization error during 4-bit compression. GPTQ~\cite{frantar_gptq_2023} uses layer-wise error compensation. For compact models, SLMQuant~\cite{wang_slmquant_2025} demonstrated that sub-4B architectures are more sensitive to aggressive quantization than larger models. This sensitivity highlights the need for direct hardware evaluation on specific SLMs rather than assuming trends from large-scale LLMs hold.
 
 \subsection{Token Eviction}
-Token eviction reduces KV-cache memory by pruning uninformative tokens during generation. H2O~\cite{zhang_h2o_2023} showed that retaining a small fraction (roughly 20\%) of accumulated attention recipients (termed ``heavy hitters'') preserves most generative capability. SnapKV~\cite{li_snapkv_2024} identifies important tokens using an observation window over recent prompt positions. PyramidKV~\cite{cai_pyramidkv_2025} refines this by assigning layer-dependent budgets: deeper layers retain more tokens while shallower layers retain fewer, improving long-context retrieval accuracy by 5\% to 15\% over uniform budgets.
+Token eviction reduces KV-cache memory by pruning uninformative tokens during generation. H2O~\cite{zhang_h2o_2023} showed that retaining a small fraction (roughly 20\%) of accumulated attention recipients preserves most generative capability. SnapKV~\cite{li_snapkv_2024} identifies important tokens using an observation window over recent prompt positions. PyramidKV~\cite{cai_pyramidkv_2025} refines this by assigning layer-dependent budgets: deeper layers retain more tokens while shallower layers retain fewer, improving long-context retrieval accuracy by 5\% to 15\% compared to uniform budgets.
 
 \subsection{KV-Cache Quantization}
 KV-cache quantization reduces the numerical precision of stored key and value vectors. TurboQuant~\cite{zandieh2026turboquant} applies random orthogonal rotations to KV vectors followed by scalar quantization without requiring calibration data. KIVI~\cite{liu_kivi_2023} uses per-channel key and per-token value quantization at 2-bit precision. Salfati et al.~\cite{salfati_quantization_2026} demonstrated that uniform quantization preserves attention score rankings better than low-rank approximations, particularly for grouped-query attention (GQA) architectures. Sun et al.~\cite{sun2026janusquant} introduced JanusQuant for long-context 2-bit quantization.
 
 \subsection{Joint and Compound Compression}
-Recent theoretical work investigates combining token pruning with precision reduction. RDKV~\cite{zhang_rdkv_2026} frames KV-cache compression as a rate-distortion optimization problem, jointly determining token retention and bit allocation through reverse water-filling. ThinKV~\cite{ramachandran_thinkv_2026} allocates tokens and precision dynamically for reasoning models. While these methods demonstrate promising accuracy-memory trade-offs in simulation, neither reports physical energy measurements on sub-4B models. Our C4-Ref setting evaluates sequential stacking (eviction followed by quantization) on physical hardware, providing an empirical baseline for joint compression strategies.
+Recent theoretical studies explore combining token pruning with precision reduction. RDKV~\cite{zhang_rdkv_2026} frames KV-cache compression as a rate-distortion optimization problem, jointly determining token retention and bit allocation through reverse water-filling. ThinKV~\cite{ramachandran_thinkv_2026} dynamically assigns tokens and precision for reasoning models. While these methods demonstrate promising accuracy-memory trade-offs in simulation, neither reports physical energy measurements on sub-4B models. Our C4-Ref setting evaluates sequential stacking (eviction followed by quantization) on physical hardware, providing an empirical baseline for joint compression strategies.
 
 \subsection{Energy Measurement in LLM Inference}
-Argerich et al.~\cite{argerich_watt_2026} evaluated over 5,000 inference runs and found that 10~Hz NVML power sampling offers an accurate, low-overhead measurement of GPU energy. They measured NVIDIA T4 idle power at approximately 12~W and peak operating power near 82~W. Husom et al.~\cite{husom_sustainable_2025} measured quantized SLMs on edge platforms, showing that energy scaling varies by sequence length and workload. We adopt their measurement protocols.
+Argerich et al.~\cite{argerich_watt_2026} evaluated over 5,000 inference runs and showed that 10~Hz NVML power sampling provides an accurate, low-overhead way to measure GPU energy. They recorded NVIDIA T4 idle power at around 12~W and peak operating power near 82~W. Husom et al.~\cite{husom_sustainable_2025} measured quantized SLMs on edge hardware, showing that energy scaling varies by sequence length and workload. We adopt these measurement protocols in our study.
 
 \subsection{Taxonomy of Related Work}
 
@@ -195,7 +195,7 @@ Figure~\ref{fig:methodology} illustrates our experimental workflow, including mo
 
 \subsection{Model Architectures}
 
-We evaluate two open-weight 3B-parameter models. Table~\ref{tab:geometry} lists their architectural parameters. The models differ in layer count, native context window, and Grouped-Query Attention (GQA)~\cite{ainslie2023gqa} configuration. Qwen uses an 8:1 GQA ratio (16 query heads sharing 2 KV heads), while Llama uses a 3:1 ratio (24 query heads sharing 8 KV heads).
+We evaluate two open-weight 3B-parameter models. Table~\ref{tab:geometry} lists their architectural specifications. These models differ in layer count, native context window, and Grouped-Query Attention (GQA)~\cite{ainslie2023gqa} layout. Specifically, Qwen uses an 8:1 GQA ratio (16 query heads sharing 2 KV heads), while Llama uses a 3:1 ratio (24 query heads sharing 8 KV heads).
 
 \begin{table}[htbp]
 \caption{Model Architecture Specifications}
@@ -215,11 +215,11 @@ Native context      & 8K  & 32K \\
 \end{tabular}
 \end{table}
 
-For Llama, we used the Unsloth Llama-3.2-3B-Instruct checkpoint~\cite{unsloth_2024} for the FP16 baseline and the CasperHansen AWQ release~\cite{casperhansen_llama32_awq} for 4-bit weights. For Qwen, we used the official Qwen2.5-3B-Instruct checkpoints~\cite{qwen2024technical}. All revisions are recorded in the experiment registry. The software environment used PyTorch~2.11.0~\cite{paszke2019pytorch}, Transformers~5.12.1~\cite{wolf2020transformers}, and TurboQuant~0.2.0~\cite{zandieh_turboquant_v020}.
+For Llama, we used the Unsloth Llama-3.2-3B-Instruct checkpoint~\cite{unsloth_2024} for the FP16 baseline and the CasperHansen AWQ release~\cite{casperhansen_llama32_awq} for 4-bit weights. For Qwen, we used the official Qwen2.5-3B-Instruct checkpoints~\cite{qwen2024technical}. All revisions are recorded in our experiment registry. Our software environment used PyTorch~2.11.0~\cite{paszke2019pytorch}, Transformers~5.12.1~\cite{wolf2020transformers}, and TurboQuant~0.2.0~\cite{zandieh_turboquant_v020}.
 
 \subsection{Experimental Configurations}
 
-We define five configurations to evaluate individual and combined compression effects:
+We define five configurations (Table~\ref{tab:configs}) to evaluate individual and combined compression effects:
 
 \begin{table}[htbp]
 \caption{Core Compression Configurations}
@@ -230,9 +230,9 @@ We define five configurations to evaluate individual and combined compression ef
 \toprule
 \textbf{Config} & \textbf{Llama} & \textbf{Qwen} & \textbf{Weights} & \textbf{KV Compression} \\
 \midrule
-FP16 baseline   & C0    & Q0    & FP16      & None \\
-AWQ baseline    & C1/C1-W & Q1-W & AWQ 4-bit & None \\
-Eviction        & C2    & Q2    & AWQ 4-bit & PyramidKV-style token eviction \\
+FP16 baseline   & C0     & Q0     & FP16      & None \\
+AWQ baseline    & C1-W   & Q1-W   & AWQ 4-bit & None (matched wrapper) \\
+Eviction        & C2     & Q2     & AWQ 4-bit & PyramidKV-style token eviction \\
 TQ-Ref only     & C3-Ref & Q3-Ref & AWQ 4-bit & TurboQuant numerical reference \\
 Compound        & C4-Ref & Q4-Ref & AWQ 4-bit & Eviction \emph{then} TQ-Ref \\
 \bottomrule
@@ -241,20 +241,20 @@ Compound        & C4-Ref & Q4-Ref & AWQ 4-bit & Eviction \emph{then} TQ-Ref \\
 
 Each configuration targets a specific component in the inference pipeline:
 \begin{itemize}
-  \item \textbf{C0 / Q0 (FP16 Baseline):} Uncompressed model execution, providing baseline values for memory allocation, power draw, and full-precision retrieval accuracy.
-  \item \textbf{C1 / Q1-W (AWQ Baseline):} 4-bit weight-only quantization, measuring parameter memory reduction and bandwidth savings without altering the KV cache.
-  \item \textbf{C2 / Q2 (PyramidKV Eviction):} AWQ combined with layerwise token eviction (averaging 1024 retained tokens per layer), testing whether spatial pruning reduces decode memory traffic while retaining retrieval capability.
-  \item \textbf{C3-Ref / Q3-Ref (TurboQuant Reference):} AWQ combined with numerical KV-cache quantization, measuring numerical retrieval accuracy alongside the runtime overhead of the reference package.
-  \item \textbf{C4-Ref / Q4-Ref (Sequential Compound):} All three techniques stacked sequentially (AWQ $\to$ eviction $\to$ TurboQuant), testing whether multi-stage compression delivers compounding energy savings or exhibits interaction effects.
+  \item \textbf{C0 / Q0 (FP16 Baseline):} Uncompressed execution, used as the reference baseline for memory footprint, power draw, and full-precision retrieval accuracy.
+  \item \textbf{C1-W / Q1-W (AWQ Baseline):} 4-bit weight-only quantization without KV cache compression, used to isolate parameter memory savings and weight transfer reduction.
+  \item \textbf{C2 / Q2 (PyramidKV Eviction):} AWQ combined with layerwise token eviction (averaging 1024 retained tokens per layer) to evaluate decode memory traffic reductions.
+  \item \textbf{C3-Ref / Q3-Ref (TurboQuant Reference):} AWQ combined with numerical KV-cache quantization to evaluate retrieval fidelity alongside reference library runtime overhead.
+  \item \textbf{C4-Ref / Q4-Ref (Sequential Compound):} All three techniques stacked sequentially (AWQ $\to$ eviction $\to$ TurboQuant) to evaluate multi-stage interactions and compound energy behavior.
 \end{itemize}
 
 We also ran two sensitivity sweeps at 4096 tokens: eviction budget (512, 1024, and 1536 average retained tokens per layer) and TurboQuant nominal precision (2, 3, and 4 bits).
 
 \subsection{Hardware and Power Measurement Protocol}
 
-Experiments ran on an NVIDIA T4 GPU (16~GB nominal VRAM) in Google Colab. We polled GPU board power at 10~Hz (100~ms intervals) through NVML~\cite{nvidia2024nvml} using \texttt{pynvml}, following the methodology of Argerich et al.~\cite{argerich_watt_2026}. Total energy in Joules was computed via trapezoidal numerical integration over the recorded power trace, with prefill and decode phases integrated separately.
+Experiments ran on an NVIDIA T4 GPU (16~GB nominal VRAM) on Google Colab. We polled GPU board power at 10~Hz (every 100~ms) through NVML~\cite{nvidia2024nvml} using \texttt{pynvml}, following the methodology of Argerich et al.~\cite{argerich_watt_2026}. Total energy in Joules was computed via trapezoidal numerical integration over the recorded power trace, with prefill and decode phases integrated separately.
 
-To isolate compression effects from variations in autoregressive text generation, all energy runs used teacher-forced decoding for exactly 64 tokens. This keeps token generation identical across configurations, ensuring that measured energy differences reflect only the compression mechanism. We tested three context lengths (1024, 2048, and 4096 tokens) with five independent measurement blocks per condition. For each run, we logged power traces, timestamps, clock frequencies, board temperatures, and allocated VRAM.
+To isolate compression effects from variations in open-ended text generation, all energy runs used teacher-forced decoding for exactly 64 tokens. This keeps token generation identical across configurations, ensuring that measured energy differences reflect only the compression mechanism. We tested three context lengths (1024, 2048, and 4096 tokens) with five independent measurement blocks per condition. For each run, we logged power traces, timestamps, clock frequencies, board temperatures, and allocated VRAM.
 
 \subsection{Eviction Implementation}
 
@@ -262,7 +262,7 @@ We implement token eviction using a custom attention wrapper. During prefill, to
 
 \subsection{TurboQuant Reference Implementation and Realization Audit}
 
-TurboQuant~\cite{zandieh2026turboquant} applies random orthogonal rotations to KV vectors and maps coordinates to discrete codebook indices. We evaluate the public reference package, version~0.2.0~\cite{zandieh_turboquant_v020}. In this reference implementation, coordinates are stored as \texttt{uint8} indices while uncompressed FP16 key and value tensors remain concurrently allocated in memory. Consequently, the reference path is numerically active (applying quantized representations during attention computation) but does not compress physical memory on device because uncompressed tensors are retained. Nominal bit widths (2, 3, or 4 bits) adjust codebook quantization levels without changing physical container byte allocation.
+TurboQuant~\cite{zandieh2026turboquant} applies random orthogonal rotations to KV vectors and maps coordinates to discrete codebook indices. We evaluate the public reference package, version~0.2.0~\cite{zandieh_turboquant_v020}. In this reference implementation, coordinates are stored as \texttt{uint8} indices while uncompressed FP16 key and value tensors remain concurrently allocated in GPU memory. Consequently, the reference path is numerically active (applying quantized representations during attention computation) but does not compress physical memory on device because uncompressed tensors are retained. Nominal bit widths (2, 3, or 4 bits) adjust codebook quantization levels without changing physical container byte allocation.
 
 Rather than assessing an idealized hardware kernel, evaluating this path serves as an empirical audit of the \emph{software-to-hardware realization gap}: the disconnect between theoretical compression formulations and how off-the-shelf libraries execute on silicon when imported by edge practitioners. To guide future kernel engineering, we formulate a symbolic energy break-even boundary (Appendix~\ref{app:ideal}) specifying the exact compute-overhead thresholds ($O_\text{net} < \epsilon_\text{mem} \cdot \Delta_D$) that a custom packed and fused CUDA/Triton kernel must satisfy to deliver net energy reductions.
 
@@ -281,7 +281,7 @@ Evaluating KV-cache compression requires a quality metric that directly isolates
 
 \subsection{Benchmark Calibration Principle}
 
-Following the evaluation methodology established in KV-cache compression literature (e.g., SnapKV~\cite{li_snapkv_2024}, PyramidKV~\cite{cai_pyramidkv_2025}, and H2O~\cite{zhang_h2o_2023}), we constructed a calibrated key-value retrieval benchmark. The model must locate a specific target record within a 4096-token synthetic document and extract the associated code following a strict formatting template. The target needle is placed at one of three document depths: beginning (10\%), middle (50\%), or end (90\%).
+Following the evaluation methodology established in KV-cache compression literature (such as SnapKV~\cite{li_snapkv_2024}, PyramidKV~\cite{cai_pyramidkv_2025}, and H2O~\cite{zhang_h2o_2023}), we constructed a calibrated key-value retrieval benchmark. The model must locate a specific target record within a 4096-token synthetic document and extract the associated code following a strict formatting template. The target needle is placed at one of three document depths: beginning (10\%), middle (50\%), or end (90\%).
 
 Calibrating task difficulty is essential: excessive distractor similarity causes baseline failure (floor effects), whereas an overly simple task masks compression degradation (ceiling effects). We calibrated distractor density and key distinctiveness so the uncompressed baseline achieves high but imperfect accuracy ($\approx 75\%-88\%$), leaving headroom to detect compression degradation. The four pilot calibration iterations (V1 to V4) are documented in Appendix~\ref{app:benchmark-pilots}.
 
@@ -309,7 +309,7 @@ We present our experimental findings across three domains: hardware energy and d
 
 \subsection{TurboQuant Reference Energy Overhead by Phase}
 
-Table~\ref{tab:llama-all} and Table~\ref{tab:qwen-all} report the physical energy overhead of the TurboQuant reference path during prefill and decode. Across all tested contexts, the reference package increases net energy consumption. Decode energy overhead grows with sequence length, exceeding 80\% for Llama TQ-only at 4096 tokens, because autoregressive decoding repeatedly reads uncompressed tensor structures from memory. When eviction precedes quantization, the smaller cache volume reduces the data handled by reference routines, partially mitigating this overhead (Section~\ref{sec:interaction}). A complete breakdown of prefill versus decode overhead across all sequence lengths is plotted in Appendix~\ref{app:context-scaling} (Figure~\ref{fig:tq-overhead}).
+Table~\ref{tab:llama-all} and Table~\ref{tab:qwen-all} show the physical energy overhead of the TurboQuant reference path during prefill and decode. Across all tested contexts, the reference package increases net energy consumption. Decode energy overhead grows as sequence length increases, exceeding 80\% for Llama TQ-only at 4096 tokens, because autoregressive decoding repeatedly reads uncompressed tensors from memory. When we apply token eviction before quantization, the smaller cache volume reduces the data handled by reference routines, which partially mitigates this overhead (Section~\ref{sec:interaction}). A complete breakdown of prefill versus decode overhead across all sequence lengths is plotted in Appendix~\ref{app:context-scaling} (Figure~\ref{fig:tq-overhead}).
 
 \subsection{Llama: Energy Across Context Lengths}
 \label{sec:llama-energy}
@@ -326,22 +326,22 @@ Table~\ref{tab:llama-all} summarizes measured energy, decode throughput, peak al
 \textbf{Config@Context} & \textbf{Total J} & \textbf{tok/s} & \textbf{Peak VRAM (MiB)} & \textbf{Cache (MiB)} \\
 \midrule
 C0 @ 1024   & $244.11 \pm 13.10$ & 21.09 & 8810 & 119 \\
-C1 @ 1024   & $268.77 \pm 26.20$ & 18.24 & 4943 & 119 \\
+C1-W @ 1024 & $268.77 \pm 26.20$ & 18.24 & 4943 & 119 \\
 C2 @ 1024   & $253.61 \pm 14.36$ & 19.31 & 4920 & 92  \\
-C3 @ 1024   & $367.00 \pm 28.44$ & 13.49 & 5099 & 187 \\
-C4 @ 1024   & $364.91 \pm 21.59$ & 12.75 & 5042 & 147 \\
+C3-Ref @ 1024 & $367.00 \pm 28.44$ & 13.49 & 5099 & 187 \\
+C4-Ref @ 1024 & $364.91 \pm 21.59$ & 12.75 & 5042 & 147 \\
 \midrule
 C0 @ 2048   & $345.26 \pm 4.97$  & 17.42 & 9663 & 231 \\
-C1 @ 2048   & $313.81 \pm 9.31$  & 20.13 & 5795 & 231 \\
+C1-W @ 2048 & $313.81 \pm 9.31$  & 20.13 & 5795 & 231 \\
 C2 @ 2048   & $338.74 \pm 21.03$ & 17.81 & 5691 & 119 \\
-C3 @ 2048   & $439.58 \pm 9.11$  & 13.33 & 6116 & 357 \\
-C4 @ 2048   & $435.05 \pm 24.47$ & 12.87 & 5853 & 187 \\
+C3-Ref @ 2048 & $439.58 \pm 9.11$  & 13.33 & 6116 & 357 \\
+C4-Ref @ 2048 & $435.05 \pm 24.47$ & 12.87 & 5853 & 187 \\
 \midrule
 C0 @ 4096   & $701.08 \pm 8.12$  & 11.34 & 12688 & 455 \\
-C1 @ 4096   & $631.25 \pm 5.05$  & 13.77 & 8820  & 455 \\
+C1-W @ 4096 & $631.25 \pm 5.05$  & 13.77 & 8820  & 455 \\
 C2 @ 4096   & $529.30 \pm 20.02$ & 20.34 & 8500  & 119 \\
-C3 @ 4096   & $913.48 \pm 2.11$  & 7.66  & 9468  & 697 \\
-C4 @ 4096   & $659.50 \pm 21.35$ & 12.53 & 8662  & 187 \\
+C3-Ref @ 4096 & $913.48 \pm 2.11$  & 7.66  & 9468  & 697 \\
+C4-Ref @ 4096 & $659.50 \pm 21.35$ & 12.53 & 8662  & 187 \\
 \bottomrule
 \end{tabular}}
 \end{table}
@@ -349,20 +349,20 @@ C4 @ 4096   & $659.50 \pm 21.35$ & 12.53 & 8662  & 187 \\
 Key observations from the scaling data include:
 
 \paragraph{Context-Dependent AWQ Efficiency.}
-At 1024 tokens, AWQ (C1) consumed 24.66~J more energy than uncompressed FP16 (C0), averaging 268.77~J versus 244.11~J. At 4096 tokens, C1 achieved an energy reduction of 9.96\% (631.25~J vs.\ 701.08~J). Dequantization overhead outweighs bandwidth savings during short sequences, while memory traffic savings emerge as sequence length increases.
+At 1024 tokens, AWQ (C1-W) consumed 24.66~J more energy than uncompressed FP16 (C0), averaging 268.77~J versus 244.11~J. At 4096 tokens, C1-W achieved an energy reduction of 9.96\% (631.25~J vs.\ 701.08~J). Dequantization overhead outweighs bandwidth savings during short sequences, while memory traffic savings emerge as sequence length increases.
 
 \paragraph{Long-Context Eviction Gains.}
-At 4096 tokens, token eviction (C2) produced substantial multi-dimensional improvements: reducing total energy consumption by 101.95~J (16.15\%) relative to C1, increasing decode throughput from 13.77 to 20.34 tokens/s (a 47.7\% speedup), and shrinking active KV cache volume by 73.8\% (from 455~MiB to 119~MiB). At 1024 tokens, where the budget retains most prompt tokens, eviction produced negligible energy difference.
+At 4096 tokens, token eviction (C2) produced clear improvements across multiple dimensions: reducing total energy consumption by 101.95~J (16.15\%) relative to C1-W (529.30~J vs.\ 631.25~J), increasing decode throughput from 13.77 to 20.34 tokens/s (a 47.7\% speedup), and shrinking active KV cache volume by 73.8\% (from 455~MiB down to 119~MiB). At 1024 tokens, where the budget retains most prompt tokens, eviction produced negligible energy differences.
 
 \paragraph{Reference Quantization Overhead.}
-At 4096 tokens, TQ-Ref (C3) increased energy consumption to 913.48~J (44.7\% higher than C1) and degraded throughput to 7.66 tokens/s. Persistent KV cache volume expanded from 455~MiB to 697~MiB because the reference implementation keeps quantized indices alongside uncompressed state tensors.
+At 4096 tokens, TQ-Ref (C3-Ref) increased energy consumption to 913.48~J (44.7\% higher than C1-W) and degraded throughput to 7.66 tokens/s. Persistent KV cache volume expanded from 455~MiB to 697~MiB because the reference implementation keeps quantized indices alongside uncompressed state tensors.
 
 \paragraph{Compound Shielding.}
-Sequential composition (C4) consumed 659.50~J at 4096 tokens, an increase of 28.26~J relative to C1. By shrinking the cache prior to TurboQuant execution, C4 consumed 253.98~J less energy than C3 alone.
+Sequential composition (C4-Ref) consumed 659.50~J at 4096 tokens, an increase of 28.26~J relative to C1-W. By shrinking the cache before running TurboQuant, C4-Ref consumed 253.98~J less energy than C3-Ref alone.
 
 \subsection{Llama: Statistical Significance at 4096 Tokens}
 
-Table~\ref{tab:llama-stats} summarizes paired hypothesis tests for Llama total energy at 4096 tokens. The energy reduction of C2 over C1 was statistically significant after Holm correction ($p = 0.00549$), as was the energy penalty of C3 relative to C1 ($p = 1.9 \times 10^{-7}$). The difference between C1 and C4 was not statistically significant ($p = 0.2465$, 95\% CI: $[-60.28, 3.76]$~J). While five measurement blocks ($n=5$) provide sufficient power to resolve large effect sizes such as C1 vs.\ C2, the confidence interval for C1 vs.\ C4 spans zero, indicating that the two configurations cannot be declared strictly equivalent without larger sample sizes.
+Table~\ref{tab:llama-stats} summarizes paired hypothesis tests for Llama total energy at 4096 tokens. The energy reduction of C2 over C1-W was statistically significant after Holm correction ($p = 0.00549$), as was the energy penalty of C3-Ref relative to C1-W ($p = 1.9 \times 10^{-7}$). The difference between C1-W and C4-Ref was not statistically significant ($p = 0.2465$, 95\% CI: $[-60.28, 3.76]$~J). While five measurement blocks ($n=5$) provide enough statistical power to resolve large differences such as C1-W vs.\ C2, the confidence interval for C1-W vs.\ C4-Ref spans zero, which means we cannot declare the two configurations strictly equivalent without larger sample sizes.
 
 \begin{table}[htbp]
 \caption{Registered Paired Tests at 4096 Tokens, Llama Total Energy}
@@ -373,11 +373,11 @@ Table~\ref{tab:llama-stats} summarizes paired hypothesis tests for Llama total e
 \toprule
 \textbf{Comparison} & \textbf{Diff (J)} & \textbf{95\% CI (J)} & \textbf{Holm p} & \textbf{Decision} \\
 \midrule
-C1 $-$ C2     & $+101.95$ & $[73.81,\ 130.08]$    & 0.00549  & C2 lower; significant \\
-C1 $-$ C3-Ref & $-282.24$ & $[-287.23,\ -277.25]$ & $1.9\!\times\!10^{-7}$ & C3 higher; significant \\
-C1 $-$ C4-Ref & $-28.26$  & $[-60.28,\ 3.76]$     & 0.2465   & Not significant \\
-C2 $-$ C4-Ref & $-130.21$ & $[-168.32,\ -92.09]$  & 0.00620  & C4 higher; significant \\
-C3 $-$ C4-Ref & $+253.98$ & $[226.93,\ 281.02]$   & 0.000206 & C4 lower; significant \\
+C1-W $-$ C2     & $+101.95$ & $[73.81,\ 130.08]$    & 0.00549  & C2 lower; significant \\
+C1-W $-$ C3-Ref & $-282.24$ & $[-287.23,\ -277.25]$ & $1.9\!\times\!10^{-7}$ & C3-Ref higher; significant \\
+C1-W $-$ C4-Ref & $-28.26$  & $[-60.28,\ 3.76]$     & 0.2465   & Not significant \\
+C2 $-$ C4-Ref   & $-130.21$ & $[-168.32,\ -92.09]$  & 0.00620  & C4-Ref higher; significant \\
+C3-Ref $-$ C4-Ref & $+253.98$ & $[226.93,\ 281.02]$ & 0.000206 & C4-Ref lower; significant \\
 \bottomrule
 \end{tabular}}
 \end{table}
@@ -387,11 +387,11 @@ C3 $-$ C4-Ref & $+253.98$ & $[226.93,\ 281.02]$   & 0.000206 & C4 lower; signifi
 
 To evaluate how multi-stage compression interacts when stacked sequentially, we define the interaction contrast:
 \begin{equation}
-I = (\text{C4} - \text{C3}) - (\text{C2} - \text{C1})
+I = (\text{C4-Ref} - \text{C3-Ref}) - (\text{C2} - \text{C1-W})
 \end{equation}
-A negative interaction ($I < 0$) indicates sub-additive energy behavior: the incremental overhead of quantization is smaller when applied after token eviction than when applied alone. For Llama, $I = -152.03$~J (95\% CI: $[-187.11, -116.96]$~J, $p = 0.00109$). Physically, this occurs because prior eviction shrinks the active KV cache volume by 73.8\% (from 455~MiB to 119~MiB), so subsequent quantization routines execute over 75\% fewer retained tokens. This substantially reduces memory bandwidth traffic and per-token dequantization operations during decoding.
+A negative interaction ($I < 0$) indicates sub-additive energy behavior: the incremental overhead of quantization is smaller when applied after token eviction than when applied alone. For Llama, $I = -152.03$~J (95\% CI: $[-187.11, -116.96]$~J, $p = 0.00109$). Physically, this happens because prior eviction shrinks the active KV cache volume by 73.8\% (from 455~MiB to 119~MiB), so subsequent quantization routines execute over 75\% fewer retained tokens. This substantially reduces memory bandwidth traffic and per-token dequantization operations during decoding.
 
-However, C4 remained 130.21~J more costly than C2 alone: prior eviction shields against the full penalty of reference quantization, but cannot overcome the inherent overhead of un-fused coordinate management.
+However, C4-Ref remained 130.21~J more costly than C2 alone: prior eviction shields against the full penalty of reference quantization, but cannot overcome the inherent overhead of un-fused coordinate management.
 
 \begin{figure}[htbp]
 \centering
@@ -405,7 +405,7 @@ As shown in Figure~\ref{fig:interaction}, this negative interaction held equally
 
 \subsection{Llama: System Trade-Offs at 4096 Tokens}
 
-The empirical trade-offs between decode throughput, energy consumption, peak VRAM, and active KV cache volume are detailed in Table~\ref{tab:llama-all} (and plotted in Appendix~\ref{app:context-scaling}, Figure~\ref{fig:tradeoffs}). In throughput versus energy, C2 forms the empirical efficiency boundary, achieving the highest throughput (20.34~tok/s) and lowest energy (529.30~J). In memory allocation, C3 incurs both the largest live cache (697~MiB) and highest peak VRAM (9468~MiB), whereas C2 minimizes both footprint metrics (119~MiB cache, 8500~MiB peak VRAM).
+The empirical trade-offs between decode throughput, energy consumption, peak VRAM, and active KV cache volume are detailed in Table~\ref{tab:llama-all} (and plotted in Appendix~\ref{app:context-scaling}, Figure~\ref{fig:tradeoffs}). In throughput versus energy, C2 forms the empirical efficiency boundary, achieving the highest throughput (20.34~tok/s) and lowest energy (529.30~J). In memory allocation, C3-Ref incurs both the largest live cache (697~MiB) and highest peak VRAM (9468~MiB), whereas C2 minimizes both footprint metrics (119~MiB cache, 8500~MiB peak VRAM).
 
 \subsection{Llama: Hard-Retrieval Quality}
 
@@ -465,7 +465,7 @@ Figure~\ref{fig:pareto3obj} displays the multi-objective frontier. Marker area r
 \label{fig:pareto3obj}
 \end{figure*}
 
-For Llama, C2 achieves the most favorable balance among measured points: lowest total energy (529.30~J), smallest persistent cache (119~MiB), highest throughput (20.34~tok/s), and retrieval accuracy within one scenario of baseline (37/60 vs.\ 38/60), with 100\% bootstrap selection stability. While C0 (100\%) and C1-W (63.0\%) also qualify as Pareto-optimal due to higher retrieval fidelity, C3 (0\%) and C4 (0.6\%) are dominated. Crucially, C2 strictly outperforms C4 across every operational dimension (19.7\% lower energy, 62.3\% higher throughput, 36.4\% smaller cache) with identical accuracy (37/60), demonstrating that naive disjoint sequential stacking is an empirical anti-pattern on real silicon compared to single-stage eviction.
+For Llama, C2 achieves the most favorable balance among measured points: lowest total energy (529.30~J), smallest persistent cache (119~MiB), highest throughput (20.34~tok/s), and retrieval accuracy within one scenario of baseline (37/60 vs.\ 38/60), with 100\% bootstrap selection stability. While C0 (100\%) and C1-W (63.0\%) also qualify as Pareto-optimal due to higher retrieval fidelity, C3-Ref (0\%) and C4-Ref (0.6\%) are dominated. Crucially, C2 strictly outperforms C4-Ref across every operational dimension (19.7\% lower energy, 62.3\% higher throughput, 36.4\% smaller cache) with identical accuracy (37/60), demonstrating that naive disjoint sequential stacking is an empirical anti-pattern on real silicon compared to single-stage eviction.
 
 For Qwen, the Pareto front divides into disjoint extremes: uncompressed Q0 provides the highest retrieval accuracy (0.883, 97.2\% bootstrap frequency), while eviction (Q2) achieves 100\% selection on energy and memory metrics but violates basic utility constraints with 1/60 retrieval. Q3-Ref was selected in only 3.8\% of resamples because its energy penalty outweighed its marginal retrieval gain over Q1-W.
 
@@ -481,10 +481,10 @@ Bootstrap frontier frequency quantifies resampling stability rather than a popul
 \textbf{Model} & \textbf{Config} & \textbf{Energy (J)} & \textbf{Retrieval} & \textbf{Cache (MiB)} & \textbf{Boot.\%} \\
 \midrule
 Llama & C0     & 701.08 & 0.783 & 455 & 100.0\% \\
-Llama & C1-W   & 639.86 & 0.633 & 455 &  63.0\% \\
+Llama & C1-W$^\dagger$   & 639.86 & 0.633 & 455 &  63.0\% \\
 Llama & C2     & 529.30 & 0.617 & 119 & 100.0\% \\
-Llama & C3     & 913.48 & 0.617 & 697 &   0.0\% \\
-Llama & C4     & 659.50 & 0.617 & 187 &   0.6\% \\
+Llama & C3-Ref & 913.48 & 0.617 & 697 &   0.0\% \\
+Llama & C4-Ref & 659.50 & 0.617 & 187 &   0.6\% \\
 \midrule
 Qwen  & Q0     & 616.78 & 0.883 & 146 &  97.2\% \\
 Qwen  & Q1-W   & 621.75 & 0.800 & 146 &  36.0\% \\
@@ -495,14 +495,18 @@ Qwen  & Q4-Ref & 628.69 & 0.017 &  60 &   0.0\% \\
 \end{tabular}}
 \begin{minipage}{\columnwidth}\vspace{2pt}\footnotesize
 Boot.\%: percentage of 2000 bootstrap resamples in which the configuration was
-selected as a Pareto-optimal point. Higher values indicate greater frontier stability.
+selected as a Pareto-optimal point. Higher values indicate greater frontier stability.\\
+$^\dagger$~C1-W (639.86~J) uses the matched custom-wrapper baseline in quality and Pareto evaluations,
+which carries an 8.61~J offset relative to un-wrapped context scaling (631.25~J, Table~\ref{tab:llama-all}).
+All C2--C4-Ref comparisons in Section~\ref{sec:interaction} use C1-W as their reference
+so that wrapper overhead is held constant across compression stages.
 \end{minipage}
 \end{table}
 
 \subsection{Power Trace Robustness and Sensitivity}
 \label{sec:robustness}
 
-Raw NVML power traces recorded occasional transient spikes exceeding the nominal 70~W threshold, including isolated samples above 100~W and a maximum reading of 124.5~W on Llama (116.1~W on Qwen). To evaluate sensitivity to measurement artifacts, we reintegrated all 100 Llama power traces under an 82~W cap and a strict 70~W cap. Energy rank orderings ($\text{C2} < \text{C1} < \text{C4} < \text{C0} < \text{C3}$) and all five registered statistical significance decisions remained completely invariant across clipping thresholds (documented and plotted in Appendix~\ref{app:power-samples}, Figure~\ref{fig:power-cap} and Figure~\ref{fig:power-samples}).
+Raw NVML power traces recorded occasional transient spikes exceeding the nominal 70~W threshold, including isolated samples above 100~W and a maximum reading of 124.5~W on Llama (116.1~W on Qwen). To evaluate sensitivity to measurement artifacts, we reintegrated all 100 Llama power traces under an 82~W cap and a strict 70~W cap. Energy rank orderings ($\text{C2} < \text{C1-W} < \text{C4-Ref} < \text{C0} < \text{C3-Ref}$) and all five registered statistical significance decisions remained completely invariant across clipping thresholds (documented and plotted in Appendix~\ref{app:power-samples}, Figure~\ref{fig:power-cap} and Figure~\ref{fig:power-samples}).
 
 \subsection{Sensitivity to Budget and Bit Width}
 
@@ -635,7 +639,7 @@ Prior literature suggests that combining weight quantization, token eviction, an
 AWQ saves $\sim$3$\times$ energy & Saves $\sim$10\% at 4096 tokens; increases energy at 1024 tokens \\
 TurboQuant reduces memory 15\% to 20\% & Realized TQ-Ref increased storage by over 50\% \\
 Eviction preserves retrieval & Preserved on Llama (37/60); collapsed on Qwen (1/60) \\
-Sequential compound minimizes all costs & C4 not significantly lower than C1; Q4 collapsed to 1/60 \\
+Sequential compound minimizes all costs & C4-Ref not significantly lower than C1-W; Q4-Ref collapsed to 1/60 \\
 \bottomrule
 \end{tabular}}
 \end{table}
@@ -692,9 +696,9 @@ Conversely, the data does not establish:
 
 Our empirical findings provide direct physical motivation for the emerging literature on joint rate-distortion compression. Theoretical frameworks such as \textbf{RDKV}~\cite{zhang_rdkv_2026} and \textbf{ThinKV}~\cite{ramachandran_thinkv_2026} propose dynamic, continuous bit allocation across tokens and layers, treating token eviction as an extreme case of zero-bit assignment within a rate-distortion objective.
 
-While these frameworks demonstrate promising Pareto frontiers in algorithmic simulation, our hardware measurements expose the concrete failure modes of disjoint sequential pipelines that make joint optimization necessary on real devices. Specifically, our empirical Pareto frontier demonstrates that naive sequential stacking (C4) is strictly dominated by single-stage eviction (C2) on balanced architectures (Llama), while causing complete retrieval collapse (1/60) on aggressive head-sharing layouts (Qwen). Expanding Qwen's eviction budget by 50\% in our sensitivity sweep (Table~\ref{tab:qwen-sensitivity}) recovered only 2 out of 15 scenarios, confirming that discrete token selection errors drive the failure.
+While these frameworks demonstrate promising Pareto frontiers in algorithmic simulation, our hardware measurements expose the concrete failure modes of disjoint sequential pipelines that make joint optimization necessary on real devices. Specifically, our empirical Pareto frontier demonstrates that naive sequential stacking (C4-Ref) is strictly dominated by single-stage eviction (C2) on balanced architectures (Llama), while causing complete retrieval collapse (1/60) on aggressive head-sharing layouts (Qwen). Expanding Qwen's eviction budget by 50\% in our sensitivity sweep (Table~\ref{tab:qwen-sensitivity}) recovered only 2 out of 15 scenarios, confirming that discrete token selection errors drive the failure.
 
-These physical silicon findings provide clear boundary conditions for RDKV and ThinKV: under aggressive GQA, retaining marginal tokens at low precision (such as 1 or 2 bits) is essential to preserve directional attention signals, whereas hard binary eviction discards them. Furthermore, our measurement of the sequential shielding effect ($I < 0$) proves that shrinking active cache volume prior to quantization yields genuine energy savings by decreasing DRAM read traffic. Consequently, our physical measurements provide both the baseline data and the practical justification for transitioning from disjoint sequential pipelines to hardware-fused joint rate-distortion engines on edge accelerators.
+These physical silicon findings provide boundary conditions for RDKV and ThinKV: under aggressive GQA, retaining marginal tokens at low precision (such as 1 or 2 bits) appears necessary to preserve directional attention signals, whereas hard binary eviction discards them. Our measurement of the sequential shielding effect ($I < 0$) confirms that shrinking active cache volume prior to quantization yields genuine energy savings by reducing DRAM read traffic. These results give both the baseline data and the practical motivation for moving from disjoint sequential pipelines to joint rate-distortion optimization on resource-constrained hardware.
 
 
 %% ════════════════════════════════════════════════════════════════
@@ -703,7 +707,7 @@ These physical silicon findings provide clear boundary conditions for RDKV and T
 \section{Threats to Validity}
 
 \subsection{Internal Validity}
-All execution rows for a given model were collected within continuous runtime sessions on Google Colab. We recorded five independent energy measurement blocks per condition ($n=5$), providing sufficient statistical power to detect large effects while acknowledging wider confidence intervals for small differences. In Llama runs, compressed configurations (C2 to C4) were compared against stock AWQ (C1), where the custom wrapper introduced a minor baseline offset ($\approx 8.61$~J at 4096 tokens). On Qwen, the matched wrapper was applied uniformly across all configurations. Two in-session code repairs in Notebook~08 were retained inline, and all raw trace files were verified via SHA-256 integrity checksums rather than post-hoc reconstruction.
+All execution rows for a given model were collected within continuous runtime sessions on Google Colab. We recorded five independent energy measurement blocks per condition ($n=5$), providing sufficient statistical power to detect large effects while acknowledging wider confidence intervals for small differences. In Llama runs, compressed configurations (C2 to C4-Ref) were compared against AWQ baseline (C1-W), where the custom wrapper introduced a minor baseline offset ($\approx 8.61$~J at 4096 tokens). On Qwen, the matched wrapper was applied uniformly across all configurations. Two in-session code repairs in Notebook~08 were retained inline, and all raw trace files were verified via SHA-256 integrity checksums rather than post-hoc reconstruction.
 
 \subsection{Construct Validity}
 Our quality evaluation focuses on structured key-value extraction across three controlled document positions. While this provides diagnostic headroom for memory compression, it does not assess multi-step reasoning, natural dialogue, summarization, or multilingual fluency. Furthermore, energy measurements reflect board-level GPU power sampled via NVML and do not capture host CPU dissipation, system memory power, or facility cooling overhead.
@@ -720,13 +724,13 @@ Family-wise error rates were controlled using Holm sequential correction for ene
 %% ════════════════════════════════════════════════════════════════
 \section{Conclusion}
 
-This empirical ablation study evaluated how 4-bit AWQ weight quantization, custom PyramidKV token eviction, and TurboQuant KV-cache quantization behave when stacked on two 3B-parameter small language models running on an NVIDIA T4 GPU. By continuously sampling physical board-level power at 10~Hz across context lengths up to 4096 tokens and measuring exact-match extraction on a calibrated 60-scenario hard-retrieval benchmark, our measurements reveal several clear operational trade-offs for edge inference.
+This empirical ablation study evaluated how 4-bit AWQ weight quantization, custom PyramidKV token eviction, and TurboQuant KV-cache quantization behave when stacked on two 3B-parameter small language models running on an NVIDIA T4 GPU. We sampled physical board-level power at 10~Hz across context lengths up to 4096 tokens and measured exact-match extraction on a calibrated 60-scenario hard-retrieval benchmark.
 
-Our primary finding is that compression efficiency depends on attention geometry and sequence length rather than nominal compression ratios alone. On Llama~3.2-3B (3:1 GQA), combining 4-bit AWQ with custom PyramidKV eviction (C2) formed the most effective configuration at 4096 tokens: delivering a statistically significant 101.95~J (16.15\%) total energy reduction, accelerating decode throughput by 47.7\% (from 13.77 to 20.34~tok/s), reducing active KV cache storage by 73.8\% (from 455~MiB to 119~MiB), and maintaining hard-retrieval accuracy within one scenario of baseline (37/60 vs.\ 38/60) with 100\% bootstrap selection stability. In contrast, applying the identical eviction policy to Qwen2.5-3B (8:1 GQA) caused hard-retrieval accuracy to collapse from 48/60 to 1/60, proving that spatial pruning heuristics cannot be assumed to transfer across grouped-query attention ratios without risking catastrophic context loss.
+Our primary finding is that compression efficiency depends on attention geometry and sequence length, not on nominal compression ratios alone. On Llama~3.2-3B (3:1 GQA), combining 4-bit AWQ with custom PyramidKV eviction (C2) gave the best result at 4096 tokens: a statistically significant 101.95~J (16.15\%) total energy reduction, a 47.7\% decode throughput gain under teacher-forced decoding (from 13.77 to 20.34~tok/s), a 73.8\% reduction in active KV cache storage (from 455~MiB to 119~MiB), and hard-retrieval accuracy within one scenario of baseline (37/60 vs.\ 38/60) with 100\% bootstrap selection stability. Applying the same eviction policy to Qwen2.5-3B (8:1 GQA) caused accuracy to collapse from 48/60 to 1/60, showing that attention-score eviction heuristics do not transfer safely across GQA ratios.
 
 Our hardware measurements also expose practical systems effects that theoretical models overlook. We measured and verified a negative compound interaction ($I = -152.03$~J on Llama, $I = -112.32$~J on Qwen, both $p < 0.01$), showing that prior cache eviction acts as an energy shield by reducing the volume of data handled by downstream quantization routines. We also documented a substantial software-to-hardware realization gap in off-the-shelf quantization packages, where retaining uncompressed tensors alongside discrete indices in the TurboQuant reference path added 31\% to 45\% net energy overhead. All energy rankings and registered statistical decisions remained invariant under 82~W and 70~W power trace clipping, confirming measurement stability.
 
-These physical silicon findings directly ground theoretical joint compression frameworks, such as RDKV and ThinKV, demonstrating why continuous rate-distortion bit allocation is necessary to prevent discrete token selection failures on aggressive GQA architectures. Future work should evaluate additional open-weight SLM architectures (such as Gemma, Mistral, and Phi-3) across varied GQA configurations, test adaptive eviction heuristics (e.g., SnapKV, ChunkKV, and Ada-KV) at native context limits (8K to 32K), build physically packed and fused custom CUDA/Triton kernels to close the realization gap, and directly benchmark joint rate-distortion optimizers against sequential baselines on edge silicon.
+These measurements directly ground theoretical joint compression frameworks such as RDKV and ThinKV, and help explain why continuous rate-distortion bit allocation is preferable to hard token eviction on aggressive GQA architectures. Future work should test additional SLM families (Gemma, Mistral, Phi-3) across varied GQA ratios, evaluate adaptive eviction heuristics (SnapKV, ChunkKV, Ada-KV) at native context limits (8K to 32K tokens), build packed and fused CUDA/Triton kernels to close the realization gap, and benchmark joint rate-distortion optimizers directly against sequential baselines.
 
 
 %% ════════════════════════════════════════════════════════════════
@@ -828,8 +832,7 @@ Generative AI tooling was utilized in two capacities during the preparation of t
 %% ════════════════════════════════════════════════════════════════
 %%  REFERENCES
 %% ════════════════════════════════════════════════════════════════
-%% Print all BibTeX entries, including uncited background references.
-\nocite{*}
+%% Only cited entries are printed; nocite{*} removed to avoid bibliography padding.
 \bibliographystyle{ACM-Reference-Format}
 \begingroup
 \sloppy
