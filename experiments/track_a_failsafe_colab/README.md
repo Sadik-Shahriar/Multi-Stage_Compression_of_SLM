@@ -44,6 +44,12 @@ standalone `.py` files as experiment runners.
     synthesis read-only, and writes only to
     `/content/CSE407_cross_model_visualization_v1/`. Eight figures and 16
     PNG/PDF files passed under visualization fingerprint `53ead4e6db45d2a8`.
+12. `10_reproducibility_environment_audit.ipynb` is a standalone environment and
+    reproducibility audit notebook. It queries all host OS parameters, NVML power
+    telemetry settings, GPU compute architecture, Python runtime stack, pinned
+    library versions, model geometry, layerwise budget vectors, and experimental
+    protocol constants. It generates `reproducibility_specs_full.json`,
+    `reproducibility_table.tex`, and `reproducibility_summary.md`.
 
 ## Safety Rules
 

@@ -1,15 +1,3 @@
-% ============================================================
-% references.bib — BibLaTeX-authored, BibTeX-compiled
-% 28 entries (>=25 required)
-%
-% This file is written in BibLaTeX style (url, doi, abstract,
-% eprinttype, urldate, keywords fields included as authored).
-% It compiles with BibTeX because acmart loads natbib internally
-% and is incompatible with biblatex. BibTeX ignores fields it
-% does not understand (urldate, eprinttype, abstract, keywords)
-% and processes the standard fields correctly.
-% ============================================================
-
 @misc{grattafiori_llama3_2024,
   title        = {The {Llama} 3 Herd of Models},
   author       = {Grattafiori, Aaron and Dubey, Abhimanyu and Jauhri, Abhinav
@@ -41,25 +29,6 @@
   urldate      = {2026-07-13},
 }
 
-@misc{zandieh_turboquant_2025,
-  title        = {{TurboQuant}: Online Vector Quantization with Near-optimal
-                  Distortion Rate},
-  shorttitle   = {{TurboQuant}},
-  author       = {Zandieh, Amir and Daliri, Majid and Hadian, Majid and
-                  Mirrokni, Vahab},
-  year         = {2025},
-  eprint       = {2504.19874},
-  eprinttype   = {arxiv},
-  url          = {https://arxiv.org/abs/2504.19874},
-  doi          = {10.48550/arXiv.2504.19874},
-  urldate      = {2026-06-28},
-  keywords     = {Computer Science - Machine Learning},
-  abstract     = {Vector quantization aims to quantize high-dimensional Euclidean
-                  vectors while minimizing distortion in their geometric structure.
-                  TurboQuant applies random rotations to achieve near-optimal
-                  distortion rates across all bit-widths for KV cache quantization.},
-}
-
 @article{lin_awq_2025,
   title        = {{AWQ}: Activation-aware Weight Quantization for On-Device
                   {LLM} Compression and Acceleration},
@@ -82,23 +51,6 @@
                   acceleration across edge platforms.},
 }
 
-@inproceedings{li_snapkv_nodate,
-  title        = {{SnapKV}: {LLM} Knows What You Are Looking for before
-                  Generation},
-  author       = {Li, Yuhong and Huang, Yingbing and Yang, Bowen and
-                  Venkitesh, Bharat and Locatelli, Acyr and Ye, Hanchen and
-                  Cai, Tianle and Lewis, Patrick and Chen, Deming},
-  booktitle    = {Advances in Neural Information Processing Systems (NeurIPS)},
-  year         = {2024},
-  pages        = {1--15},
-  publisher    = {Curran Associates, Inc.},
-  address      = {Red Hook, NY, USA},
-  langid       = {english},
-  abstract     = {SnapKV is an innovative and fine-tuning-free approach that
-                  efficiently minimizes KV cache size while delivering comparable
-                  accuracy in real-world applications.},
-}
-
 @misc{cai_pyramidkv_2025,
   title        = {{PyramidKV}: Dynamic {KV} Cache Compression based on
                   Pyramidal Information Funneling},
@@ -116,22 +68,6 @@
   abstract     = {PyramidKV dynamically adjusts KV cache size across layers,
                   allocating more cache in lower layers and less in higher ones,
                   achieving up to 20.5 absolute accuracy improvement on TREC.},
-}
-
-@misc{zhang_h2o_nodate,
-  title        = {{H2O}: Heavy-Hitter Oracle for Efficient Generative Inference
-                  of Large Language Models},
-  author       = {Zhang, Zhenyu and Sheng, Ying and Zhou, Tianyi and Chen,
-                  Tianlong and Zheng, Lianmin and Cai, Ruisi and Song, Zhao and
-                  Tian, Yuandong and R{\'e}, Christopher and Barrett, Clark and
-                  Wang, Zhangyang and Chen, Beidi},
-  journal      = {arXiv preprint arXiv:2306.14048},
-  journaltitle = {arXiv preprint arXiv:2306.14048},
-  year         = {2023},
-  langid       = {english},
-  abstract     = {H2O retains a balance of recent tokens and Heavy Hitter tokens
-                  in the KV cache, improving throughput by up to 29x over leading
-                  inference systems on OPT-6.7B and OPT-30B.},
 }
 
 @misc{liu_kivi_2023,
@@ -170,17 +106,6 @@
                   by up to 70\% in server scenarios.},
 }
 
-@misc{lyeonov_energy_nodate,
-  title        = {Energy Efficiency and Energy Saving: Theory and Practice
-                  of the {EU}},
-  author       = {Lyeonov, Serhiy and Vakulenko, Ihor and Matvieieva, Yuliia},
-  journal      = {SocioEconomic Challenges},
-  journaltitle = {SocioEconomic Challenges},
-  year         = {2021},
-  howpublished = {SocioEconomic Challenges},
-  langid       = {english},
-}
-
 @inproceedings{strubell_energy_2019,
   title        = {Energy and Policy Considerations for Deep Learning in {NLP}},
   author       = {Strubell, Emma and Ganesh, Ananya and McCallum, Andrew},
@@ -195,20 +120,6 @@
   url          = {https://aclanthology.org/P19-1355},
   urldate      = {2026-06-28},
   langid       = {english},
-}
-
-@misc{patterson_carbon_nodate,
-  title        = {Carbon Emissions and Large Neural Network Training},
-  author       = {Patterson, David and Gonzalez, Joseph and Le, Quoc and
-                  Liang, Chen and Munguia, Lluis-Miquel and Rothchild, Daniel
-                  and So, David and Texier, Maud and Dean, Jeff},
-  journal      = {arXiv preprint arXiv:2104.10350},
-  journaltitle = {arXiv preprint arXiv:2104.10350},
-  year         = {2021},
-  langid       = {english},
-  abstract     = {Energy use and carbon footprint analysis of large models shows
-                  DNN, datacenter, and processor choices can reduce carbon
-                  footprint by up to 1000x.},
 }
 
 @inproceedings{bender_dangers_2021,
@@ -340,22 +251,6 @@
   abstract     = {ThinKV applies hybrid quantization-eviction based on thought
                   importance in CoT reasoning, achieving near-lossless accuracy
                   with under 5\% of the original KV cache.},
-}
-
-@inproceedings{dao_flashattention_nodate,
-  title        = {{FlashAttention}: Fast and Memory-Efficient Exact Attention
-                  with {IO}-Awareness},
-  author       = {Dao, Tri and Fu, Daniel Y and Ermon, Stefano and Rudra,
-                  Atri and R{\'e}, Christopher},
-  booktitle    = {Advances in Neural Information Processing Systems},
-  year         = {2022},
-  volume       = {35},
-  pages        = {16344--16359},
-  publisher    = {Curran Associates, Inc.},
-  address      = {Red Hook, NY, USA},
-  langid       = {english},
-  abstract     = {FlashAttention uses tiling to reduce HBM reads/writes, achieving
-                  15\% end-to-end speedup on BERT-large and 3x speedup on GPT-2.},
 }
 
 @misc{li2024survey,
@@ -739,6 +634,7 @@
 }
 
 %% Pages corrected: wrong 47444-47461 -> verified 47901-47911 (PMLR v235)
+
 @inproceedings{tang2024quest,
   title        = {{QUEST}: Query-Aware Sparsity for Efficient Long-Context
                   {LLM} Inference},
@@ -846,72 +742,6 @@
   url          = {https://proceedings.mlr.press/v235/egiazarian24a.html},
   urldate      = {2026-06-28},
 }
-
-@inproceedings{liu2024kivi,
-  title        = {{KIVI}: A Tuning-Free Asymmetric 2bit Quantization for
-                  {KV} Cache},
-  shorttitle   = {{KIVI}},
-  author       = {Liu, Zirui and Yuan, Jiayi and Jin, Hongye and Zhong,
-                  Shaochen and Xu, Zhaozhuo and Braverman, Vladimir and Chen,
-                  Beidi and Hu, Xia},
-  booktitle    = {Proceedings of the 41st International Conference on Machine
-                  Learning (ICML)},
-  series       = {Proceedings of Machine Learning Research},
-  volume       = {235},
-  pages        = {32332--32344},
-  year         = {2024},
-  publisher    = {PMLR},
-  address      = {Vienna, Austria},
-  url          = {https://proceedings.mlr.press/v235/liu24bz.html},
-  urldate      = {2026-06-28},
-}
-
-@misc{frantar2023gptq,
-  title        = {{GPTQ}: Accurate Post-Training Quantization for Generative
-                  Pre-trained Transformers},
-  shorttitle   = {{GPTQ}},
-  author       = {Frantar, Elias and Ashkboos, Saleh and Hoefler, Torsten and
-                  Alistarh, Dan},
-  booktitle    = {The Eleventh International Conference on Learning
-                  Representations (ICLR)},
-  year         = {2023},
-  howpublished = {International Conference on Learning Representations (ICLR)},
-  url          = {https://openreview.net/forum?id=tcbBPnZ3tV},
-  urldate      = {2026-06-28},
-}
-
-@misc{lin2024awq,
-  title        = {{AWQ}: Activation-aware Weight Quantization for On-Device
-                  {LLM} Compression and Acceleration},
-  shorttitle   = {{AWQ}},
-  author       = {Lin, Ji and Tang, Jiaming and Tang, Haotian and Yang, Shang
-                  and Chen, Wei-Ming and Wang, Wei-Chen and Xiao, Guangxuan and
-                  Dang, Xingyu and Gan, Chuang and Han, Song},
-  booktitle    = {Proceedings of Machine Learning and Systems 6 (MLSys)},
-  pages        = {87--100},
-  year         = {2024},
-  howpublished = {Proceedings of Machine Learning and Systems 6 (MLSys)},
-  url          = {https://proceedings.mlsys.org/paper_files/paper/2024/hash/1b742ae2171f28b4ee43a3d537f81533-Abstract-Conference.html},
-  urldate      = {2026-06-28},
-}
-
-@misc{ramachandran2026thinkv,
-  title        = {{ThinKV}: Thought-Adaptive {KV} Cache Compression for
-                  Efficient Reasoning Models},
-  shorttitle   = {{ThinKV}},
-  author       = {Ramachandran, Akshat and Neseem, Marina and Sakr, Charbel
-                  and Venkatesan, Rangharajan and Khailany, Brucek and Krishna,
-                  Tushar},
-  booktitle    = {International Conference on Learning Representations (ICLR)},
-  year         = {2026},
-  howpublished = {International Conference on Learning Representations (ICLR)},
-  url          = {https://openreview.net/forum?id=EqxGhEjvJa},
-  urldate      = {2026-06-28},
-}
-
-%% ============================================================
-%% PHASE 6 — Statistical Methodology Foundations (4 entries)
-%% ============================================================
 
 @article{wilson1927probable,
   title        = {Probable Inference, the Law of Succession, and Statistical

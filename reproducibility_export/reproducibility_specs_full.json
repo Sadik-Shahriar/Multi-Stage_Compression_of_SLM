@@ -1,0 +1,247 @@
+{
+  "schema_version": "cse407-reproducibility-audit-v1",
+  "audit_timestamp_utc": "2026-08-16T07:47:53.463773+00:00",
+  "host_specs": {
+    "os_system": "Linux",
+    "os_release": "6.6.122+",
+    "os_version": "#1 SMP Thu Apr 30 18:17:14 UTC 2026",
+    "platform": "Linux-6.6.122+-x86_64-with-glibc2.35",
+    "cpu": {
+      "processor": "x86_64",
+      "architecture": "x86_64",
+      "logical_cores": 2,
+      "model_name": "Intel(R) Xeon(R) CPU @ 2.00GHz"
+    },
+    "ram": {
+      "total_gb": 12.67,
+      "available_gb": 11.19
+    }
+  },
+  "gpu_hardware": {
+    "device_name": "Tesla T4",
+    "driver_version": "580.82.07",
+    "nvml_version": "13.580.82.07",
+    "compute_capability": "7.5",
+    "vram_total_bytes": 16106127360,
+    "vram_total_gib": 15.0,
+    "nominal_vram_gb": 16,
+    "usable_vram_gib": 15.0,
+    "enforced_power_limit_w": 70.0,
+    "default_power_limit_w": 70.0,
+    "sm_clock_mhz": 300,
+    "mem_clock_mhz": 405,
+    "current_temp_c": 47,
+    "power_polling_interval_s": 0.1,
+    "power_polling_frequency_hz": 10.0,
+    "power_capping_regimes_w": [
+      "raw (unclipped)",
+      82.0,
+      70.0
+    ],
+    "power_integration_method": "Trapezoidal Riemann sum (integral P(t) dt)"
+  },
+  "software_stack": {
+    "python": "3.12.13",
+    "torch": "2.11.0+cu128",
+    "torchvision": "0.26.0+cu128",
+    "transformers": "5.13.1",
+    "accelerate": "1.14.0",
+    "gptqmodel": "Not Installed",
+    "turboquant": "Not Installed",
+    "pynvml": "installed",
+    "numpy": "2.0.2",
+    "scipy": "1.16.3",
+    "pandas": "2.2.2",
+    "matplotlib": "3.10.0"
+  },
+  "canonical_software_pins": {
+    "torch": "2.11.0+cu128",
+    "cuda_runtime": "12.8",
+    "transformers": "5.12.1",
+    "transformers_commit": "ddb849abe009d1089e6c691bfc897f27211c663c",
+    "turboquant": "0.2.0",
+    "turboquant_source_sha256": "7358e2778c8de6974b0c7212ae8e3dbe00552a96b2e2df0aa42878f239a4c72a",
+    "gptqmodel": "7.1.0",
+    "accelerate": "1.14.0",
+    "numpy": "2.2.6",
+    "scipy": "1.16.3 (Llama) / 1.16.1 (Qwen)",
+    "pandas": "2.2.2"
+  },
+  "model_architectures": {
+    "llama_3_2_3b_instruct": {
+      "model_family": "Llama 3.2",
+      "parameter_count": "3.21B",
+      "uncompressed_repo_id": "unsloth/Llama-3.2-3B-Instruct",
+      "uncompressed_revision": "006f5dcd1393c3add266de40994ba96225e9689d",
+      "awq_repo_id": "casperhansen/llama-3.2-3b-instruct-awq",
+      "awq_revision": "272b3bde867b606760447deb9a4d2719fbdfd3ae",
+      "awq_quantization_config": {
+        "bits": 4,
+        "group_size": 128,
+        "zero_point": true,
+        "version": "GEMM"
+      },
+      "architecture": {
+        "num_hidden_layers": 28,
+        "num_attention_heads_query": 24,
+        "num_key_value_heads": 8,
+        "gqa_ratio": "3:1 (24 Q / 8 KV)",
+        "head_dim": 128,
+        "hidden_size": 3072,
+        "intermediate_size": 8192,
+        "vocab_size": 128256,
+        "max_position_embeddings": 8192,
+        "rope_theta": 500000.0,
+        "hidden_act": "silu"
+      },
+      "kv_cache_bytes_per_token_fp16": 114688,
+      "kv_cache_mib_at_4096_fp16": 448.0
+    },
+    "qwen_2_5_3b_instruct": {
+      "model_family": "Qwen 2.5",
+      "parameter_count": "3.09B",
+      "uncompressed_repo_id": "Qwen/Qwen2.5-3B-Instruct",
+      "uncompressed_revision": "aa8e72537993ba99e69dfaafa59ed015b17504d1",
+      "awq_repo_id": "Qwen/Qwen2.5-3B-Instruct-AWQ",
+      "awq_revision": "3559b226e8ce77211e2c1bd7ddfb7686fec4d6dd",
+      "awq_quantization_config": {
+        "bits": 4,
+        "group_size": 128,
+        "zero_point": true,
+        "version": "GEMM"
+      },
+      "architecture": {
+        "num_hidden_layers": 36,
+        "num_attention_heads_query": 16,
+        "num_key_value_heads": 2,
+        "gqa_ratio": "8:1 (16 Q / 2 KV)",
+        "head_dim": 128,
+        "hidden_size": 2048,
+        "intermediate_size": 11008,
+        "vocab_size": 151936,
+        "max_position_embeddings": 32768,
+        "rope_theta": 1000000.0,
+        "hidden_act": "silu"
+      },
+      "kv_cache_bytes_per_token_fp16": 36864,
+      "kv_cache_mib_at_4096_fp16": 144.0
+    }
+  },
+  "compression_protocols": {
+    "weight_quantization": {
+      "method": "Activation-aware Weight Quantization (AWQ)",
+      "precision": "INT4 GEMM",
+      "group_size": 128,
+      "weight_storage_llama_gib": 1.76,
+      "weight_storage_qwen_gib": 1.71
+    },
+    "token_eviction": {
+      "policy": "Custom Pyramidal KV-cache Eviction (PyramidKV-style)",
+      "average_budget_tokens": 1024,
+      "sensitivity_budgets_tokens": [
+        512,
+        1024,
+        1536
+      ],
+      "attention_window": 32,
+      "pooling_kernel_size": 5,
+      "llama_28layer_allocation": [
+        1110,
+        1108,
+        1106,
+        1104,
+        1101,
+        1099,
+        1096,
+        1094,
+        1091,
+        1088,
+        1085,
+        1081,
+        1078,
+        1074,
+        1070,
+        1066,
+        1061,
+        1056,
+        1051,
+        1045,
+        1038,
+        1030,
+        1020,
+        1009,
+        995,
+        975,
+        941,
+        0
+      ],
+      "qwen_36layer_allocation_range": {
+        "layer_0_max": 1966,
+        "layer_35_min": 82,
+        "average": 1024
+      }
+    },
+    "kv_quantization": {
+      "framework": "TurboQuant reference implementation (turboquant==0.2.0)",
+      "nominal_bit_widths": [
+        2,
+        3,
+        4
+      ],
+      "physical_storage_format": "uint8 index containers + FP32 norms + uncompressed FP16 residual",
+      "uncompressed_residual_window_tokens": 128,
+      "reconstruction_error_bound_nmse": {
+        "2_bit": "<= 1.00",
+        "3_bit": "<= 0.50",
+        "4_bit": "<= 0.25 (observed ~2.5e-4 on 4-bit)"
+      }
+    },
+    "sequential_pipeline_execution": {
+      "stage_1": "AWQ linear projection inference (INT4 weights, FP16 activations)",
+      "stage_2": "Attention scoring and pyramidal token eviction pruning",
+      "stage_3": "TurboQuant coordinate quantization on retained tokens (TQ-Ref)"
+    }
+  },
+  "evaluation_protocol": {
+    "evaluation_task": "Hard-Retrieval Needle-In-A-Haystack (NIAH) Key-Value Extraction",
+    "test_scenarios_total": 60,
+    "depth_distribution": {
+      "shallow_10_percent": 20,
+      "middle_50_percent": 20,
+      "deep_90_percent": 20
+    },
+    "sensitivity_scenarios_common": 15,
+    "context_lengths_evaluated": [
+      1024,
+      2048,
+      4096
+    ],
+    "fixed_decode_length_tokens": 64,
+    "generation_sampling": {
+      "do_sample": false,
+      "temperature": 0.0,
+      "top_p": 1.0
+    },
+    "random_seed": 407,
+    "energy_measurement": {
+      "blocks_per_condition": 5,
+      "sampling_frequency_hz": 10.0,
+      "integration": "Trapezoidal rule",
+      "metrics": [
+        "Total Energy (J)",
+        "Prefill Energy (J)",
+        "Decode Energy (J)",
+        "Decode Throughput (tok/s)",
+        "Peak Allocated VRAM (MiB)"
+      ]
+    },
+    "statistical_methods": {
+      "energy_pairwise_tests": "Paired Student's t-test and Wilcoxon signed-rank test",
+      "multiple_comparisons_correction": "Holm-Bonferroni step-down procedure (family alpha = 0.05)",
+      "quality_pairwise_tests": "Exact paired McNemar test with Bonferroni correction",
+      "quality_confidence_intervals": "Wilson score 95% confidence intervals",
+      "pareto_frontier_uncertainty": "2000 depth-stratified bootstrap resamples",
+      "sequential_interaction_model": "I = E(C4) - E(C1) - [E(C2) - E(C1)] - [E(C3) - E(C1)]"
+    }
+  }
+}
