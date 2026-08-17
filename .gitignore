@@ -7,3 +7,4 @@ packages/
 __pycache__/
 *.py[cod]
 .ipynb_checkpoints/
+skills-lock.json
