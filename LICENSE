@@ -1,0 +1,37 @@
+PROPRIETARY ACADEMIC RESEARCH LICENSE
+ALL RIGHTS RESERVED
+
+Copyright (c) 2026 Md. Sadik Shahriar, Nipa Mridha, Tanha Humaira.
+Department of Computer Science and Engineering, East West University.
+
+This repository, including all source code, experimental notebooks, empirical evidence 
+bundles, raw telemetry traces, prompts, algorithms, and documentation, represents 
+original academic research developed for the project:
+
+"Multi-Stage Compression of Small Language Models for Energy-Efficient Inference: 
+ An Empirical Systems Ablation"
+
+TERMS AND CONDITIONS:
+
+1. ACADEMIC EVALUATION ONLY:
+   This codebase and all associated artifacts are provided strictly for confidential 
+   course evaluation, grading, and academic review by authorized faculty and examiners 
+   at East West University.
+
+2. ALL RIGHTS RESERVED / NO PUBLIC REDISTRIBUTION:
+   This work is pending formal peer-reviewed conference/journal publication. 
+   No part of this source code, experimental data, methodology, benchmark design, 
+   or written content may be copied, modified, distributed, sublicensed, published, 
+   mirrored, or commercially exploited in any form without the prior express written 
+   permission of the copyright holders.
+
+3. PROHIBITION OF PUBLIC RE-HOSTING:
+   Public hosting, fork distribution, or inclusion in external packages or public 
+   repositories is strictly prohibited until formal academic publication is completed 
+   and an explicit public release is authorized by the authors.
+
+4. NO WARRANTY:
+   THE WORK IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+   INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A 
+   PARTICULAR PURPOSE, AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS BE LIABLE 
+   FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY ARISING FROM THE USE OF THIS CODE.
