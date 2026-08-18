@@ -1474,60 +1474,181 @@ def build_presentation():
         s16.shapes.add_picture(img_even, Inches(7.0), Inches(2.4), width=Inches(5.333))
 
     # =========================================================================
-    # SLIDE 17: Multi-Objective 3D Pareto Frontier & Power Robustness
+    # SLIDE 17: Multi-Objective Bootstrap Pareto Frontier & Stability Analysis
     # =========================================================================
     s17 = prs.slides.add_slide(blank_layout)
     set_slide_bg(s17)
-    add_header(s17, "10. Multi-Objective Analysis", 
-               "Empirical 3D Pareto Frontier & Power Robustness", 
-               "Balancing Energy, Quality, and Memory under 2000 bootstrap resamples and power clipping.")
+    add_header(s17, "10. Multi-Objective Pareto Analysis", 
+               "Empirical 3D Bootstrap Pareto Frontier & Selection Stability", 
+               "Evaluating non-dominated trade-offs across Energy (J), Retrieval Accuracy, and KV Storage over 2,000 bootstrap resamples.")
 
-    add_card(s17, Inches(0.8), Inches(1.65), Inches(5.8), Inches(5.35), C_WHITE)
-    tb = s17.shapes.add_textbox(Inches(1.05), Inches(1.85), Inches(5.3), Inches(4.9))
-    tf = tb.text_frame
-    tf.word_wrap = True
-    tf.margin_left = tf.margin_top = tf.margin_right = tf.margin_bottom = 0
+    # Left Column: Table 8 (Three-Objective Pareto Frontier at 4096 Tokens)
+    add_card(s17, Inches(0.8), Inches(1.65), Inches(5.75), Inches(5.45), C_WHITE)
+    top_bar_l = s17.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(0.8), Inches(1.65), Inches(5.75), Inches(0.06))
+    top_bar_l.fill.solid()
+    top_bar_l.fill.fore_color.rgb = C_BLUE
+    top_bar_l.line.fill.background()
 
-    p = tf.paragraphs[0]
-    p.text = "3D Pareto Frontier & The Energy Trap"
-    p.font.name = "Trebuchet MS"
-    p.font.size = Pt(18)
-    p.font.bold = True
-    p.font.color.rgb = C_NAVY_DARK
-    p.space_after = Pt(8)
+    tb_t = s17.shapes.add_textbox(Inches(1.0), Inches(1.75), Inches(5.35), Inches(0.35))
+    tf_t = tb_t.text_frame
+    tf_t.word_wrap = True
+    tf_t.margin_left = tf_t.margin_top = tf_t.margin_right = tf_t.margin_bottom = 0
+    p_t = tf_t.paragraphs[0]
+    p_t.text = "Three-Objective Pareto Frontier (Table 8)"
+    p_t.font.name = "Trebuchet MS"
+    p_t.font.size = Pt(16)
+    p_t.font.bold = True
+    p_t.font.color.rgb = C_NAVY_DARK
 
-    pareto_text = [
-        ("The Energy-Only Trap:", "On Qwen, Q2 has lowest energy (550.5 J) and smallest cache (38.3 MiB) with 100% bootstrap Pareto selection. BUT retrieval is 1/60 (useless)!"),
-        ("Quality Threshold Mandatory:", "Pareto selection alone is not a deployment rule. A minimum quality constraint (>60%) eliminates Q2 and promotes Q0/Q1-W."),
-        ("Llama Pareto Winner (C2):", "C2 achieves 100% bootstrap stability with 529 J energy, 119 MiB cache, and 37/60 retrieval."),
-        ("Power Trace Robustness (100% Stable):", "Raw NVML transients reached 124.5W. Reintegration under 82W and 70W caps preserved 100% of rankings and significance decisions across all 40 registered tests!")
+    # Table 8 (11 rows x 6 columns) - 精确优化的列宽
+    t_shape = s17.shapes.add_table(11, 6, Inches(0.95), Inches(2.15), Inches(5.45), Inches(3.0))
+    t = t_shape.table
+    t.columns[0].width = Inches(0.80)   # Model
+    t.columns[1].width = Inches(1.20)   # Config
+    t.columns[2].width = Inches(0.90)   # Energy (J)
+    t.columns[3].width = Inches(0.90)   # Retrieval
+    t.columns[4].width = Inches(0.85)   # Cache
+    t.columns[5].width = Inches(0.80)   # Boot.%
+
+    p_headers = ["Model", "Config", "Energy", "Retrieval", "Cache", "Boot.%"]
+    for j, h in enumerate(p_headers):
+        c = t.cell(0, j)
+        c.text = h
+        c.fill.solid()
+        c.fill.fore_color.rgb = C_NAVY
+        for p in c.text_frame.paragraphs:
+            p.font.name = "Trebuchet MS"
+            p.font.size = Pt(10.5)
+            p.font.bold = True
+            p.font.color.rgb = C_WHITE
+
+    pareto_rows = [
+        ("Llama", "C0 (FP16)", "701.1 J", "78.3%", "455 MiB", "100.0%"),
+        ("Llama", "C1-W (AWQ)", "639.9 J", "63.3%", "455 MiB", "63.0%"),
+        ("Llama", "C2 (Evict)", "529.3 J", "61.7%", "119 MiB", "100.0%"),
+        ("Llama", "C3-Ref (TQ)", "913.5 J", "61.7%", "697 MiB", "0.0%"),
+        ("Llama", "C4-Ref (Both)", "659.5 J", "61.7%", "187 MiB", "0.6%"),
+        ("Qwen", "Q0 (FP16)", "616.8 J", "88.3%", "146 MiB", "97.2%"),
+        ("Qwen", "Q1-W (AWQ)", "621.8 J", "80.0%", "146 MiB", "36.0%"),
+        ("Qwen", "Q2 (Evict)", "550.5 J", "1.7%", "38 MiB", "100.0%"),
+        ("Qwen", "Q3-Ref (TQ)", "812.3 J", "81.7%", "224 MiB", "3.8%"),
+        ("Qwen", "Q4-Ref (Both)", "628.7 J", "1.7%", "60 MiB", "0.0%")
     ]
-    for p_title, p_desc in pareto_text:
-        p = tf.add_paragraph()
-        p.text = f"- {p_title} "
+
+    for i, row in enumerate(pareto_rows):
+        for j, val in enumerate(row):
+            cell = t.cell(i + 1, j)
+            cell.text = val
+            cell.fill.solid()
+            
+            # Row highlight coloring
+            if i == 2:  # Llama C2 (Winner)
+                cell.fill.fore_color.rgb = C_CARD_SUCCESS
+            elif i == 7: # Qwen Q2 (Energy Trap)
+                cell.fill.fore_color.rgb = C_CARD_ALERT
+            elif i in [3, 4, 9]: # Dominated
+                cell.fill.fore_color.rgb = C_CARD_ALT
+            elif i % 2 == 1:
+                cell.fill.fore_color.rgb = C_CARD_ALT
+            else:
+                cell.fill.fore_color.rgb = C_WHITE
+                
+            for p in cell.text_frame.paragraphs:
+                p.font.name = "Calibri"
+                p.font.size = Pt(9.5)
+                if i == 2: # Llama C2
+                    p.font.color.rgb = C_TEAL
+                    p.font.bold = (j in [1, 2, 4, 5])
+                elif i == 7: # Qwen Q2
+                    p.font.color.rgb = C_RED
+                    p.font.bold = (j in [1, 3, 5])
+                elif i in [3, 4, 9]: # Dominated
+                    p.font.color.rgb = C_MUTED
+                    p.font.bold = False
+                else:
+                    p.font.color.rgb = C_NAVY_DARK
+                    p.font.bold = (j in [0, 1])
+
+    # Summary Callout below Table
+    tb_not = s17.shapes.add_textbox(Inches(0.95), Inches(5.25), Inches(5.45), Inches(1.75))
+    tf_n = tb_not.text_frame
+    tf_n.word_wrap = True
+    tf_n.margin_left = tf_n.margin_top = tf_n.margin_right = tf_n.margin_bottom = 0
+    
+    notes_pareto = [
+        ("Boot. % Definition:", "Percentage of 2,000 bootstrap resamples selected as Pareto-optimal. Quantifies empirical resampling stability under variance."),
+        ("Llama C2 Winner (100%):", "Minimal energy & smallest cache with baseline retrieval; strictly dominates sequential C4-Ref (0.6%)."),
+        ("Qwen Q2 Energy Trap (100%):", "Optimal on Energy/Cache alone, but retrieval collapses to 1/60 (pathological non-viable state)."),
+        ("Sequential Anti-Pattern:", "C4-Ref (0.6%) and Q4-Ref (0.0%) fail to reach the Pareto front on physical hardware.")
+    ]
+    for idx, (n_title, n_desc) in enumerate(notes_pareto):
+        p = tf_n.paragraphs[0] if idx == 0 else tf_n.add_paragraph()
+        p.text = f"- {n_title} "
         p.font.name = "Calibri"
-        p.font.size = Pt(13)
+        p.font.size = Pt(10)
         p.font.bold = True
         p.font.color.rgb = C_NAVY
         run = p.add_run()
-        run.text = p_desc
+        run.text = n_desc
         run.font.bold = False
         run.font.color.rgb = C_BODY
-        p.space_after = Pt(6)
+        p.space_after = Pt(2)
 
-    add_card(s17, Inches(6.8), Inches(1.65), Inches(5.733), Inches(5.35), C_WHITE)
-    tb = s17.shapes.add_textbox(Inches(7.05), Inches(1.8), Inches(5.233), Inches(0.45))
-    tf = tb.text_frame
-    p = tf.paragraphs[0]
-    p.text = "Measured Energy vs. Quality vs. Memory Frontier"
-    p.font.name = "Trebuchet MS"
-    p.font.size = Pt(16)
-    p.font.bold = True
-    p.font.color.rgb = C_BLUE
+    # Right Column: Graph (Figure 4) & In-Depth Findings
+    add_card(s17, Inches(6.75), Inches(1.65), Inches(5.783), Inches(5.45), C_WHITE)
+    top_bar_r = s17.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(6.75), Inches(1.65), Inches(5.783), Inches(0.06))
+    top_bar_r.fill.solid()
+    top_bar_r.fill.fore_color.rgb = C_INDIGO
+    top_bar_r.line.fill.background()
 
+    tb_g = s17.shapes.add_textbox(Inches(6.95), Inches(1.75), Inches(5.383), Inches(0.35))
+    tf_g = tb_g.text_frame
+    tf_g.word_wrap = True
+    tf_g.margin_left = tf_g.margin_top = tf_g.margin_right = tf_g.margin_bottom = 0
+    p_g = tf_g.paragraphs[0]
+    p_g.text = "Empirical 3D Pareto Frontier (Figure 4)"
+    p_g.font.name = "Trebuchet MS"
+    p_g.font.size = Pt(16)
+    p_g.font.bold = True
+    p_g.font.color.rgb = C_BLUE
+
+    # Embedded Graph (Width 4.8", Height ~2.05", Centered)
     img_pareto = resolve_path("evidence/accepted/CSE407_cross_model_visualization_v1/fig08_measured_pareto_energy_quality_memory.png")
     if os.path.exists(img_pareto):
-        s17.shapes.add_picture(img_pareto, Inches(7.0), Inches(2.35), width=Inches(5.333))
+        s17.shapes.add_picture(img_pareto, Inches(7.24), Inches(2.05), width=Inches(4.80))
+
+    # Findings Box Below Graph
+    tb_fb = s17.shapes.add_textbox(Inches(6.95), Inches(4.18), Inches(5.383), Inches(2.80))
+    tf_fb = tb_fb.text_frame
+    tf_fb.word_wrap = True
+    tf_fb.margin_left = tf_fb.margin_top = tf_fb.margin_right = tf_fb.margin_bottom = 0
+
+    p_f0 = tf_fb.paragraphs[0]
+    p_f0.text = "Visual Encodings & Key Empirical Discoveries:"
+    p_f0.font.name = "Trebuchet MS"
+    p_f0.font.size = Pt(12)
+    p_f0.font.bold = True
+    p_f0.font.color.rgb = C_NAVY_DARK
+    p_f0.space_after = Pt(2)
+
+    pareto_findings = [
+        ("Visual Encodings:", "Marker area encodes persistent KV storage; horizontal bars = energy SD; vertical bars = Wilson 95% CIs; border width = bootstrap stability."),
+        ("Llama 3.2-3B Pareto Winner:", "C2 single-stage eviction delivers optimal trade-off (529 J, 119 MiB, 20.3 tok/s, 37/60 retrieval) with 100% bootstrap stability, dominating C4-Ref (0.6%)."),
+        ("Qwen Disjoint Frontier & Energy Trap:", "Qwen exhibits total bifurcation: Q2 achieves 100% on energy/cache but fails task utility (1/60). Q3-Ref retains quality (49/60) but at high energy (812 J)."),
+        ("Quality Constraint is Mandatory:", "Bootstrap stability quantifies resampling variance, not viability. A quality threshold (>60%) is required to eliminate non-viable points like Q2.")
+    ]
+    for pf_title, pf_desc in pareto_findings:
+        p = tf_fb.add_paragraph()
+        p.text = f"- {pf_title} "
+        p.font.name = "Calibri"
+        p.font.size = Pt(9.5)
+        p.font.bold = True
+        p.font.color.rgb = C_NAVY
+        run = p.add_run()
+        run.text = pf_desc
+        run.font.bold = False
+        run.font.color.rgb = C_BODY
+        p.space_after = Pt(2)
 
     # =========================================================================
     # SLIDE 18: Bridging to Joint Optimization (RDKV & ThinKV)
