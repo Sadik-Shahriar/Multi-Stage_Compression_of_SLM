@@ -116,7 +116,7 @@ In this study, we investigate four core questions:
   \item \textbf{RQ1 (Context Scaling and Multi-Stage Efficiency):} How do weight quantization, token eviction, and KV-cache quantization affect physical GPU energy consumption and throughput when applied one by one and sequentially for 1024, 2048, and 4096 tokens?
   \item \textbf{RQ2 (Cross-Architectural Robustness):} Does token eviction provide consistent trade-offs across different attention layouts (Llama's 3:1 and Qwen's 8:1 GQA) or does aggressive head sharing cause retrieval failures?
   \item \textbf{RQ3 (Compound Interaction and Overhead Shielding):} When multiple compression stages are applied sequentially, do their effects add up or is there an energetic shielding interaction?
-  \item \textbf{RQ4 (Multi-Objective Pareto Optimization):} Which compression configurations form the non-dominated Pareto frontier for energy, retrieval accuracy, and persistent memory footprint under bootstrap resampling?
+  \item \textbf{RQ4 (Multi-Objective Pareto Optimization):} Which compression configurations form the non-dominated Pareto frontier for energy, retrieval accuracy, decode throughput, and persistent memory footprint under bootstrap resampling?
 \end{enumerate}
 
 \paragraph{Key Contributions.}
@@ -296,7 +296,7 @@ The document structure is shown in Figure~\ref{fig:hard_retrieval}. The evaluati
 \centering
 \includegraphics[width=0.98\textwidth]{figures/hard_retrieval.png}
 \Description{A 4096-token document diagram shows target-code needles inserted at 10, 50, and 90 percent depth within distractor text, with strict exact-match evaluation.}
-\caption{Overview of the 4096-token frozen hard-retrieval benchmark, illustrating the 10\%, 50\%, and 90\% depth needle insertion points within the distractor haystack, and the strict evaluation criteria.}
+\caption{Overview of the 4096-token hard-retrieval benchmark, showing the 10\%, 50\%, and 90\% depth needle insertion points within the distractor haystack, and the strict evaluation criteria.}
 \label{fig:hard_retrieval}
 \end{figure*}
 
@@ -326,23 +326,23 @@ Table~\ref{tab:llama-all} summarizes measured energy, decode throughput, peak al
 \toprule
 \textbf{Config@Context} & \textbf{Total J} & \textbf{tok/s} & \textbf{Peak VRAM (MiB)} & \textbf{Cache (MiB)} \\
 \midrule
-C0 @ 1024   & $244.11 \pm 13.10$ & 21.09 & 8810 & 119 \\
-C1-W @ 1024 & $268.77 \pm 26.20$ & 18.24 & 4943 & 119 \\
-C2 @ 1024   & $253.61 \pm 14.36$ & 19.31 & 4920 & 92  \\
-C3-Ref @ 1024 & $367.00 \pm 28.44$ & 13.49 & 5099 & 187 \\
-C4-Ref @ 1024 & $364.91 \pm 21.59$ & 12.75 & 5042 & 147 \\
+FP16 (C0) @ 1024        & $244.11 \pm 13.10$ & 21.09 & 8810 & 119 \\
+AWQ (C1-W) @ 1024       & $268.77 \pm 26.20$ & 18.24 & 4943 & 119 \\
+Evict (C2) @ 1024       & $253.61 \pm 14.36$ & 19.31 & 4920 & 92  \\
+TQ-Ref (C3-Ref) @ 1024  & $367.00 \pm 28.44$ & 13.49 & 5099 & 187 \\
+Compound (C4-Ref) @ 1024& $364.91 \pm 21.59$ & 12.75 & 5042 & 147 \\
 \midrule
-C0 @ 2048   & $345.26 \pm 4.97$  & 17.42 & 9663 & 231 \\
-C1-W @ 2048 & $313.81 \pm 9.31$  & 20.13 & 5795 & 231 \\
-C2 @ 2048   & $338.74 \pm 21.03$ & 17.81 & 5691 & 119 \\
-C3-Ref @ 2048 & $439.58 \pm 9.11$  & 13.33 & 6116 & 357 \\
-C4-Ref @ 2048 & $435.05 \pm 24.47$ & 12.87 & 5853 & 187 \\
+FP16 (C0) @ 2048        & $345.26 \pm 4.97$  & 17.42 & 9663 & 231 \\
+AWQ (C1-W) @ 2048       & $313.81 \pm 9.31$  & 20.13 & 5795 & 231 \\
+Evict (C2) @ 2048       & $338.74 \pm 21.03$ & 17.81 & 5691 & 119 \\
+TQ-Ref (C3-Ref) @ 2048  & $439.58 \pm 9.11$  & 13.33 & 6116 & 357 \\
+Compound (C4-Ref) @ 2048& $435.05 \pm 24.47$ & 12.87 & 5853 & 187 \\
 \midrule
-C0 @ 4096   & $701.08 \pm 8.12$  & 11.34 & 12688 & 455 \\
-C1-W @ 4096 & $631.25 \pm 5.05$  & 13.77 & 8820  & 455 \\
-C2 @ 4096   & $529.30 \pm 20.02$ & 20.34 & 8500  & 119 \\
-C3-Ref @ 4096 & $913.48 \pm 2.11$  & 7.66  & 9468  & 697 \\
-C4-Ref @ 4096 & $659.50 \pm 21.35$ & 12.53 & 8662  & 187 \\
+FP16 (C0) @ 4096        & $701.08 \pm 8.12$  & 11.34 & 12688 & 455 \\
+AWQ (C1-W) @ 4096       & $631.25 \pm 5.05$  & 13.77 & 8820  & 455 \\
+Evict (C2) @ 4096       & $529.30 \pm 20.02$ & 20.34 & 8500  & 119 \\
+TQ-Ref (C3-Ref) @ 4096  & $913.48 \pm 2.11$  & 7.66  & 9468  & 697 \\
+Compound (C4-Ref) @ 4096& $659.50 \pm 21.35$ & 12.53 & 8662  & 187 \\
 \bottomrule
 \end{tabular}}
 \end{table}
@@ -350,20 +350,20 @@ C4-Ref @ 4096 & $659.50 \pm 21.35$ & 12.53 & 8662  & 187 \\
 Key observations from the scaling data include:
 
 \paragraph{Context-Dependent AWQ Efficiency.}
-AWQ (C1-W) used 24.66~J more energy than uncompressed FP16 (C0) at 1024 tokens, with an average of 268.77~J compared to 244.11~J. C1-W attained an energy reduction of 9.96\% at 4096 tokens (631.25~J vs. 701.08~J). Dequantization overhead dominates the bandwidth savings for short sequences, but memory traffic savings become significant as the sequence length increases.
+AWQ baseline (C1-W) used 24.66~J more energy than uncompressed FP16 (C0) at 1024 tokens, with an average of 268.77~J compared to 244.11~J. AWQ baseline (C1-W) attained an energy reduction of 9.96\% at 4096 tokens (631.25~J vs. 701.08~J). Dequantization overhead dominates the bandwidth savings for short sequences, but memory traffic savings become significant as the sequence length increases.
 
 \paragraph{Long-Context Eviction Gains.}
-At 4096 tokens, token eviction (C2) gave clear improvements in multiple dimensions: reducing total energy consumption by 101.95~J (16.15\%) over C1-W (529.30~J vs. 631.25~J), increasing decode throughput from 13.77 to 20.34 tokens/s (47.7\% speedup), and shrinking active KV cache volume by 73.8\% (from 455~MiB down to 119~MiB). For a budget of 1024 tokens, when the prompt tokens are still most of the budget, the energy differences were negligible for eviction.
+At 4096 tokens, token eviction (C2) gave clear improvements in multiple dimensions: reducing total energy consumption by 101.95~J (16.15\%) over the AWQ baseline (C1-W, 529.30~J vs. 631.25~J), increasing decode throughput from 13.77 to 20.34 tokens/s (47.7\% speedup), and shrinking active KV cache volume by 73.8\% (from 455~MiB down to 119~MiB). For a budget of 1024 tokens, when the prompt tokens are still most of the budget, the energy differences were negligible for eviction.
 
 \paragraph{Reference Quantization Overhead.}
-At 4096 tokens, TQ-Ref (C3-Ref) increased energy consumption to 913.48~J (44.7\% higher than C1-W) and degraded throughput to 7.66 tokens/s. Persistent KV cache volume expanded from 455~MiB to 697~MiB because the reference implementation keeps quantized indices alongside uncompressed state tensors.
+At 4096 tokens, TurboQuant reference (C3-Ref) increased energy consumption to 913.48~J (44.7\% higher than C1-W) and degraded throughput to 7.66 tokens/s. Persistent KV cache volume expanded from 455~MiB to 697~MiB because the reference implementation keeps quantized indices alongside uncompressed state tensors.
 
 \paragraph{Compound Shielding.}
-Sequential composition (C4-Ref) consumed 659.50~J at 4096 tokens, an increase of 28.26~J relative to C1-W. By shrinking the cache before running TurboQuant, C4-Ref consumed 253.98~J less energy than C3-Ref alone.
+Sequential compound composition (C4-Ref) consumed 659.50~J at 4096 tokens, an increase of 28.26~J relative to the AWQ baseline (C1-W). By shrinking the cache before running TurboQuant, compound stacking (C4-Ref) consumed 253.98~J less energy than TurboQuant reference (C3-Ref) alone.
 
 \subsection{Llama: Statistical Significance at 4096 Tokens}
 
-Table~\ref{tab:llama-stats} summarizes paired hypothesis tests for Llama total energy at 4096 tokens. The energy reduction of C2 over C1-W was statistically significant after Holm correction ($p = 0.00549$), as was the energy penalty of C3-Ref relative to C1-W ($p = 1.9 \times 10^{-7}$). The difference between C1-W and C4-Ref was not statistically significant ($p = 0.2465$, 95\% CI: $[-60.28, 3.76]$~J). While five measurement blocks ($n=5$) provide enough statistical power to resolve large differences such as C1-W vs.\ C2, the confidence interval for C1-W vs.\ C4-Ref spans zero, which means we cannot declare the two configurations strictly equivalent without larger sample sizes.
+Table~\ref{tab:llama-stats} summarizes paired hypothesis tests for Llama total energy at 4096 tokens. The energy reduction of eviction (C2) over the AWQ baseline (C1-W) was statistically significant after Holm correction ($p = 0.00549$), as was the energy penalty of TurboQuant reference (C3-Ref) relative to the AWQ baseline (C1-W, $p = 1.9 \times 10^{-7}$). The difference between the AWQ baseline (C1-W) and compound stacking (C4-Ref) was not statistically significant ($p = 0.2465$, 95\% CI: $[-60.28, 3.76]$~J). While five measurement blocks ($n=5$) provide enough statistical power to resolve large differences such as C1-W vs.\ C2, the confidence interval for C1-W vs.\ C4-Ref spans zero, which means we cannot declare the two configurations strictly equivalent without larger sample sizes.
 
 \begin{table}[htbp]
 \caption{Registered Paired Tests at 4096 Tokens, Llama Total Energy}
@@ -374,11 +374,11 @@ Table~\ref{tab:llama-stats} summarizes paired hypothesis tests for Llama total e
 \toprule
 \textbf{Comparison} & \textbf{Diff (J)} & \textbf{95\% CI (J)} & \textbf{Holm p} & \textbf{Decision} \\
 \midrule
-C1-W $-$ C2     & $+101.95$ & $[73.81,\ 130.08]$    & 0.00549  & C2 lower; significant \\
-C1-W $-$ C3-Ref & $-282.24$ & $[-287.23,\ -277.25]$ & $1.9\!\times\!10^{-7}$ & C3-Ref higher; significant \\
-C1-W $-$ C4-Ref & $-28.26$  & $[-60.28,\ 3.76]$     & 0.2465   & Not significant \\
-C2 $-$ C4-Ref   & $-130.21$ & $[-168.32,\ -92.09]$  & 0.00620  & C4-Ref higher; significant \\
-C3-Ref $-$ C4-Ref & $+253.98$ & $[226.93,\ 281.02]$ & 0.000206 & C4-Ref lower; significant \\
+AWQ vs. Evict (C1-W $-$ C2)         & $+101.95$ & $[73.81,\ 130.08]$    & 0.00549  & C2 lower; significant \\
+AWQ vs. TQ-Ref (C1-W $-$ C3-Ref)     & $-282.24$ & $[-287.23,\ -277.25]$ & $1.9\!\times\!10^{-7}$ & C3-Ref higher; significant \\
+AWQ vs. Compound (C1-W $-$ C4-Ref)   & $-28.26$  & $[-60.28,\ 3.76]$     & 0.2465   & Not significant \\
+Evict vs. Compound (C2 $-$ C4-Ref)   & $-130.21$ & $[-168.32,\ -92.09]$  & 0.00620  & C4-Ref higher; significant \\
+TQ-Ref vs. Compound (C3-Ref $-$ C4-Ref) & $+253.98$ & $[226.93,\ 281.02]$ & 0.000206 & C4-Ref lower; significant \\
 \bottomrule
 \end{tabular}}
 \end{table}
@@ -390,9 +390,9 @@ To evaluate how multi-stage compression interacts when stacked sequentially, we 
 \begin{equation}
 I = (\text{C4-Ref} - \text{C3-Ref}) - (\text{C2} - \text{C1-W})
 \end{equation}
-A negative interaction ($I < 0$) implies sub-additive energy consumption: the overhead of quantization is lower when applied after the eviction compared to the case when it is applied alone. For Llama, $I = -152.03$~J (95\% CI: $[-187.11, -116.96]$~J, $p = 0.00109$). Physically, this is explained by the fact that eviction reduces the size of the active KV cache (from 455~MiB to 119~MiB), thus making the following quantization process operate on 73.8\% fewer tokens, which leads to a significant reduction of memory bandwidth consumption and the amount of dequantization operations during decoding.
+where $I$ measures the compound interaction contrast between compound stacking (C4-Ref), TurboQuant-only (C3-Ref), token eviction (C2), and the AWQ baseline (C1-W). A negative interaction ($I < 0$) implies sub-additive energy consumption: the overhead of quantization is lower when applied after the eviction compared to the case when it is applied alone. For Llama, $I = -152.03$~J (95\% CI: $[-187.11, -116.96]$~J, $p = 0.00109$). Physically, this is explained by the fact that eviction reduces the size of the active KV cache (from 455~MiB to 119~MiB), thus making the following quantization process operate on 73.8\% fewer tokens, which leads to a significant reduction of memory bandwidth consumption and the amount of dequantization operations during decoding.
 
-However, C4-Ref remained 130.21~J more costly than C2 alone: prior eviction shields against the full penalty of reference quantization, but cannot overcome the inherent overhead of un-fused coordinate management.
+However, compound stacking (C4-Ref) remained 130.21~J more costly than eviction (C2) alone: prior eviction shields against the full penalty of reference quantization, but cannot overcome the inherent overhead of un-fused coordinate management.
 
 \begin{figure}[htbp]
 \centering
@@ -406,7 +406,7 @@ As shown in Figure~\ref{fig:interaction}, this negative interaction held equally
 
 \subsection{Llama: System Trade-Offs at 4096 Tokens}
 
-The trade-offs between decode throughput, energy consumption, peak VRAM usage, and active KV cache are described in Table~\ref{tab:llama-all} (and visualized in Appendix~\ref{app:context-scaling}, Figure~\ref{fig:tradeoffs}). In terms of throughput per energy, C2 shows the best trade-off (20.34~tok/s vs.\ 529.30~J for C2). In terms of memory footprint, C3-Ref has the largest active KV cache (697~MiB) and peak VRAM usage (9468~MiB), while C2 has the smallest footprint (119~MiB) and peak VRAM (8500~MiB).
+The trade-offs between decode throughput, energy consumption, peak VRAM usage, and active KV cache are described in Table~\ref{tab:llama-all} (and visualized in Appendix~\ref{app:context-scaling}, Figure~\ref{fig:tradeoffs}). In terms of throughput per energy, single-stage eviction (C2) shows the best trade-off (20.34~tok/s vs.\ 529.30~J for C2). In terms of memory footprint, TurboQuant reference (C3-Ref) has the largest active KV cache (697~MiB) and peak VRAM usage (9468~MiB), while eviction (C2) has the smallest footprint (119~MiB) and peak VRAM (8500~MiB).
 \subsection{Llama: Hard-Retrieval Quality}
 
 Table~\ref{tab:llama-quality} reports retrieval accuracy on the frozen 60-scenario benchmark.
@@ -419,17 +419,17 @@ Table~\ref{tab:llama-quality} reports retrieval accuracy on the frozen 60-scenar
 \toprule
 \textbf{Config} & \textbf{Pass/60} & \textbf{Rate} & \textbf{Wilson 95\% CI} \\
 \midrule
-C0 (FP16)     & 47/60 & 0.783 & $[0.664,\ 0.869]$ \\
-C1-W (AWQ)    & 38/60 & 0.633 & $[0.507,\ 0.744]$ \\
-C2 (Evict)    & 37/60 & 0.617 & $[0.490,\ 0.729]$ \\
-C3-Ref (TQ)   & 37/60 & 0.617 & $[0.490,\ 0.729]$ \\
-C4-Ref (Both) & 37/60 & 0.617 & $[0.490,\ 0.729]$ \\
+C0 (FP16 Baseline)      & 47/60 & 0.783 & $[0.664,\ 0.869]$ \\
+C1-W (AWQ Baseline)     & 38/60 & 0.633 & $[0.507,\ 0.744]$ \\
+C2 (AWQ + Evict)        & 37/60 & 0.617 & $[0.490,\ 0.729]$ \\
+C3-Ref (AWQ + TQ-Ref)   & 37/60 & 0.617 & $[0.490,\ 0.729]$ \\
+C4-Ref (Compound Stack) & 37/60 & 0.617 & $[0.490,\ 0.729]$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \begingroup\raggedright
-Uncompressed FP16 (C0) achieved the highest retrieval accuracy (47/60 vs.\ 38/60 for AWQ). Among the compressed variants, C2, C3-Ref, and C4-Ref each differed from the AWQ baseline (C1-W) by only one scenario (37/60 vs.\ 38/60). Analysis of failure cases showed that incorrect outputs were primarily distractor key confusions rather than missing responses or formatting errors.
+Uncompressed FP16 (C0) achieved the highest retrieval accuracy (47/60 vs.\ 38/60 for AWQ baseline C1-W). Among the compressed variants, eviction (C2), TurboQuant reference (C3-Ref), and compound stacking (C4-Ref) each differed from the AWQ baseline (C1-W) by only one scenario (37/60 vs.\ 38/60). Analysis of failure cases showed that incorrect outputs were primarily distractor key confusions rather than missing responses or formatting errors.
 \par\endgroup
 
 Table~\ref{tab:depth} details performance across needle insertion depths. All configurations achieved highest accuracy at 10\% depth (beginning of the prompt) and lower accuracy at 50\% and 90\% depths.
@@ -442,71 +442,71 @@ Table~\ref{tab:depth} details performance across needle insertion depths. All co
 \toprule
 \textbf{Config} & \textbf{10\%} & \textbf{50\%} & \textbf{90\%} \\
 \midrule
-C0     & 19/20 & 13/20 & 15/20 \\
-C1-W   & 18/20 & 10/20 & 10/20 \\
-C2     & 18/20 & 10/20 &  9/20 \\
-C3-Ref & 18/20 & 10/20 &  9/20 \\
-C4-Ref & 17/20 & 10/20 & 10/20 \\
+C0 (FP16 Baseline)      & 19/20 & 13/20 & 15/20 \\
+C1-W (AWQ Baseline)     & 18/20 & 10/20 & 10/20 \\
+C2 (AWQ + Evict)        & 18/20 & 10/20 &  9/20 \\
+C3-Ref (AWQ + TQ-Ref)   & 18/20 & 10/20 &  9/20 \\
+C4-Ref (Compound Stack) & 17/20 & 10/20 & 10/20 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\subsection{Pareto Frontier and Bootstrap Stability}
+\subsection{Multi-Objective Pareto Frontier and Bootstrap Stability}
 
-Table~\ref{tab:pareto3} presents the empirical three-objective Pareto frontier across total energy, hard-retrieval accuracy, and persistent KV cache footprint at 4096 tokens, evaluated over 2000 bootstrap resamples.
+Table~\ref{tab:pareto4d} shows the empirical four-objective Pareto frontier across total energy ($\min$), persistent KV cache footprint ($\min$), decode throughput ($\max$), and hard-retrieval accuracy ($\max$) at 4096 tokens, evaluated over 2000 paired bootstrap resamples.
 
-Figure~\ref{fig:pareto3obj} displays the multi-objective frontier. Marker area represents persistent KV cache volume, horizontal error bars denote energy standard deviation, vertical error bars denote Wilson 95\% confidence intervals for retrieval, and border thickness indicates bootstrap frontier-selection stability.
+Figure~\ref{fig:pareto4d} shows the corresponding multi-objective trade-off profile using normalized parallel coordinates. Each axis represents one performance metric scaled from 0.0 to 1.0 (where 1.0 indicates best performance). Bold solid lines denote configurations on the empirical four-dimensional Pareto frontier, while dashed lines mark dominated configurations.
 
 \begin{figure*}[htbp]
 \centering
-\includegraphics[width=\textwidth]{figures/fig08_measured_pareto_energy_quality_memory.pdf}
-\Description{Two Pareto plots compare energy, retrieval quality, and persistent cache storage for Llama and Qwen at 4096 tokens.}
-\caption{Empirical energy, quality, and memory Pareto frontier at 4096 tokens. Each marker denotes one configuration; marker area encodes persistent KV cache storage; horizontal bars show energy standard deviation; vertical bars show Wilson 95\% confidence intervals; border width represents bootstrap frontier-selection stability (2000 resamples). Left: Llama. Right: Qwen. Qwen exhibits complete separation between low-energy, zero-retrieval eviction (Q2) and high-energy, high-retrieval quantization (Q3-Ref).}
-\label{fig:pareto3obj}
+\includegraphics[width=\textwidth]{figures/fig_pareto_4d_parallel_coords.pdf}
+\Description{Four-axis parallel coordinates plot comparing total energy, KV cache memory, decode throughput, and retrieval accuracy for Llama and Qwen at 4096 tokens.}
+\caption{Four-axis parallel coordinates trade-off profile at 4096 tokens across total energy, KV cache footprint, decode throughput, and hard-retrieval accuracy. Solid polylines indicate four-dimensional Pareto-optimal configurations, and dashed polylines denote dominated configurations. Left: Llama~3.2-3B (3:1 GQA). Right: Qwen2.5-3B (8:1 GQA).}
+\label{fig:pareto4d}
 \end{figure*}
 
-For Llama, C2 gives the best trade-off of our performance metrics overall: minimal total energy (529.30~J), smallest cache footprint (119~MiB), maximal throughput (20.34~tok/s) along with evaluation results reaching within one scenario to baseline retrieval accuracy (37/60 vs.\ 38/60), and a bootstrap selection stability of 100\%. Although C0 (100\%) and C1-W (63.0\%) are both Pareto-optimal with respect to retrieval fidelity, C3-Ref (0\%) and C4-Ref (0.6\%) are dominated. Importantly, C2 robustly outperforms C4-Ref across all axes of operation (19.7\% lower energy, 62.3\% higher throughput, and 36.4\% smaller cache) with the same accuracy (37/60), showing that naive disjoint sequential stacking is an empirical anti-pattern on actual silicon compared to single-stage eviction.
+For Llama, single-stage eviction (C2) provides the most favorable balance across system metrics: minimal total energy ($529.30\pm 20.02$~J), smallest cache footprint ($119.0$~MiB), and maximal throughput ($20.34\pm 1.62$~tok/s), while staying within one test case of the baseline retrieval rate (37/60 vs.\ 38/60, $61.7\%$ vs.\ $63.3\%$) with 100.0\% bootstrap selection stability. Uncompressed FP16 (C0, 100.0\%) and stock AWQ (C1-W, 63.3\%) remain on the Pareto frontier due to higher retrieval accuracy (78.3\% and 63.3\%). TurboQuant reference variants C3-Ref (0.0\%) and C4-Ref (36.2\%) are dominated. Crucially, C2 strictly outperforms C4-Ref across all operational conditions (19.7\% lower energy, 62.3\% higher throughput, 36.4\% smaller cache at identical 37/60 retrieval), showing that sequential stacking introduces unnecessary overhead compared to single-stage eviction on balanced attention geometry.
 
-In the case of Qwen, we see a disjoint Pareto front for retrieval accuracy from uncompressed Q0 (0.883, 97.2\% bootstrap frequency) and eviction (Q2) being 100\% selected on energy and memory metrics but simultaneously violates basic utility constraints with 1/60 retrieval.
+For Qwen, the Pareto analysis reveals a sharp split. Uncompressed FP16 (Q0) is Pareto-optimal ($616.78\pm 6.79$~J, $13.23$~tok/s, 88.3\% retrieval, 97.9\% bootstrap stability), strictly dominating stock AWQ (Q1-W, $621.75$~J, 80.0\% retrieval). Token eviction (Q2) achieves 100.0\% unconstrained bootstrap selection on energy ($550.48$~J) and memory ($38.2$~MiB) alone, but drops retrieval accuracy to $1/60$ (1.7\%). When filtered by a practical operational threshold ($Q \ge 50\%$), Q2 (Eviction) is excluded as non-viable, leaving Q0 (Baseline) as the sole viable frontier configuration.
 
-Bootstrap frontier frequency estimates resampling stability instead of a population probability of optimality. It is important to note that Pareto membership alone does not constitute a deployment recommendation; a minimum quality threshold must be defined in order to avoid what we would refer to as non-viable configurations such as Q2.
+Bootstrap selection frequency measures resampling stability under empirical variance rather than the ground-truth probability of optimality. In multi-objective deployment, mathematical non-dominance must be paired with operational quality thresholds to prevent the selection of degenerate solutions.
 
-\begin{table}[htbp]
-\caption{Three-Objective Pareto Frontier at 4096 Tokens (2000 Bootstrap Resamples)}
-\label{tab:pareto3}
-\centering\small
-\resizebox{\columnwidth}{!}{%
-\begin{tabular}{@{}llrrrl@{}}
+\begin{table*}[htbp]
+\caption{Four-Objective Pareto Frontier Analysis at 4096 Tokens (2000 Bootstrap Resamples)}
+\label{tab:pareto4d}
+\centering\scriptsize
+\setlength{\tabcolsep}{2pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{@{}llrrrrccc@{}}
 \toprule
-\textbf{Model} & \textbf{Config} & \textbf{Energy (J)} & \textbf{Retrieval} & \textbf{Cache (MiB)} & \textbf{Boot.\%} \\
+\textbf{Model} & \textbf{Config} & \textbf{Energy (J) $\downarrow$} & \textbf{Cache (MiB) $\downarrow$} & \textbf{Throughput (tok/s) $\uparrow$} & \textbf{Retrieval $\uparrow$} & \textbf{4D Frontier} & \textbf{Boot.\% (4D)} & \textbf{Viable ($Q \ge 50\%$)} \\
 \midrule
-Llama & C0     & 701.08 & 0.783 & 455 & 100.0\% \\
-Llama & C1-W$^\dagger$   & 639.86 & 0.633 & 455 &  63.0\% \\
-Llama & C2     & 529.30 & 0.617 & 119 & 100.0\% \\
-Llama & C3-Ref & 913.48 & 0.617 & 697 &   0.0\% \\
-Llama & C4-Ref & 659.50 & 0.617 & 187 &   0.6\% \\
+Llama 3.2-3B   & FP16 (C0)            & $701.08 \pm 8.12$ & 455.0 & $11.34 \pm 0.06$ & 0.783 (47/60) & \textbf{Yes} & 100.0\% & \textbf{Yes} \\
+               & AWQ Baseline (C1-W)$^\dagger$ & $639.86 \pm 5.48$ & 455.0 & $13.71 \pm 0.24$ & 0.633 (38/60) & \textbf{Yes} & 63.3\% & \textbf{Yes} \\
+               & AWQ + Evict (C2)     & $529.30 \pm 20.02$ & 119.0 & $20.34 \pm 1.62$ & 0.617 (37/60) & \textbf{Yes} & 100.0\% & \textbf{Yes} \\
+               & AWQ + TQ-Ref (C3-Ref)& $913.48 \pm 2.11$ & 696.5 & $7.66 \pm 0.02$ & 0.617 (37/60) & No & 0.0\% & No (Dominated) \\
+               & Compound (C4-Ref)    & $659.50 \pm 21.35$ & 187.2 & $12.53 \pm 0.96$ & 0.617 (37/60) & No & 36.2\% & No (Dominated) \\
 \midrule
-Qwen  & Q0     & 616.78 & 0.883 & 146 &  97.2\% \\
-Qwen  & Q1-W   & 621.75 & 0.800 & 146 &  36.0\% \\
-Qwen  & Q2     & 550.48 & 0.017 &  38 & 100.0\% \\
-Qwen  & Q3-Ref & 812.28 & 0.817 & 224 &   3.8\% \\
-Qwen  & Q4-Ref & 628.69 & 0.017 &  60 &   0.0\% \\
+Qwen2.5-3B     & FP16 (Q0)            & $616.78 \pm 6.79$ & 146.2 & $13.23 \pm 0.15$ & 0.883 (53/60) & \textbf{Yes} & 97.9\% & \textbf{Yes} \\
+               & AWQ Baseline (Q1-W)  & $621.75 \pm 25.14$ & 146.2 & $13.12 \pm 1.03$ & 0.800 (48/60) & No & 45.6\% & No (Dominated) \\
+               & AWQ + Evict (Q2)     & $550.48 \pm 10.07$ & 38.2 & $12.53 \pm 1.46$ & 0.017 (1/60) & \textbf{Yes} & 100.0\% & \xmark\ (Failed $Q$) \\
+               & AWQ + TQ-Ref (Q3-Ref)& $812.28 \pm 13.11$ & 223.9 & $8.60 \pm 0.37$ & 0.817 (49/60) & No & 4.9\% & No (Dominated) \\
+               & Compound (Q4-Ref)    & $628.69 \pm 9.77$ & 60.2 & $9.04 \pm 0.60$ & 0.017 (1/60) & No & 0.0\% & \xmark\ (Failed $Q$) \\
 \bottomrule
 \end{tabular}}
-\begin{minipage}{\columnwidth}\vspace{2pt}\footnotesize
-Boot.\%: percentage of 2000 bootstrap resamples in which the configuration was
-selected as a Pareto-optimal point. Higher values indicate greater frontier stability.\\
+\begin{minipage}{\textwidth}\vspace{3pt}\footnotesize
+Objectives: Minimize total energy ($J$), minimize persistent KV cache footprint ($\text{MiB}$), maximize decode throughput ($\text{tok/s}$), and maximize hard-retrieval accuracy ($Q$).\\
+Boot.\% (4D): Percentage of 2000 paired bootstrap resamples where the configuration forms the 4D empirical Pareto frontier.\\
+Viable ($Q \ge 50\%$): Pareto optimality evaluated subject to an operational viability constraint requiring at least 50\% retrieval success.\\
 $^\dagger$~C1-W (639.86~J) uses the matched custom-wrapper baseline in quality and Pareto evaluations,
 which carries an 8.61~J offset relative to un-wrapped context scaling (631.25~J, Table~\ref{tab:llama-all}).
-All C2--C4-Ref comparisons in Section~\ref{sec:interaction} use C1-W as their reference
-so that wrapper overhead is held constant across compression stages.
 \end{minipage}
-\end{table}
+\end{table*}
 
 \subsection{Power Trace Robustness and Sensitivity}
 \label{sec:robustness}
 
-Typically, raw NVML power traces feature transient excursions above nominal 70~W values, with isolated samples exceeding 100~W (peaking at 124.5~W on Llama and 116.1~W on Qwen). To confirm that our findings are not artifacts of measurement spikes, we reintegrated all 100 Llama power traces with an 82~W cap and a strict 70~W cap. These decisions remained invariant across clipping thresholds (plotted in Appendix~\ref{app:power-samples}, Figure~\ref{fig:power-cap} and Figure~\ref{fig:power-samples}): the energy rank ordering ($\text{C2} < \text{C1} < \text{C4-Ref} < \text{C0} < \text{C3-Ref}$) and all five registered statistical significance decisions were unchanged.
+Typically, raw NVML power traces feature transient excursions above nominal 70~W values, with isolated samples exceeding 100~W (peaking at 124.5~W on Llama and 116.1~W on Qwen). To confirm that our findings are not artifacts of measurement spikes, we reintegrated all 100 Llama power traces with an 82~W cap and a strict 70~W cap. These decisions remained invariant across clipping thresholds (plotted in Appendix~\ref{app:power-samples}, Figure~\ref{fig:power-cap} and Figure~\ref{fig:power-samples}): the energy rank ordering ($\text{Evict (C2)} < \text{AWQ (C1)} < \text{Compound (C4-Ref)} < \text{FP16 (C0)} < \text{TQ-Ref (C3-Ref)}$) and all five registered statistical significance decisions were unchanged.
 
 \subsection{Sensitivity to Budget and Bit Width}
 
@@ -515,7 +515,7 @@ Sensitivity sweeps on Llama at 4096 tokens (plotted in Appendix~\ref{app:benchma
 \subsection{Qwen: Energy Measurements}
 \label{sec:qwen-energy}
 
-Table~\ref{tab:qwen-all} summarizes Qwen2.5-3B energy consumption across context lengths. Unlike Llama, AWQ (Q1-W) did not yield energy savings relative to uncompressed FP16 (Q0) at any context length. At 4096 tokens, Q0 averaged 616.78~J compared to 621.75~J for Q1-W.
+Table~\ref{tab:qwen-all} summarizes Qwen2.5-3B energy consumption across context lengths. Unlike Llama, the AWQ baseline (Q1-W) did not yield energy savings relative to uncompressed FP16 (Q0) at any context length. At 4096 tokens, uncompressed FP16 (Q0) averaged 616.78~J compared to 621.75~J for the AWQ baseline (Q1-W).
 
 \begin{table}[htbp]
 \caption{Qwen Energy (J, mean $\pm$ SD) Across Contexts}
@@ -524,7 +524,7 @@ Table~\ref{tab:qwen-all} summarizes Qwen2.5-3B energy consumption across context
 \resizebox{\columnwidth}{!}{%
 \begin{tabular}{@{}lrrrrr@{}}
 \toprule
-\textbf{Context} & \textbf{Q0} & \textbf{Q1-W} & \textbf{Q2} & \textbf{Q3-Ref} & \textbf{Q4-Ref} \\
+\textbf{Context} & \textbf{FP16 (Q0)} & \textbf{AWQ (Q1-W)} & \textbf{Evict (Q2)} & \textbf{TQ-Ref (Q3-Ref)} & \textbf{Compound (Q4-Ref)} \\
 \midrule
 1024 & $258.6\!\pm\!27.4$ & $293.4\!\pm\!21.6$ & $272.0\!\pm\!13.9$ & $358.6\!\pm\!9.6$  & $343.0\!\pm\!14.1$ \\
 2048 & $334.2\!\pm\!17.5$ & $398.5\!\pm\!12.5$ & $342.6\!\pm\!10.3$ & $540.9\!\pm\!14.1$ & $435.2\!\pm\!20.0$ \\
@@ -533,7 +533,7 @@ Table~\ref{tab:qwen-all} summarizes Qwen2.5-3B energy consumption across context
 \end{tabular}}
 \end{table}
 
-Eviction (Q2) required the lowest energy across all context lengths. At 4096 tokens, Q2 consumed 71.27~J less energy than Q1-W (an 11.5\% reduction), though the difference fell short of statistical significance after Holm correction ($p = 0.0656$). However, this energy reduction is accompanied by severe retrieval degradation (Section~\ref{sec:qwen-quality}).
+Single-stage eviction (Q2) required the lowest energy across all context lengths. At 4096 tokens, eviction (Q2) consumed 71.27~J less energy than the AWQ baseline (Q1-W, an 11.5\% reduction), though the difference fell short of statistical significance after Holm correction ($p = 0.0656$). However, this energy reduction is accompanied by severe retrieval degradation (Section~\ref{sec:qwen-quality}).
 
 \subsection{Qwen: Hard-Retrieval Quality}
 \label{sec:qwen-quality}
@@ -548,18 +548,18 @@ Table~\ref{tab:qwen-quality} reports hard-retrieval accuracy for Qwen2.5-3B.
 \toprule
 \textbf{Config} & \textbf{Pass/60} & \textbf{Rate} & \textbf{Wilson 95\% CI} \\
 \midrule
-Q0 (FP16)     & 53/60 & 0.883 & $[0.778,\ 0.942]$ \\
-Q1-W (AWQ)    & 48/60 & 0.800 & $[0.682,\ 0.882]$ \\
-Q2 (Evict)    & 1/60  & 0.017 & $[0.003,\ 0.089]$ \\
-Q3-Ref (TQ)   & 49/60 & 0.817 & $[0.701,\ 0.894]$ \\
-Q4-Ref (Both) & 1/60  & 0.017 & $[0.003,\ 0.089]$ \\
+Q0 (FP16 Baseline)      & 53/60 & 0.883 & $[0.778,\ 0.942]$ \\
+Q1-W (AWQ Baseline)     & 48/60 & 0.800 & $[0.682,\ 0.882]$ \\
+Q2 (AWQ + Evict)        & 1/60  & 0.017 & $[0.003,\ 0.089]$ \\
+Q3-Ref (AWQ + TQ-Ref)   & 49/60 & 0.817 & $[0.701,\ 0.894]$ \\
+Q4-Ref (Compound Stack) & 1/60  & 0.017 & $[0.003,\ 0.089]$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Eviction (Q2) reduced retrieval accuracy to 1/60 across all document depths (0/20 at 10\%, 0/20 at 50\%, 1/20 at 90\%). Paired comparison against Q1-W showed 47 performance losses and 0 gains (exact McNemar $p = 1.71 \times 10^{-13}$). Compound compression (Q4-Ref) also collapsed to 1/60, inheriting the failure of the eviction stage.
+Single-stage eviction (Q2) reduced retrieval accuracy to 1/60 across all document depths (0/20 at 10\%, 0/20 at 50\%, 1/20 at 90\%). Paired comparison against the AWQ baseline (Q1-W) showed 47 performance losses and 0 gains (exact McNemar $p = 1.71 \times 10^{-13}$). Compound compression (Q4-Ref) also collapsed to 1/60, inheriting the failure of the eviction stage.
 
-Conversely, TurboQuant reference (Q3-Ref) maintained retrieval accuracy (49/60), closely matching Q1-W (48/60), while increasing total energy consumption by 190.53~J (30.6\%) to 812.28~J.
+Conversely, TurboQuant reference (Q3-Ref) maintained retrieval accuracy (49/60), closely matching the AWQ baseline (Q1-W, 48/60), while increasing total energy consumption by 190.53~J (30.6\%) to 812.28~J.
 
 \subsection{Cross-Model Quality Contrast}
 
@@ -579,14 +579,14 @@ Sensitivity results for Qwen are summarized in Table~\ref{tab:qwen-sensitivity}.
 \textbf{Variant} & \textbf{Energy (J)} & \textbf{Retrieval} & \textbf{Wilson 95\% CI} \\
 \midrule
 \multicolumn{4}{l}{\textit{PyramidKV budget sweep}} \\
-Q2-B512  & $515.2 \pm 8.9$  & 0/15 & $[0.000,\ 0.218]$ \\
-Q2-B1024 & $550.5 \pm 10.1$ & 1/15 & $[0.003,\ 0.234]$ \\
-Q2-B1536 & $590.6 \pm 13.2$ & 2/15 & $[0.026,\ 0.320]$ \\
+Q2-B512 (Budget 512)   & $515.2 \pm 8.9$  & 0/15 & $[0.000,\ 0.218]$ \\
+Q2-B1024 (Budget 1024) & $550.5 \pm 10.1$ & 1/15 & $[0.003,\ 0.234]$ \\
+Q2-B1536 (Budget 1536) & $590.6 \pm 13.2$ & 2/15 & $[0.026,\ 0.320]$ \\
 \midrule
 \multicolumn{4}{l}{\textit{TurboQuant bit-width sweep}} \\
-Q3-Ref-TQ2 & $808.9 \pm 34.0$ & 4/15  & $[0.109,\ 0.520]$ \\
-Q3-Ref-TQ3 & $791.3 \pm 19.6$ & 11/15 & $[0.480,\ 0.891]$ \\
-Q3-Ref-TQ4 & $812.3 \pm 13.1$ & 12/15 & $[0.548,\ 0.930]$ \\
+Q3-Ref-TQ2 (2-bit TQ)  & $808.9 \pm 34.0$ & 4/15  & $[0.109,\ 0.520]$ \\
+Q3-Ref-TQ3 (3-bit TQ)  & $791.3 \pm 19.6$ & 11/15 & $[0.480,\ 0.891]$ \\
+Q3-Ref-TQ4 (4-bit TQ)  & $812.3 \pm 13.1$ & 12/15 & $[0.548,\ 0.930]$ \\
 \bottomrule
 \end{tabular}}
 \end{table}
@@ -597,12 +597,12 @@ While the reference package expands physical DRAM allocation by over 50\%, our m
 
 \subsection{TurboQuant Retrieval Quality Preservation}
 
-To see whether compressing the KV cache with TurboQuant causes any drop in quality, we compared the retrieval accuracy of the non-TurboQuant baselines (C1-W and Q1-W) directly against the TurboQuant setups (C3-Ref and Q3-Ref) across all 60 test scenarios.
+To see whether compressing the KV cache with TurboQuant causes any drop in quality, we compared the retrieval accuracy of the non-TurboQuant AWQ baselines (C1-W and Q1-W) directly against the TurboQuant setups (C3-Ref and Q3-Ref) across all 60 test scenarios.
 
 Our results show that applying TurboQuant does not cause any significant quality loss on either model:
 \begin{itemize}
-  \item \textbf{Llama 3.2-3B (C1-W vs.\ C3-Ref):} The uncompressed KV baseline (C1-W) scored 38/60 (63.3\%), while TurboQuant (C3-Ref) scored 37/60 (61.7\%). This is a difference of only one test case out of 60, and the exact McNemar paired test gives $p = 1.0$, showing zero statistically meaningful degradation. Across document depths, C3-Ref matched C1-W almost case by case (18/20 at 10\% depth, 10/20 at 50\% depth, and 9/20 at 90\% depth).
-  \item \textbf{Qwen2.5-3B (Q1-W vs.\ Q3-Ref):} For Qwen, the baseline Q1-W scored 48/60 (80.0\%), while TurboQuant (Q3-Ref) scored 49/60 (81.7\%). TurboQuant outperformed the baseline by one question and was very close to the uncompressed FP16 result (53/60, 88.3\%) on the same test set. In contrast, token eviction completely failed on Qwen, with only 1/60 questions being retrieved correctly.
+  \item \textbf{Llama 3.2-3B (AWQ C1-W vs.\ TurboQuant C3-Ref):} The uncompressed KV baseline (C1-W) scored 38/60 (63.3\%), while TurboQuant reference (C3-Ref) scored 37/60 (61.7\%). This is a difference of only one test case out of 60, and the exact McNemar paired test gives $p = 1.0$, showing zero statistically meaningful degradation. Across document depths, C3-Ref matched C1-W almost case by case (18/20 at 10\% depth, 10/20 at 50\% depth, and 9/20 at 90\% depth).
+  \item \textbf{Qwen2.5-3B (AWQ Q1-W vs.\ TurboQuant Q3-Ref):} For Qwen, the AWQ baseline (Q1-W) scored 48/60 (80.0\%), while TurboQuant reference (Q3-Ref) scored 49/60 (81.7\%). TurboQuant outperformed the baseline by one question and was very close to the uncompressed FP16 result (53/60, 88.3\%) on the same test set. In contrast, token eviction completely failed on Qwen, with only 1/60 questions being retrieved correctly.
 
 
 \end{itemize}
@@ -633,7 +633,7 @@ As our hypotheses in Table~\ref{tab:hypotheses} show, existing research suggests
 AWQ saves $\sim$3$\times$ energy & Saves $\sim$10\% at 4096 tokens; increases energy at 1024 tokens \\
 TurboQuant reduces memory 15\% to 20\% & Realized TQ-Ref increased storage by over 50\% \\
 Eviction preserves retrieval & Preserved on Llama (37/60); collapsed on Qwen (1/60) \\
-Sequential compound minimizes all costs & C4-Ref not significantly lower than C1-W; Q4-Ref collapsed to 1/60 \\
+Sequential compound minimizes all costs & Compound (C4-Ref) not significantly lower than AWQ (C1-W); Compound (Q4-Ref) collapsed to 1/60 \\
 \bottomrule
 \end{tabular}}
 \end{table}
@@ -676,8 +676,8 @@ The registered experimental matrix establishes:
 \end{enumerate}
 
 Conversely, the data does not establish:
-\begin{itemize}
-  \item Strict energetic equivalence between C1-W and C4-Ref (the 95\% CI $[-60.28, 3.76]$~J spans zero but remains wide).
+\begin{itemize}\raggedright
+  \item Strict energetic equivalence between AWQ baseline (C1-W) and compound stacking (C4-Ref) (the 95\% CI $[-60.28, 3.76]$~J spans zero but remains wide).
   \item That Qwen's retrieval failure was caused solely by GQA geometry to the exclusion of tokenization or attention patterns.
   \item That energy penalties in the reference implementation would persist in a custom fused CUDA kernel.
   \item That Llama's retrieval retention is useful for context lengths larger than 4096 tokens or for open-ended reasoning tasks.
@@ -689,7 +689,7 @@ Conversely, the data does not establish:
 
 Our empirical results provide direct physical motivation for the flourishing literature on joint rate-distortion compression. Some theoretical frameworks, \textbf{RDKV}~\cite{zhang_rdkv_2026} and \textbf{ThinKV}~\cite{ramachandran_thinkv_2026} explore continuous bit allocation for tokens and layers dynamically, where token eviction is considered as a special case of zero-bit assignment in a rate-distortion objective.
 
-While these frameworks generate promising Pareto frontiers in algorithmic simulation, our hardware measurements show tangible failure modes of disjoint sequential pipelines which demand joint optimization on real devices. As empirically illustrated by our Pareto frontier, naive sequential stacking (C4-Ref) is strictly behind single-stage eviction (C2) on balanced architectures like Llama; and leads to complete retrieval collapse (1/60) on aggressive head-sharing layouts like Qwen. Increasing Qwen's eviction budget in our sensitivity sweep (Table~\ref{tab:qwen-sensitivity}) by 50\% retrieved only 2 out of 15 scenarios, indicating that the failure is driven by discrete token selection errors.
+While these frameworks generate promising Pareto frontiers in algorithmic simulation, our hardware measurements show tangible failure modes of disjoint sequential pipelines which demand joint optimization on real devices. As empirically illustrated by our Pareto frontier, naive sequential compound stacking (C4-Ref) is strictly behind single-stage eviction (C2) on balanced architectures like Llama; and leads to complete retrieval collapse (1/60) on aggressive head-sharing layouts like Qwen. Increasing Qwen's eviction budget in our sensitivity sweep (Table~\ref{tab:qwen-sensitivity}) by 50\% retrieved only 2 out of 15 scenarios, indicating that the failure is driven by discrete token selection errors.
 
 The physical silicon results present boundary conditions for RDKV and ThinKV: to preserve directional attention signals, marginal tokens have to be kept at low precision (1 or 2 bits) under aggressive GQA, since hard binary eviction discards them. Our measurement of the sequential shielding effect ($I < 0$) confirms that shrinking active cache volume prior to quantization yields genuine energy savings by reducing DRAM read traffic. These results give both the baseline data and the practical motivation for moving from disjoint sequential pipelines to joint rate-distortion optimization on resource-constrained hardware.
 
@@ -700,7 +700,7 @@ The physical silicon results present boundary conditions for RDKV and ThinKV: to
 \section{Threats to Validity}
 
 \subsection{Internal Validity}
-All execution rows for a given model were collected within continuous runtime sessions on Google Colab. We have recorded 5 independent energy measurement blocks per condition ($n=5$), giving us sufficient statistical power to detect large effects while also acknowledging the greater confidence intervals for small effects. For the Llama runs, note that we compared against AWQ baseline (C1-W) by using compressed variants (C2-4-Ref) with the custom wrapper applied, which introduces a small baseline shift ($\approx 8.61$~J at 4096 tokens). In the case of Qwen, the equivalent wrapper was applied consistently across all configurations. We have kept two in-session code repairs from Notebook~08 for posterity, and all trace files were checked for SHA-256 integrity rather than reconstructed from the notebook.
+All execution rows for a given model were collected within continuous runtime sessions on Google Colab. We have recorded 5 independent energy measurement blocks per condition ($n=5$), giving us sufficient statistical power to detect large effects while also acknowledging the greater confidence intervals for small effects. For the Llama runs, note that we compared against AWQ baseline (C1-W) by using compressed variants (C2, C3-Ref, C4-Ref) with the custom wrapper applied, which introduces a small baseline shift ($\approx 8.61$~J at 4096 tokens). In the case of Qwen, the equivalent wrapper was applied consistently across all configurations. We have kept two in-session code repairs from Notebook~08 for posterity, and all trace files were checked for SHA-256 integrity rather than reconstructed from the notebook.
 
 \subsection{Construct Validity}
 Our quality assessment is based upon key-value extraction at three controlled document depth positions. While this provides diagnostic headroom for memory compression, it does not evaluate multi-step reasoning, natural dialogue, summarization, or multilingual fluency. In addition, our energy measurements capture board-level GPU power through NVML, excluding host CPU dissipation, system memory power, and facility cooling overhead.
@@ -822,7 +822,7 @@ Exact hardware scheduling and transient GPU frequencies vary across cloud instan
 %% ════════════════════════════════════════════════════════════════
 \section*{Generative AI Usage Statement}
 
-Generative AI tooling was utilized in two capacities during the preparation of this manuscript: assisting in drafting initial boilerplate code for experiment orchestration and figure plotting, and aiding in bibliographic search and reference matching. All AI-assisted suggestions, numerical outputs, and citations were independently verified against source papers and experimental logs. The conceptual formulation, experimental designs, empirical analyses, and conclusions are the sole work of the authors.
+We used generative AI tools to help draft initial plotting scripts and search related literature. We  verified all codes, data, and citations against primary sources, and take full responsibility for the experimental design, findings, and conclusions.
 
 %% ════════════════════════════════════════════════════════════════
 %%  REFERENCES
@@ -890,10 +890,10 @@ Table~\ref{tab:storage} and Figure~\ref{fig:ideal-components} break down how dec
 \toprule
 \textbf{Path} & \textbf{Non-TQ base} & \textbf{Realized TQ-Ref} & \textbf{Ideal packed} & \textbf{Ideal/FP16} \\
 \midrule
-Llama TQ-only   & 455.00 & 696.50 & 131.14 & 28.8\% \\
-Llama evict.+TQ & 119.00 & 187.25 &  41.89 & 35.2\% \\
-Qwen TQ-only    & 146.25 & 223.88 &  42.15 & 28.8\% \\
-Qwen evict.+TQ  &  38.25 &  60.19 &  13.46 & 35.2\% \\
+Llama TQ-only (C3-Ref)   & 455.00 & 696.50 & 131.14 & 28.8\% \\
+Llama Evict+TQ (C4-Ref)  & 119.00 & 187.25 &  41.89 & 35.2\% \\
+Qwen TQ-only (Q3-Ref)    & 146.25 & 223.88 &  42.15 & 28.8\% \\
+Qwen Evict+TQ (Q4-Ref)   &  38.25 &  60.19 &  13.46 & 35.2\% \\
 \bottomrule
 \end{tabular}}
 \begin{minipage}{\columnwidth}\vspace{2pt}\footnotesize
@@ -944,7 +944,7 @@ Figure~\ref{fig:break-even} shows the upper limit of $O_\text{net}/\epsilon_\tex
 \label{fig:break-even}
 \end{subfigure}
 \Description{Three appendix diagrams summarize ideal KV-cache compression: a footprint decomposition, modeled dataflow, and symbolic energy break-even bounds.}
-\caption{Compact overview of the ideal packed/fused TurboQuant analysis. All values are theoretical estimates, not experimental measurements.}
+\caption{Compact overview of the ideal packed/fused TurboQuant analysis. All values are theoretical calculation, not experimental measurements.}
 \end{figure*}
 
 %% ════════════════════════════════════════════════════════════════
@@ -974,7 +974,7 @@ In this section, we present additional figures related to energy scaling with co
 \begin{subfigure}{\textwidth}
 \centering
 \includegraphics[width=0.75\textwidth]{figures/fig02_measured_context_scaling.pdf}
-\caption{Context scaling of prefill energy, decode energy, and decode throughput across context lengths.}
+\caption{Context scaling of prefill energy, decode energy, and decode throughput across multiple context lengths.}
 \label{fig:context-scaling}
 \end{subfigure}
 \Description{Supplementary system measurements showing phase overhead, trade-offs, and context scaling.}

@@ -50,6 +50,13 @@ standalone `.py` files as experiment runners.
     library versions, model geometry, layerwise budget vectors, and experimental
     protocol constants. It generates `reproducibility_specs_full.json`,
     `reproducibility_table.tex`, and `reproducibility_summary.md`.
+13. `11_multidim_pareto_frontier_colab.ipynb` is a standalone 4-objective Pareto
+    frontier analysis and visualization notebook. It evaluates four simultaneous
+    dimensions: Total Energy ($\min E$), Persistent KV Cache Memory ($\min M$),
+    Decode Throughput ($\max T$), and Hard-Retrieval Accuracy ($\max Q$). It runs
+    vectorized 4D non-dominated sorting, 2000-iteration paired bootstrap stability,
+    and generates 3D Pareto scatter, 4-axis Parallel Coordinates, Radar profiles,
+    pairwise 2D trade-off matrices, interactive Plotly dashboards, and LaTeX tables.
 
 ## Safety Rules
 
