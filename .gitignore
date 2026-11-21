@@ -8,3 +8,26 @@ __pycache__/
 *.py[cod]
 .ipynb_checkpoints/
 skills-lock.json
+
+# Manuscripts, slides, and course materials
+/IEEE Conference/
+/Nsys Conference/
+/IEEE-conference-template-062824/
+/paper/
+/proposal/
+/presentation/
+/templates/
+/drawio/
+/course/
+/deliverables/
+
+# Local planning, reviews, and temporary outputs
+/AGENTS.md
+/archive/
+/context/
+/logs/
+/scratch/
+/tools/legacy/
+/check.md
+/reviewers review.md
+/reproducibility_export/reproducibility_table.tex

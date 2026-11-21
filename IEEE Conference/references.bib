@@ -27,37 +27,24 @@
                   acceleration across edge platforms.},
 }
 
-@misc{cai_pyramidkv_2025,
+@inproceedings{cai_pyramidkv_2025,
   title        = {{PyramidKV}: Dynamic {KV} Cache Compression based on
                   Pyramidal Information Funneling},
-  shorttitle   = {{PyramidKV}},
   author       = {Cai, Zefan and others},
-  year         = {2024},
-  eprint       = {2406.02069},
-  eprinttype   = {arxiv},
-  note         = {arXiv:2406.02069},
-  doi          = {10.48550/arXiv.2406.02069},
-  urldate      = {2026-06-28},
-  keywords     = {Computer Science - Computation and Language},
-  abstract     = {PyramidKV dynamically adjusts KV cache size across layers,
-                  allocating more cache in lower layers and less in higher ones,
-                  achieving up to 20.5 absolute accuracy improvement on TREC.},
+  booktitle    = {Conference on Language Modeling (COLM)},
+  year         = {2025},
 }
 
-@misc{liu_kivi_2023,
-  title        = {{KIVI}: A Tuning-Free Asymmetric 2bit Quantization for
-                  {KV} Cache},
-  shorttitle   = {{KIVI}},
-  author       = {Liu, Zirui and others},
+@inproceedings{liu_kivi_2023,
+  title        = {{KIVI}: A Tuning-Free Asymmetric 2bit Quantization for {KV} Cache},
+  author       = {Liu, Zirui and Yuan, Jiayi and Jin, Hongye and Zhong, Shaochen
+                  and Xu, Zhaozhuo and Braverman, Vladimir and Chen, Beidi and Hu, Xia},
+  booktitle    = {Proceedings of the 41st International Conference on Machine Learning},
+  series       = {Proceedings of Machine Learning Research},
+  volume       = {235},
+  pages        = {32332--32344},
   year         = {2024},
-  eprint       = {2402.02750},
-  eprinttype   = {arxiv},
-  note         = {arXiv:2402.02750},
-  doi          = {10.13140/RG.2.2.28167.37282},
-  urldate      = {2026-06-28},
-  keywords     = {Computer Science - Computation and Language},
-  abstract     = {KIVI uses 2-bit KV cache quantization enabling Llama, Falcon,
-                  and Mistral to maintain quality with 2.6x less peak memory.},
+  publisher    = {PMLR},
 }
 
 @misc{argerich_watt_2026,
@@ -191,17 +178,12 @@
                   with under 5\% of the original KV cache.},
 }
 
-@misc{li2024survey,
+@article{li2024survey,
   title        = {A Survey on Large Language Model Acceleration based on
                   {KV} Cache Management},
   author       = {Li, Haoyang and others},
-  journal      = {arXiv preprint arXiv:2412.19442},
-  journaltitle = {arXiv preprint arXiv:2412.19442},
+  journal      = {Transactions on Machine Learning Research},
   year         = {2025},
-  eprint       = {2412.19442},
-  eprinttype   = {arxiv},
-  publisher    = {Transactions on Machine Learning Research},
-  doi          = {10.48550/arXiv.2412.19442},
 }
 
 @inproceedings{sun2026janusquant,
@@ -212,6 +194,7 @@
   booktitle    = {Proceedings of the 31st {ACM} {SIGPLAN} Annual Symposium
                   on Principles and Practice of Parallel Programming},
   pages        = {301--314},
+  doi          = {10.1145/3774934.3786428},
   year         = {2026},
   publisher    = {Association for Computing Machinery},
   address      = {New York, NY, USA},
@@ -234,14 +217,10 @@
 }
 
 @misc{unsloth_2024,
-  title        = {Unsloth: Fast and Memory-Efficient {LLM} Fine-Tuning and
-                  Inference},
-  shorttitle   = {Unsloth},
-  author       = {Han, Daniel and Han, Michael and {Unsloth AI Team}},
-  year         = {2024},
-  publisher    = {GitHub},
+  title        = {{Unsloth}},
+  author       = {Han, Daniel and Han, Michael and {Unsloth team}},
+  year         = {2023},
   howpublished = {\url{https://github.com/unslothai/unsloth}},
-  urldate      = {2026-07-13},
 }
 
 @inproceedings{paszke2019pytorch,
@@ -271,13 +250,11 @@
 }
 
 @manual{nvidia2024nvml,
-  title        = {{NVIDIA} Management Library ({NVML}) {API} Reference Guide},
-  author       = {{NVIDIA Corporation}},
+  title        = {{NVML API} Reference Guide: Device Queries},
   organization = {NVIDIA Corporation},
   year         = {2024},
-  url          = {https://docs.nvidia.com/deploy/nvml-api/},
-  urldate      = {2026-06-28},
-  note         = {Version 12.0},
+  url          = {https://docs.nvidia.com/deploy/archive/R550/nvml-api/group__nvmlDeviceQueries.html},
+  note         = {R550},
 }
 
 @inproceedings{ainslie2023gqa,
@@ -318,7 +295,7 @@
   author       = {Kamradt, Gregory},
   year         = {2023},
   publisher    = {GitHub},
-  howpublished = {\url{https://github.com/gkamradt/LLMTest_NeedleInAHaystack}},
+  howpublished = {\url{https://github.com/gkamradt/needle-in-a-haystack}},
   urldate      = {2026-06-28},
 }
 
@@ -397,7 +374,7 @@
   author       = {Li, Yuhong and others},
   booktitle    = {Advances in Neural Information Processing Systems (NeurIPS)},
   volume       = {37},
-  pages        = {26217--26240},
+  pages        = {22947--22970},
   year         = {2024},
   publisher    = {Curran Associates, Inc.},
   address      = {Red Hook, NY, USA},
@@ -410,7 +387,7 @@
   author       = {Zhang, Zhenyu and others},
   booktitle    = {Advances in Neural Information Processing Systems (NeurIPS)},
   volume       = {36},
-  pages        = {34661--34730},
+  pages        = {34661--34710},
   year         = {2023},
   publisher    = {Curran Associates, Inc.},
   address      = {Red Hook, NY, USA},
