@@ -162,7 +162,7 @@ Each GPU notebook automatically installs required packages (`transformers`, `tur
   - `fig06_modeled_phase_byte_demand.pdf` — Prefill vs. Decode Phase Byte Demand Model
   - `fig07_symbolic_energy_break_even.pdf` — Closed-Form Symbolic Energy Break-Even Contours
   - `fig08_measured_pareto_energy_quality_memory.pdf` — Multi-Objective Pareto Frontier
-- **Output:** Saves all 16 figure files into [`paper/figures/`](paper/figures/).
+- **Output:** Writes 16 figure files to `/content/CSE407_cross_model_visualization_v1/`. The [saved figure bundle](evidence/accepted/CSE407_cross_model_visualization_v1/) is available in this repository.
 
 ---
 
@@ -173,28 +173,6 @@ Each GPU notebook automatically installs required packages (`transformers`, `tur
 - **Objective:** Automatically queries the live environment (host OS, GPU clock rates, NVML polling settings, library builds, layerwise eviction budgets) and exports:
   - [`reproducibility_export/reproducibility_specs_full.json`](reproducibility_export/reproducibility_specs_full.json)
   - [`reproducibility_export/reproducibility_summary.md`](reproducibility_export/reproducibility_summary.md)
-  - [`reproducibility_export/reproducibility_table.tex`](reproducibility_export/reproducibility_table.tex)
-
----
-
-### Step 10: Manuscript & Presentation Compilation
-
-**Compile the LaTeX Paper:**
-```bash
-cd paper
-pdflatex main.tex
-bibtex main
-pdflatex main.tex
-pdflatex main.tex
-```
-*Compiles the ACM SIGCONF manuscript `paper/main.pdf` using the generated figures.*
-
-**Generate the Slide Deck:**
-```bash
-pip install python-pptx
-python presentation/generate_presentation.py
-```
-*Generates the 12-slide presentation deck [`presentation/SLM_Energy_Ablation_Presentation.pptx`](presentation/SLM_Energy_Ablation_Presentation.pptx).*
 
 ---
 
