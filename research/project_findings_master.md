@@ -14,6 +14,9 @@ Evidence labels used throughout:
 
 - **Accepted measured evidence:** immutable experiment bundles that passed final
   integrity and are registered as accepted.
+- **Verified follow-up measurement:** the completed Notebook 12 reviewer
+  experiment, verified against its archived raw traces and documented separately
+  from the registered core matrices.
 - **Accepted derived evidence:** analysis based only on accepted measurements
   that passed its own integrity gates.
 - **Provisional synthesis:** the local cross-model synthesis under fingerprint
@@ -81,6 +84,10 @@ internally validated cross-model synthesis, and an accepted visualization bundle
 The project also records four hard-retrieval calibration pilots, including three
 failed pilots that were deliberately discarded rather than reused as final
 evidence.
+
+The Llama reviewer follow-up used stock and wrapped AWQ in the same session and
+workload. The wrapper energy shift was uncertain, and the negative interaction
+persisted with either baseline (Section 10.5).
 
 The most important conceptual result is that the accessible TurboQuant package
 path and an ideal production implementation are different evidence objects.
@@ -198,6 +205,7 @@ rewritten to match outcomes.
 | A4 | Notebook 08 | Full Qwen reference experiment | Accepted measured evidence |
 | A5 | Notebook 09 | Cross-model and ideal-realization synthesis | Provisional, internally validated |
 | A5 figures | Notebook 09B | Portable visualization from provisional synthesis | Accepted visualization output |
+| Reviewer follow-up | Notebook 12 | Same-session Llama wrapper and interaction control at 4096 | Completed, raw traces and results verified |
 
 ### 4.2 Reproducibility and fail-closed rules
 
@@ -222,7 +230,8 @@ outputs are written under `/content`, and a downloadable ZIP is produced.
 - Hard quality: 4096 exact tokenizer-specific tokens, 60 frozen scenarios per
   configuration.
 - Repetitions: five energy blocks per model/configuration/context in the core
-  matrices.
+  matrices. Notebook 12 used ten counterbalanced blocks at 4096 tokens with both
+  AWQ baselines and all three compressed paths in each block.
 - Statistics: registered paired tests where a true within-session pairing
   existed, non-parametric alternatives, multiplicity adjustment, effect sizes,
   Wilson quality intervals, interaction contrasts, and bootstrap frontier
@@ -259,11 +268,11 @@ revisions registered in `research/experiment_registry.json`.
 | TQ reference | C3-Ref, systems source label C3 | Q3-Ref | AWQ plus numerical TQ-Ref |
 | Compound | C4-Ref, systems source label C4 | Q4-Ref | AWQ plus eviction followed by TQ-Ref |
 
-Historical Llama systems energy uses stock C1 at all contexts. Llama has a
-separate C1-W matched-wrapper control only at 4096, collected in a different
-session. Qwen uses matched Q1-W throughout. Therefore, the Llama C1-to-C3
-TQ-only contrast is wrapper-confounded, while the Qwen Q1-W-to-Q3-Ref contrast
-is better matched.
+Historical Llama systems energy uses stock C1 at all contexts. Notebook 05
+collected C1-W at 4096 tokens in a separate session, and Notebook 12 later
+measured both baselines with the compressed paths in one 4096-token session
+(Section 10.5). The historical Llama C1-to-C3 TQ-only contrast includes a
+wrapper difference. Qwen uses matched Q1-W throughout its core matrix.
 
 ### 5.3 Implementation boundaries
 
@@ -512,9 +521,10 @@ I = (C4 - C3) - (C2 - C1)
 
 For total energy, `I = -152.03 J`, 95% CI `[-187.11, -116.96]`, Holm-adjusted
 `p = 0.00109`. Decode energy and decode time also had significant negative
-interactions. The negative sign means eviction shielded part of TQ-Ref overhead
-by shortening the cache before quantization. It does not mean TQ-Ref became free:
-the direct C4-minus-C2 total-energy overhead remained approximately 130.21 J.
+interactions. The negative sign indicates lower incremental TQ-Ref energy after
+eviction, consistent with quantization operating on fewer retained entries. The
+direct C4-minus-C2 total-energy overhead remained approximately 130.21 J.
+Section 10.5 tests the interaction in a new session using both AWQ baselines.
 
 ### 8.3 Historical quality and sensitivity caution
 
@@ -715,10 +725,67 @@ with decode throughput approximately 13.71 tokens/s. Their analytical retained
 FP cache was 469,762,048 bytes after prefill and 477,102,080 bytes after the
 64-token decode. All rows passed structural gates and trace reintegration.
 
-This control is close to historical stock C1 (`631.25 +/- 5.05 J`) but was
-collected in a separate session with a different exact prompt/workload. The
-cross-session C1-W-to-v5 comparisons are descriptive only; they are not valid
-paired or causal tests.
+Relative to historical stock C1 (`631.25 +/- 5.05 J`), the C1-W mean was 8.61 J
+higher (+1.36%). Substituting it into the v5 contrast yields −143.42 J. Both
+calculations are descriptive because the prompt and session differed. The
+same-session estimate is in Section 10.5.
+
+### 10.5 Same-session wrapper and interaction follow-up (Notebook 12)
+
+Reviewer #1, comment 3(b) for Paper 744 asked for the magnitude and direction of
+the wrapper's baseline shift and its effect on the interaction. On 22 November
+2026 the follow-up ran C1, C1-W, C2, C3-Ref and C4-Ref in ten counterbalanced
+blocks on one Tesla T4 with a 70 W enforced board power limit. Both AWQ baselines
+had compression disabled. All 50 measurements used the same resident Llama
+3.2-3B AWQ checkpoint, frozen 4096-token scenario `d50-s00` and 64
+teacher-forced decode tokens. GPU-board energy was integrated from nominal 10 Hz
+NVML traces over prefill and decode. The parity probe produced zero maximum
+absolute prefill logit difference and matched greedy token IDs and cache lengths.
+All five paths passed warm-up and structural validation.
+[Reviewer comments](../744.pdf) · [Executed Notebook 12](../experiments/track_a_failsafe_colab/12_llama_matched_wrapper_interaction_v1.ipynb)
+
+| Configuration | Mean ± SD total energy (J), 10 blocks |
+|---|---:|
+| C1, stock AWQ | 579.26 ± 5.03 |
+| C1-W, wrapped AWQ | 575.13 ± 16.71 |
+| C2, eviction | 551.27 ± 10.83 |
+| C3-Ref, TQ-Ref | 878.17 ± 13.28 |
+| C4-Ref, eviction then TQ-Ref | 637.78 ± 20.20 |
+
+For each block, the interaction was `I(B) = (C4-Ref − C3-Ref) − (C2 − B)`, using
+stock C1 or wrapped C1-W as baseline `B`. The change in interaction
+`I(C1-W) − I(C1)` is exactly the paired baseline shift `C1-W − C1`.
+The intervals below are two-sided 95% Student t intervals on the ten block
+contrasts.
+
+| Paired contrast | Mean (J) | 95% CI (J) |
+|---|---:|---:|
+| Wrapper shift, C1-W − C1 | −4.13 | [−16.36, +8.10] |
+| Interaction with stock C1 | −212.41 | [−226.65, −198.16] |
+| Interaction with wrapped C1-W | −216.54 | [−237.15, −195.92] |
+| Incremental TQ-Ref energy after eviction, C4-Ref − C2 (exploratory) | +86.51 | [+68.50, +104.52] |
+
+The observed wrapper shift was −0.71% of the stock mean. Its interval spans
+zero, so the direction remains uncertain. The first block contributed the
+largest paired shift (−49.20 J). It passed the integrity checks and is included
+in the primary analysis. As an exploratory check, omitting it gives +0.88 J
+(95% CI [−4.38, +6.13] J). Both interaction estimates were negative in every
+block, and both intervals remained below zero when any one block was omitted
+or when traces were reintegrated with 82 W or 70 W sample clipping.
+
+Within this session and workload, the negative interaction persisted after
+matching the wrapper. Adding TQ-Ref after eviction still increased total energy
+relative to eviction alone. The intervals describe repeatability across blocks
+on one prompt and one T4 session. The parity probe checks the study's wrapper
+with compression disabled. Published PyramidKV benchmark accuracy is a separate
+validation question under option 3(a).
+
+The archive contains the run manifest, parity record, 10 block files, 50 unique
+power traces and the summary tables. Local verification matched all 67 recorded
+file hashes, the run fingerprint `240d4ec29411a934`, the frozen token hashes and
+the displayed notebook outputs. Independently reintegrating the 50 traces
+reproduced both CSVs and all reported means and intervals.
+[Result ZIP](../evidence/supplemental/bundles/CSE407_llama_matched_wrapper_interaction_v1_20261122T112205Z-348460e2.zip)
 
 ## 11. Llama Power Robustness
 
@@ -1077,7 +1144,8 @@ A5 evidence.
 Cross-model interpretation preserves different baseline structures:
 
 - Llama context-matrix energy: stock C1;
-- Llama matched-wrapper control: C1-W at 4096 only, separate session;
+- Llama matched-wrapper control used in the synthesis: Notebook 05 C1-W at
+  4096, collected in a separate session;
 - Qwen context-matrix energy: matched-wrapper Q1-W;
 - compound baseline: C2 for Llama and Q2 for Qwen.
 
@@ -1107,8 +1175,7 @@ per model, this is evidence of model dependence, not a general architecture law.
 
 Both models had negative sequential energy interactions:
 
-- Llama total interaction: -152.03 J, but stock-C1 versus wrapped-path
-  confounding remains;
+- Llama v5 total interaction: -152.03 J, using stock C1 for the AWQ arm;
 - Qwen total interaction: -112.32 J within a matched session;
 - both remained negative under 82 W and 70 W trace clipping.
 
@@ -1116,6 +1183,9 @@ This repeated direction supports a systems mechanism: eviction reduces retained
 tokens before TQ-Ref, so the expensive reference transform and materialized state
 operate over less cache. The magnitude should not be directly compared as if the
 models shared a paired unit.
+
+The later Notebook 12 follow-up corroborated the Llama interaction direction
+with a matched wrapper on its own workload (Section 10.5).
 
 ### 15.5 Measured multi-objective frontier
 
@@ -1427,12 +1497,13 @@ systems discussion and can be used when page space permits.
 
 ### 18.1 Test framework and multiplicity
 
-The project uses paired tests wherever a true within-session blocking structure
-exists: five paired energy blocks per model/configuration/context, and 60 paired
-quality scenarios stratified by three depth bins. Holm sequential adjustment
-controls the familywise error rate within each registered test family. Wilcoxon
-signed-rank tests serve as non-parametric alternatives for small-sample energy
-comparisons (n=5). McNemar exact tests address paired binary quality outcomes.
+The core experiments used five paired energy blocks per model, configuration
+and context, and 60 paired quality scenarios stratified by three depth bins.
+Holm sequential adjustment controls the familywise error rate within each
+registered test family. Wilcoxon signed-rank tests serve as non-parametric
+alternatives for small-sample energy comparisons (n=5). McNemar exact tests
+address paired binary quality outcomes. The Notebook 12 follow-up reports
+individual paired t intervals over ten blocks on one workload (Section 10.5).
 
 Multiple testing and small n constrain resolution. With five blocks per
 comparison, the minimum detectable Holm-adjusted p-value for any single test is
@@ -1500,12 +1571,12 @@ measure whether eviction modifies TQ-Ref overhead:
 | Qwen | Raw | Throughput | +1.09 tok/s | [−1.39, 3.57] | 0.2895 (n.s.) |
 
 Both models showed significant negative total and decode energy interactions:
-eviction shielded TQ-Ref overhead by shrinking the cache before the reference
-quantization transform. The Llama interaction magnitude was larger, but the
-Llama stock-C1 baseline was not wrapper-matched. Throughput and decode time
-interactions were not significant for both models after adjustment, consistent
-with the eviction-shielding effect being energy-dominated rather than
-throughput-dominated at these sample sizes.
+the incremental TQ-Ref energy was lower after eviction, consistent with the
+reference transform operating on fewer tokens. This table contains the
+registered core results using historical stock C1 for Llama. Section 10.5
+reports the separate ten-block Llama experiment with both baselines.
+Throughput interactions were not significant in either core matrix. The
+decode-time interaction was significant for Llama.
 
 ### 18.5 Hard-quality Wilson intervals and cross-model contrast
 
@@ -1694,22 +1765,20 @@ evidence that measurements are incomplete.
 
 ### 19.4 Llama stock-versus-wrapper confound
 
-Historical Llama systems energy used stock C1 (no attention wrapper) at all three
-contexts. The matched-wrapper C1-W control was collected only at 4096 tokens in a
-separate session. Consequently:
+The Llama v5 context-scaling results (Section 7), TQ-only overhead in Figure 1
+and registered sequential interaction (Section 18.4) use stock C1. Their
+comparisons with the compressed paths can include wrapper effects. The earlier
++8.61 J difference also includes prompt and session differences (Section 10.4).
+Qwen used matched Q1-W throughout its core matrix.
 
-- The Llama context-scaling results (Section 7) compare C2/C3/C4 against stock C1,
-  not matched C1-W. The stock-to-wrapper difference was small
-  (~8.61 J at 4096) but not zero.
-- The Llama TQ-only energy overhead (Section 17, Figure 1) uses stock C1 as the
-  denominator and is therefore wrapper-confounded.
-- The Llama sequential interaction contrast (Section 18.4) uses stock C1 in the
-  `(C2 − C1)` arm, introducing a potential wrapper offset.
-- Qwen used matched Q1-W throughout, making its TQ-only and interaction contrasts
-  wrapper-clean.
-
-This asymmetry should be reported in the paper. It does not invalidate the Llama
-results, but it makes Qwen's within-session contrasts more precisely identified.
+Notebook 12 isolated the wrapper comparison on one prompt by measuring C1 and
+C1-W in the same blocks as the compressed paths (Section 10.5). The run used
+PyTorch 2.14.1+cu130, Transformers 5.12.1, GPTQModel 7.1.0 and TurboQuant 0.2.0.
+The loader selected `AwqGEMMTritonLinear` after two AWQ JIT extension attempts
+failed, and the selected backend was shared across all conditions on the same
+model. The manifest records the NumPy `trapz` compatibility alias. The historical
+Llama runs used PyTorch 2.11.0+cu128. Interpret absolute joules and interaction
+magnitudes within their respective workload and runtime.
 
 ### 19.5 Synthesis provisional status
 
@@ -1790,21 +1859,21 @@ same total VRAM reduction.
 
 ### 20.2 Internal validity
 
-**Single session per model.** Each model's core matrix was collected in one Colab
-session. Environmental factors — GPU thermal state, background load, Colab
+**Single session per core matrix.** Each model's core matrix was collected in one
+Colab session. Environmental factors — GPU thermal state, background load, Colab
 scheduling, DRAM refresh, and runtime initialization — were shared across blocks
 within a session but not independently varied. Cross-session comparisons
 (including Llama C1-W versus v5 C1) are descriptive only.
 
-**Five energy blocks.** Each configuration/context has five energy blocks. This
-provides adequate power for large effects (the C2-vs-C1 and C3-vs-C1 contrasts)
-but limits resolution for small effects. The C1-vs-C4 non-significance at 4096
-may reflect either true proximity or insufficient sample size.
+**Energy blocks.** The core matrices have five blocks per configuration and
+context, which limits resolution for small effects such as the historical
+C1-vs-C4 comparison at 4096. The ten follow-up blocks repeat a single workload.
 
 **Llama stock-versus-wrapper confound (Section 19.4).** The Llama v5 systems
 matrix used stock C1 as the AWQ reference, while compressed paths used a custom
-attention wrapper. The wrapper overhead was small at 4096 (~8.61 J), but it
-introduces a systematic offset in all Llama contrasts involving C1.
+attention wrapper. The same-session follow-up estimates the wrapper shift for
+one 4096-token prompt. Its interval spans both energy decreases and increases,
+and how the wrapper affects other prompts and contexts remains open.
 
 **Qwen eviction failure mechanism.** The catastrophic eviction failure on Qwen
 (1/60) is a measured outcome, but the responsible factor is not isolated. The
@@ -1874,9 +1943,10 @@ dominated.
 
 **Interaction interpretation.** The sequential interaction `I = (C4−C3) − (C2−C1)`
 measures whether the compound path deviates from the sum of individual component
-effects. It does not decompose the mechanism. The Llama interaction uses a
-confounded stock-C1 arm. Both models have n=5, so interaction precision is
-limited.
+effects. The historical Llama interaction uses a stock-C1 arm, and both core
+matrices have n=5. The ten-block Llama follow-up measures how baseline choice
+affects the contrast under matched conditions. The contrast alone does not
+identify the physical mechanism.
 
 ### 20.5 Ethical and broader impact considerations
 
@@ -1905,7 +1975,7 @@ applications. Ethical considerations include:
 | Qwen full reference | `evidence/accepted/bundles/CSE407_qwen_track_a_reference_v1/` | `861d89617e53034d` | 593 | Immutable accepted |
 | Visualization | `evidence/accepted/CSE407_cross_model_visualization_v1/` | `53ead4e6db45d2a8` | 23 | Accepted visualization |
 
-### 21.2 Provisional and discarded evidence
+### 21.2 Provisional, discarded, and supplemental evidence
 
 | Bundle | Path | Fingerprint | Files | Status |
 |---|---|---|---:|---|
@@ -1914,6 +1984,11 @@ applications. Ethical considerations include:
 | Pilot V2 (discarded) | `evidence/discarded/bundles/CSE407_llama_track_a_pilot_v2_discarded/` | `922e8877398679eb` | — | Discarded |
 | Pilot V3 (discarded) | `evidence/discarded/bundles/CSE407_llama_track_a_pilot_v3_discarded/` | `43041ef3243f87a3` | — | Discarded |
 | Pilot V4 (discarded) | `evidence/discarded/bundles/CSE407_llama_track_a_pilot_v4_discarded/` | `15a1017ec54949b9` | — | Discarded (calibration only) |
+
+The supplemental Notebook 12 archive contains 68 files under fingerprint
+`240d4ec29411a934` and session `20261122T112205Z-348460e2`. Its SHA-256 is
+`a5537052b78b661b0ec01222013530234d6e70761a4fd14e8d00e4766c8b3eb7`.
+[Verified follow-up archive](../evidence/supplemental/bundles/CSE407_llama_matched_wrapper_interaction_v1_20261122T112205Z-348460e2.zip)
 
 ### 21.3 Notebook inventory
 
@@ -1930,6 +2005,7 @@ applications. Ethical considerations include:
 | 08 | `08_qwen2_5_full_reference_v1.ipynb` | Qwen full experiment | Completed, accepted (with repairs) |
 | 09 | `09_cross_model_synthesis_v1_colab.ipynb` | Cross-model synthesis | CPU, completed, provisional |
 | 09B | (Colab-connected, Drive-independent) | Visualization | CPU, completed, accepted figures |
+| 12 | [`12_llama_matched_wrapper_interaction_v1.ipynb`](../experiments/track_a_failsafe_colab/12_llama_matched_wrapper_interaction_v1.ipynb) | Llama same-session wrapper control and interaction | Completed, verified follow-up |
 
 All notebooks live under `experiments/track_a_failsafe_colab/`. The Notebook 09B
 source may not yet be in the local repository and should be preserved.
@@ -1958,9 +2034,11 @@ discarded/accepted decisions, and repair provenance.
 | Llama v5 systems | 380 | (easy task, historical) | 95 | (included in 380) | (included) |
 | Llama hard quality/control | 5 (C1-W only) | 300 | 5 | — | — |
 | Qwen full reference | 75 core | 300 core | 95 | 20 | 60 |
-| **Total unique measurement rows** | **460** | **600** | **195** | **20** | **60** |
+| **Registered totals** | **460** | **600** | **195** | **20** | **60** |
+| Llama Notebook 12 follow-up | 50 | — | 50 | — | — |
+| **Totals including the follow-up** | **510** | **600** | **245** | **20** | **60** |
 
-The Llama power robustness analysis reintegrated all 100 Llama traces (95 v5 +
+The earlier Llama power robustness analysis reintegrated 100 Llama traces (95 v5 +
 5 C1-W) without collecting new measurements. The cross-model synthesis joined
 585 normalized energy rows and 885 normalized quality rows from both models.
 
@@ -2142,6 +2220,13 @@ following sections need to be authored from this master findings document:
 | Discussion | Sections 18, 19, 22 | Statistical interpretation, failures, claims |
 | Threats / Limitations | Section 20 | Required by course rubric |
 | Conclusion | Sections 22.1, 22.4 | Supported claims and proposal evaluation |
+
+For Paper 744, use the same-session wrapper shift and paired interaction
+estimates in Section 10.5 in place of the cross-session baseline substitution
+in Section IV-B. Identify the ten-block follow-up by its workload and session
+when presenting it alongside the registered v5 estimate. In the reviewer
+response, report the three paired estimates and their intervals under option
+3(b).
 
 ### 23.2 Proposal and literature update
 
