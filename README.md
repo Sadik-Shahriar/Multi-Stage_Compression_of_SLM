@@ -1,12 +1,12 @@
-# Multi-Stage Compression of Small Language Models for Energy-Efficient Edge Inference
+# Multi-Stage Compression of Small Language Models for Energy-Efficient Inference: An Empirical Systems Ablation
 
 **Course:** CSE407 — East West University  
-**Authors:** Md. Sadik Shahriar, Nipa Mridha, Tanha Humaira  
-**Platform:** All experiments were executed entirely on **Google Colab** (free tier, NVIDIA Tesla T4 GPU)
+**Authors:** Md. Sadik Shahriar, Nipa Mridha, Tanha Humaira, Ahmed Abdal Shafi Rasel\
+**Measurement platform:** Google Colab with an NVIDIA Tesla T4 GPU
 
 [![License: All Rights Reserved](https://img.shields.io/badge/License-All%20Rights%20Reserved-red.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
-[![PyTorch 2.11](https://img.shields.io/badge/PyTorch-2.11%2Bcu128-red.svg)](https://pytorch.org/)
+[![Core runs: PyTorch 2.11](https://img.shields.io/badge/Core%20runs-PyTorch%202.11%2Bcu128-red.svg)](https://pytorch.org/)
 [![Hardware: NVIDIA Tesla T4](https://img.shields.io/badge/Hardware-NVIDIA%20Tesla%20T4-green.svg)](https://www.nvidia.com/en-us/data-center/tesla-t4/)
 [![Platform: Google Colab](https://img.shields.io/badge/Platform-Google%20Colab-F9AB00.svg)](https://colab.research.google.com)
 
@@ -14,24 +14,25 @@
 
 ## 📌 Overview & Objective
 
-This repository contains the complete experimental suite, ablation pipelines, and statistical analysis for our empirical research paper on multi-stage Small Language Model (SLM) compression. 
+This repository contains the experiment notebooks, measured results, and statistical analyses for our study of multi-stage small language model (SLM) compression.
 
-We evaluate the physical energy (10 Hz continuous NVML telemetry), dynamic memory footprint, decode throughput, and exact retrieval accuracy of sequentially stacked compression techniques:
+We measure GPU-board energy from 10 Hz NVML power traces, memory footprint, decode throughput, and exact-match retrieval for three compression techniques.
+
 - **4-bit Weight Quantization (AWQ)**
-- **Dynamic Pyramidal KV-Cache Eviction (PyramidKV)**
-- **KV-Cache Quantization (TurboQuant)**
+- **Custom PyramidKV-style KV-cache token eviction**
+- **TurboQuant reference KV-cache quantization (TQ-Ref)**
 
 Evaluated across two sub-4B open-weights model architectures on **NVIDIA Tesla T4** hardware:
 1. **Llama 3.2-3B-Instruct** (28 layers, 24 Query / 8 KV heads, $3:1$ GQA ratio)
 2. **Qwen2.5-3B-Instruct** (36 layers, 16 Query / 2 KV heads, $8:1$ GQA ratio)
 
-> **Execution Platform:** Every notebook in this repository is completely self-contained and designed to run directly on **Google Colab** (free tier). No local GPU, high-performance workstation, or private cloud instance is needed.
+The measured energy and throughput characterize T4 inference. Edge accelerators require separate measurements.
 
 ---
 
 ## 🗺 Chronological Execution Sequence
 
-To execute the entire pipeline from scratch, upload the `.ipynb` files to Google Colab and run them in the following order:
+To reproduce the core pipeline, upload the notebooks to Google Colab and follow this sequence. The [wrapper follow-up](#supplemental-llama-wrapper-control) can be run independently.
 
 | Step | Task | Notebook | Colab Runtime | Approximate Time |
 |:---:|:---|:---|:---:|:---:|
@@ -57,7 +58,7 @@ To execute the entire pipeline from scratch, upload the `.ipynb` files to Google
 4. For CPU steps: Default standard CPU runtime is sufficient.
 5. Execute all cells from top to bottom (**Runtime → Run all**).
 
-Each GPU notebook automatically installs required packages (`transformers`, `turboquant`, `gptqmodel`, `pynvml`, etc.) and asserts pinned software versions at startup.
+Follow each notebook's setup instructions for package versions and input artifacts.
 
 ---
 
@@ -67,7 +68,7 @@ Each GPU notebook automatically installs required packages (`transformers`, `tur
 - **Colab Runtime:** T4 GPU (~2 hours)
 - **Objective:** Evaluates 5 compression configurations ($C_0, C_1, C_2, C_3\text{-Ref}, C_4\text{-Ref}$) across context lengths of 1024, 2048, and 4096 tokens.
 - **Measurements:**
-  - 10 Hz continuous NVML GPU board power polling (Joules)
+  - 10 Hz NVML GPU-board power polling and integrated energy in joules
   - Prefill latency, decode latency, and decode throughput (tokens/sec)
   - Peak allocated VRAM
   - Baseline retrieval accuracy across 5 replicates
@@ -105,9 +106,9 @@ Each GPU notebook automatically installs required packages (`transformers`, `tur
 - **Colab Runtime:** CPU (~2 min)
 - **Objective:**
   - Integrates all 100 power traces (95 from Step 1 + 5 from Step 3).
-  - Re-evaluates energy under raw transients, an 82 W ceiling, and a 70 W enforced cap.
+  - Reintegrates the raw traces and repeats the analysis after clipping samples at 82 W and 70 W.
   - Runs pairwise paired t-tests and Wilcoxon signed-rank tests with Holm-Bonferroni corrections.
-- **Finding:** Proves that energy rankings and statistical significance decisions remain 100% stable regardless of power cap clipping.
+- **Finding:** The tested rankings and registered significance decisions held under both clipping thresholds.
 
 ---
 
@@ -145,7 +146,7 @@ Each GPU notebook automatically installs required packages (`transformers`, `tur
     $$I = [E(C_4) - E(C_1)] - [E(C_2) - E(C_1)] - [E(C_3) - E(C_1)]$$
   - Runs paired t-tests, Wilcoxon tests, Holm-Bonferroni corrections, exact McNemar tests, and Wilson 95% confidence intervals.
   - Models compulsory DRAM byte demand versus non-traffic compute overhead break-even boundaries.
-- **Output:** Generates 41 statistical tables, Pareto frontiers, and analytical break-even surfaces.
+- **Output:** A 41-file provisional synthesis with statistical summaries, Pareto results, and modeled break-even results.
 
 ---
 
@@ -153,7 +154,7 @@ Each GPU notebook automatically installs required packages (`transformers`, `tur
 
 - **Notebook:** [`experiments/track_a_failsafe_colab/09b_cross_model_visualization.ipynb`](experiments/track_a_failsafe_colab/09b_cross_model_visualization.ipynb)
 - **Colab Runtime:** CPU (~2 min)
-- **Objective:** Reads the synthesis tables and automatically renders all 8 publication figures in both vector PDF and high-resolution PNG:
+- **Objective:** Renders eight figures from the synthesis tables in vector PDF and high-resolution PNG:
   - `fig01_measured_tq_overhead.pdf` — TurboQuant Reference Overhead & Latency Inflation
   - `fig02_measured_context_scaling.pdf` — Energy & Throughput Scaling vs. Context
   - `fig03_retrieval_wilson.pdf` — Hard-Retrieval Accuracy with Wilson 95% CIs
@@ -176,19 +177,19 @@ Each GPU notebook automatically installs required packages (`transformers`, `tur
 
 ---
 
-## 🔬 Deterministic vs. Physical Measurement Behavior
+### Supplemental Llama wrapper control
 
-When you re-run these experiments on Google Colab:
+Open [Notebook 12](experiments/track_a_failsafe_colab/12_llama_matched_wrapper_interaction_v1.ipynb) in a fresh Colab T4 runtime and run its numbered cells in order. The follow-up compares stock and wrapped AWQ alongside the three compressed paths in ten counterbalanced blocks. Every run uses the same 4,096-token prompt and 64 teacher-forced decode tokens.
 
-| Measurement Dimension | On Fresh Colab Run | Technical Reason |
-|:---|:---:|:---|
-| **Retrieval Accuracy (e.g., 37/60, 48/60, 1/60)** | **100% Exact Match** | Greedy decoding (`temperature=0.0`), fixed seed (`407`), pinned model checkpoints. |
-| **Quality Evaluation Output CSVs** | **100% Exact Match** | Deterministic token generation and exact string matching. |
-| **Energy Rankings ($C_2 < C_1 < C_0 < C_4 < C_3$)** | **100% Stable** | Confirmed across multiple runs and 3 power clipping regimes in Step 4. |
-| **Statistical Decisions ($p < 0.01$, Interaction $I < 0$)** | **100% Stable** | Robust across paired t-tests and Wilcoxon signed-rank tests. |
-| **Analytical Synthesis & Figure Generation** | **Byte-Identical** | Pure deterministic arithmetic on generated tables. |
-| **Raw Energy in Joules** | **$\pm 2\text{--}5\%$ variation** | Normal physical noise from NVML hardware board power sampling. |
-| **Raw Power Traces** | **Similar shape, slight variance** | Physical board-level power fluctuations on GPU. |
+The [verified result archive](evidence/supplemental/bundles/CSE407_llama_matched_wrapper_interaction_v1_20261122T112205Z-348460e2.zip) contains 50 measurements and 50 raw power traces, paired contrasts, the runtime manifest, and a checksum inventory. The completed run used PyTorch 2.14.1+cu130.
+
+---
+
+## 🔬 Reproducing Recorded Results
+
+- Use the pinned checkpoints, frozen prompt IDs, and fixed decode settings in the notebooks. Compare retrieval counts with the archived results.
+- GPU energy, latency, and throughput vary across sessions. Record the GPU, runtime, and software versions when comparing a fresh run with the archived measurements.
+- Reintegrate the saved traces to check energy totals and repeat the registered statistics. The 82 W and 70 W clipping checks use those same traces.
 
 ---
 
@@ -197,59 +198,70 @@ When you re-run these experiments on Google Colab:
 | Config | Weight Precision | KV Cache Retention Policy | KV Cache Precision | Pipeline Stage Order |
 |:---|:---|:---|:---|:---|
 | **$C_0$ / $Q_0$** | FP16 (Baseline) | Full Attention (No eviction) | FP16 (Baseline) | Standard uncompressed model |
-| **$C_1$ / $Q_1$** | AWQ INT4 (group 128) | Full Attention (No eviction) | FP16 (Baseline) | AWQ linear projections |
+| **`C1`, `C1-W`, `Q1-W`** | AWQ INT4 (group 128) | Full Attention (No eviction) | FP16 (Baseline) | AWQ linear projections |
 | **$C_2$ / $Q_2$** | AWQ INT4 (group 128) | Custom PyramidKV ($\bar{b}=1024$) | FP16 (Baseline) | AWQ $\to$ Pyramidal token pruning |
-| **$C_3\text{-Ref}$ / $Q_3\text{-Ref}$** | AWQ INT4 (group 128) | Full Attention (No eviction) | TurboQuant 4-bit (128-tok FP16 res) | AWQ $\to$ TQ coordinate quantization |
-| **$C_4\text{-Ref}$ / $Q_4\text{-Ref}$** | AWQ INT4 (group 128) | Custom PyramidKV ($\bar{b}=1024$) | TurboQuant 4-bit (128-tok FP16 res) | AWQ $\to$ PyramidKV $\to$ TQ Quantization |
+| **$C_3\text{-Ref}$ / $Q_3\text{-Ref}$** | AWQ INT4 (group 128) | Full Attention (No eviction) | Nominal 4-bit TQ-Ref (128-token FP16 residual) | AWQ $\to$ TQ coordinate quantization |
+| **$C_4\text{-Ref}$ / $Q_4\text{-Ref}$** | AWQ INT4 (group 128) | Custom PyramidKV ($\bar{b}=1024$) | Nominal 4-bit TQ-Ref (128-token FP16 residual) | AWQ $\to$ PyramidKV $\to$ TQ Quantization |
+
+`C1` is stock Llama AWQ. `C1-W` and `Q1-W` use the attention wrapper. TQ-Ref stores byte-sized indices and retains materialized FP16 keys and values.
 
 ---
 
 ## 📊 Summary of Core Empirical Findings
 
-### 1. Llama 3.2-3B Performance at 4096 Context Length
+### 1. Llama 3.2-3B systems results at 4096 tokens
 
-| Configuration | Total Energy (J) | Energy $\Delta$ vs $C_0$ | Decode Throughput | Active KV Cache | Hard NIAH Accuracy |
-|:---|:---:|:---:|:---:|:---:|:---:|
-| **$C_0$ (FP16 Baseline)** | $631.33 \pm 4.21\text{ J}$ | — | $13.77\text{ tok/s}$ | $455\text{ MiB}$ | $38 / 60\ (63.3\%)$ |
-| **$C_1$ (AWQ INT4)** | $603.95 \pm 2.65\text{ J}$ | $-4.34\%$ | $14.15\text{ tok/s}$ | $455\text{ MiB}$ | $38 / 60\ (63.3\%)$ |
-| **$C_2$ (AWQ + PyramidKV)** | **$529.38 \pm 3.12\text{ J}$** | **$-16.15\%$** | **$20.34\text{ tok/s}$** | **$119\text{ MiB}$ ($-73.8\%$)** | **$37 / 60\ (61.7\%)$** |
-| **$C_3\text{-Ref}$ (AWQ + TQ-Ref)**| $791.42 \pm 6.14\text{ J}$ | $+25.36\%$ | $9.82\text{ tok/s}$ | $523\text{ MiB}$ ($+14.9\%$) | $38 / 60\ (63.3\%)$ |
-| **$C_4\text{-Ref}$ (Compound)** | $668.74 \pm 4.88\text{ J}$ | $+5.93\%$ | $13.56\text{ tok/s}$ | $187\text{ MiB}$ ($-58.9\%$) | $37 / 60\ (61.7\%)$ |
+The values below come from the [Llama core systems summary](evidence/accepted/bundles/CSE407_llama_v5_final/v5_final_core_summary.csv).
 
-### 2. GQA Architecture Fragility (Llama 3.2-3B vs. Qwen2.5-3B)
+| Configuration | Total energy (J), mean ± SD | Decode (tok/s) | Active KV cache (MiB) |
+|:---|---:|---:|---:|
+| FP16 (C0) | 701.08 ± 8.12 | 11.34 | 455.00 |
+| Stock AWQ (C1) | 631.25 ± 5.05 | 13.77 | 455.00 |
+| AWQ + eviction (C2) | 529.30 ± 20.02 | 20.34 | 119.00 |
+| AWQ + TQ-Ref (C3-Ref) | 913.48 ± 2.11 | 7.66 | 696.50 |
+| AWQ + eviction + TQ-Ref (C4-Ref) | 659.50 ± 21.35 | 12.53 | 187.25 |
 
-```text
-┌─────────────────────────────────────────────────────────────────────────────────┐
-│ RETRIEVAL ACCURACY UNDER TOKEN EVICTION (4096 Context, 60 Scenarios)            │
-├──────────────────────────────┬────────────────────────┬─────────────────────────┤
-│ Configuration                │ Llama 3.2-3B (3:1 GQA) │ Qwen2.5-3B (8:1 GQA)    │
-├──────────────────────────────┼────────────────────────┼─────────────────────────┤
-│ Baseline ($C_0 / Q_0$)       │ 38 / 60 (63.3%)        │ 48 / 60 (80.0%)         │
-│ AWQ ($C_1 / Q_1$)            │ 38 / 60 (63.3%)        │ 48 / 60 (80.0%)         │
-│ AWQ + PyramidKV ($C_2 / Q_2$)│ 37 / 60 (61.7%)        │ 1 / 60 (1.7%) [COLLAPSE]│
-│ Retention Budget +50% (1536) │ —                      │ 2 / 15 (13.3%) [FAILED] │
-└──────────────────────────────┴────────────────────────┴─────────────────────────┘
-```
+At 4096 tokens, eviction used 16.15% less energy and reduced the active cache by 73.8% relative to stock AWQ.
+
+### 2. Hard retrieval at 4096 tokens
+
+| Configuration | Llama 3.2-3B | Qwen2.5-3B |
+|:---|---:|---:|
+| FP16 (C0 / Q0) | 47/60 | 53/60 |
+| Wrapped AWQ (C1-W / Q1-W) | 38/60 | 48/60 |
+| AWQ + eviction (C2 / Q2) | 37/60 | 1/60 |
+
+The separate 15-scenario Qwen budget sweep yielded 0/15, 1/15, and 2/15 at mean budgets of 512, 1024, and 1536 tokens per layer. GQA ratio, layer count, tokenization, and implementation details vary between Llama and Qwen, leaving the cause of the retrieval gap unresolved. [Llama retrieval evidence](evidence/accepted/bundles/CSE407_llama_track_a_full_v1/track_a_full_quality_results.csv) · [Qwen retrieval evidence](evidence/accepted/bundles/CSE407_qwen_track_a_reference_v1/core_quality_results.csv) · [Qwen sensitivity evidence](evidence/accepted/bundles/CSE407_qwen_track_a_reference_v1/sensitivity_quality_results.csv)
+
+### 3. Same-session Llama interaction
+
+| Paired contrast | Mean (J) | 95% CI (J) |
+|:---|---:|:---|
+| Wrapper shift (C1-W minus C1) | −4.13 | [−16.36, +8.10] |
+| Interaction with stock AWQ | −212.41 | [−226.65, −198.16] |
+| Interaction with wrapped AWQ | −216.54 | [−237.15, −195.92] |
+
+The wrapper interval spans zero. The interaction stayed negative with either baseline on the tested workload.
 
 ---
 
 ## 📖 Citation
 
 ```bibtex
-@inproceedings{shahriar2026multistage,
-  title     = {Multi-Stage Compression of Small Language Models for Energy-Efficient Inference: An Empirical Systems Ablation},
-  author    = {Shahriar, Md. Sadik and Mridha, Nipa and Humaira, Tanha},
-  booktitle = {Proceedings of the ACM Conference (ACM sigconf)},
-  year      = {2026},
-  publisher = {Association for Computing Machinery}
+@misc{shahriar2026multistage,
+  title  = {Multi-Stage Compression of Small Language Models for Energy-Efficient Inference: An Empirical Systems Ablation},
+  author = {Shahriar, Md. Sadik and Mridha, Nipa and Humaira, Tanha and Rasel, Ahmed Abdal Shafi},
+  year   = {2026},
+  note   = {Accepted manuscript}
 }
 ```
 
-## 👥 Authors & License
+## 👥 Authors, Contributors & License
 
 - **Md. Sadik Shahriar** — [shahriarsadik@gmail.com](mailto:shahriarsadik@gmail.com)
 - **Nipa Mridha** — [mridhanipa886@gmail.com](mailto:mridhanipa886@gmail.com)
 - **Tanha Humaira** — [chandnihumaira373@gmail.com](mailto:chandnihumaira373@gmail.com)
+- **Ahmed Abdal Shafi Rasel** — project supervision and manuscript co-authorship
 
 Department of Computer Science and Engineering, **East West University**
  
