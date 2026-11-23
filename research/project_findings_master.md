@@ -14,9 +14,10 @@ Evidence labels used throughout:
 
 - **Accepted measured evidence:** immutable experiment bundles that passed final
   integrity and are registered as accepted.
-- **Verified follow-up measurement:** the completed Notebook 12 reviewer
-  experiment, verified against its archived raw traces and documented separately
-  from the registered core matrices.
+- **Verified follow-up measurement:** the Notebook 12 energy follow-up and the
+  Notebooks 13–14 LongBench TREC comparison. The former was verified against raw
+  power traces and the latter against the archived prompts, predictions, and
+  cache shapes.
 - **Accepted derived evidence:** analysis based only on accepted measurements
   that passed its own integrity gates.
 - **Provisional synthesis:** the local cross-model synthesis under fingerprint
@@ -88,6 +89,12 @@ evidence.
 The Llama reviewer follow-up used stock and wrapped AWQ in the same session and
 workload. The wrapper energy shift was uncertain, and the negative interaction
 persisted with either baseline (Section 10.5).
+
+On all 200 LongBench TREC cases, the authors' and custom eviction paths each
+scored 65.5% on the study's Llama 3.2-3B AWQ checkpoint at nominal K=1,024
+(paired difference 0.0 percentage points, 95% CI [−2.0, +2.0]). The custom path
+stored 66.9% fewer prefill head-token slots. Section 10.6 describes the effect of
+the different cache layouts and software stacks on interpretation.
 
 The most important conceptual result is that the accessible TurboQuant package
 path and an ideal production implementation are different evidence objects.
@@ -206,6 +213,7 @@ rewritten to match outcomes.
 | A5 | Notebook 09 | Cross-model and ideal-realization synthesis | Provisional, internally validated |
 | A5 figures | Notebook 09B | Portable visualization from provisional synthesis | Accepted visualization output |
 | Reviewer follow-up | Notebook 12 | Same-session Llama wrapper and interaction control at 4096 | Completed, raw traces and results verified |
+| Reviewer follow-up | Notebooks 13–14 | Authors' and custom PyramidKV-style eviction on 200 paired LongBench TREC cases | Completed, predictions and results verified |
 
 ### 4.2 Reproducibility and fail-closed rules
 
@@ -786,6 +794,86 @@ file hashes, the run fingerprint `240d4ec29411a934`, the frozen token hashes and
 the displayed notebook outputs. Independently reintegrating the 50 traces
 reproduced both CSVs and all reported means and intervals.
 [Result ZIP](../evidence/supplemental/bundles/CSE407_llama_matched_wrapper_interaction_v1_20261122T112205Z-348460e2.zip)
+
+### 10.6 LongBench TREC comparison with the authors' PyramidKV (Notebooks 13–14)
+
+Reviewer #1, comment 3(a) for Paper 744 asked for benchmark validation against the
+authors' PyramidKV. Notebooks 13 and 14 ran the authors' released Llama SDPA path
+and the study's custom PyramidKV-style path, respectively. Each run included a
+stock FullKV control in its own Tesla T4 Colab session. Both used the same Llama
+3.2-3B-Instruct AWQ checkpoint at revision
+`272b3bde867b606760447deb9a4d2719fbdfd3ae`, the same fixed token IDs for all 200
+LongBench v1 TREC cases, batch size one, and greedy generation capped at 64
+tokens. Prompts ranged from 1,884 to 4,096 tokens after middle truncation of
+153 cases. The authors' TREC scorer used the first line of each prediction.
+All 800 saved predictions received binary scores on this workload.
+[Reviewer comments](../744.pdf) · [LongBench paper](https://aclanthology.org/2024.acl-long.172/) · [Pinned upstream implementation and scorer](https://github.com/Zefan-Cai/KVCache-Factory/tree/68cd9551a63fedf362ddb0edb008badd04c24996)
+
+| Configuration | TREC correct | Score | Mean prefill tokens per layer | Cache heads per layer | Mean prefill head-token slots across layers |
+|---|---:|---:|---:|---:|---:|
+| FullKV, upstream environment | 135/200 | 67.5% | 3,848.5 | 8 | 862,057 |
+| Authors' PyramidKV | 131/200 | 65.5% | 1,031.4 | 24 | 693,092 |
+| FullKV, custom environment | 136/200 | 68.0% | 3,848.5 | 8 | 862,057 |
+| Custom PyramidKV-style eviction | 131/200 | 65.5% | 1,024.0 | 8 | 229,371 |
+
+The two eviction paths tied on aggregate score. They both answered 129 cases
+correctly and 67 incorrectly. Each answered two cases correctly that the other
+missed, for 196/200 agreement on correctness. The scored first line matched on
+190/200 cases, and the full generated token sequence matched on 23/200. All four
+correctness disagreements occurred among the 153 middle-truncated prompts. Both
+eviction paths scored 100/153 on that subset and 31/47 on the remaining prompts.
+These subsets reflect the original prompt lengths. They provide a descriptive
+check of the tie under the shared cap.
+
+| Paired contrast | Difference (pp) | 95% paired bootstrap CI (pp) | Gains / losses |
+|---|---:|---:|---:|
+| Authors' PyramidKV minus its FullKV | −2.0 | [−4.5, 0.0] | 1 / 5 |
+| Custom eviction minus its FullKV | −2.5 | [−5.0, −0.5] | 0 / 5 |
+| Custom eviction minus authors' PyramidKV | 0.0 | [−2.0, +2.0] | 2 / 2 |
+| Custom FullKV minus upstream FullKV | +0.5 | [0.0, +1.5] | 1 / 0 |
+| Difference in changes from each FullKV, custom minus upstream | −0.5 | [−2.5, +1.0] | — |
+
+Intervals were recomputed from 20,000 paired resamples of the cases using seed
+407. The baseline-adjusted contrast asks whether the score changed more from
+FullKV in the custom environment than in the upstream environment. It was
+−0.5 pp, with an interval spanning zero. A formal equivalence conclusion would
+require a prespecified margin. For the custom path's five losses relative to its
+FullKV, an exploratory two-sided exact McNemar test gave unadjusted
+`p = 0.0625`. The percentile interval for that contrast excludes zero, so the
+conclusion about a small loss is sensitive to the inference method.
+
+Both eviction settings used nominal K=1,024, but each kept its own selection
+and storage rules. The authors' path used an eight-token observation window and
+width-seven max pooling. The custom path used a 32-token window and width-five
+average pooling with scores aggregated by native KV head. A head-token slot
+counts one retained token in one stored head of one layer. The custom path
+stored 66.9% fewer such slots than the authors' path and 73.4% fewer than its
+own FullKV. The authors' path stored 19.6% fewer than its FullKV. These counts
+describe the prefill cache tensors. Total peak GPU memory and energy depend on
+other allocations and computation.
+
+Both sessions used PyTorch 2.11.0+cu128 and CUDA 12.8. The authors' path ran
+Transformers 4.44.2 with AutoAWQ 0.2.7 `WQLinear_GEMM`. The custom path ran
+Transformers 5.12.1 with GPTQModel 7.1.0, which selected
+`AwqExllamaV2Linear`. The two stock FullKV arms matched on 199/200 case scores
+and 185/200 full token sequences. Within the custom environment, enabling the
+wrapper with eviction disabled preserved the full token sequence on both
+parity prompts. The FullKV controls quantify baseline agreement. Differences
+in how eviction interacts with either stack can still affect the comparison.
+
+This provides direct validation of aggregate TREC accuracy against the authors'
+released implementation on the study's 3B AWQ configuration. A literal
+reproduction of the published 8B numbers would require that model and its
+published setup. For example, Table 1 reports 58.0% on TREC at K=64 for
+Llama-3-8B-Instruct. Section 10.5 reports the separate energy result for option
+3(b). [PyramidKV paper, Table 1](https://arxiv.org/html/2406.02069#S5.T1)
+
+Verification matched the file hashes for both ZIPs and all five A payload files
+transferred into B. All 200 prompt token sequences were independently rebuilt
+from the pinned data and tokenizer; all 800 predictions decoded back to the
+archived text and had matching case keys, cache shapes, and scores. Both pilots
+passed, and the recomputed accuracies, paired intervals, and cache summaries
+matched the archive and executed Notebook 14 output.
 
 ## 11. Llama Power Robustness
 
@@ -1875,6 +1963,12 @@ attention wrapper. The same-session follow-up estimates the wrapper shift for
 one 4096-token prompt. Its interval spans both energy decreases and increases,
 and how the wrapper affects other prompts and contexts remains open.
 
+**TREC validation scope (Section 10.6).** The two eviction runs used one AWQ
+checkpoint and identical prompts, with different Transformers versions,
+AWQ kernels, and KV head layouts. The comparison covers one benchmark and one
+nominal budget with a 4,096-token cap. It measures agreement on the study's
+3B configuration. A literal 8B replication requires the published settings.
+
 **Qwen eviction failure mechanism.** The catastrophic eviction failure on Qwen
 (1/60) is a measured outcome, but the responsible factor is not isolated. The
 custom PyramidKV-style scorer, specific pyramidal budget distribution, Qwen's
@@ -1990,6 +2084,15 @@ The supplemental Notebook 12 archive contains 68 files under fingerprint
 `a5537052b78b661b0ec01222013530234d6e70761a4fd14e8d00e4766c8b3eb7`.
 [Verified follow-up archive](../evidence/supplemental/bundles/CSE407_llama_matched_wrapper_interaction_v1_20261122T112205Z-348460e2.zip)
 
+The [Notebook 13 upstream archive](../evidence/supplemental/bundles/paper744_trec_official_20261122T183143Z-faaf2ef3.zip)
+contains 6 files and has SHA-256
+`6ba3f2bdb6ca3676abac46322ebc9528a3b55380be4edb232a78fc381752e832`.
+The [Notebook 14 comparison archive](../evidence/supplemental/bundles/paper744_trec_comparison_20261123T050201Z-feaf1115.zip)
+contains 12 files and has SHA-256
+`72b1a7cdeca761a866d75623c2eeadfa7fe40f4520ab833b00b2e89363c1cf5d`.
+Both use schema `paper744-llama-3b-trec-v1` and workload SHA-256
+`94bd110fc970e318bb781284528fbfca667754f7fd1acf53a96b194a60de9ee1`.
+
 ### 21.3 Notebook inventory
 
 | # | Notebook | Role | Status |
@@ -2006,6 +2109,8 @@ The supplemental Notebook 12 archive contains 68 files under fingerprint
 | 09 | `09_cross_model_synthesis_v1_colab.ipynb` | Cross-model synthesis | CPU, completed, provisional |
 | 09B | (Colab-connected, Drive-independent) | Visualization | CPU, completed, accepted figures |
 | 12 | [`12_llama_matched_wrapper_interaction_v1.ipynb`](../experiments/track_a_failsafe_colab/12_llama_matched_wrapper_interaction_v1.ipynb) | Llama same-session wrapper control and interaction | Completed, verified follow-up |
+| 13 | [`13_pyramidkv_official_trec_colab.ipynb`](../experiments/track_a_failsafe_colab/13_pyramidkv_official_trec_colab.ipynb) | Authors' SDPA implementation and FullKV on frozen TREC inputs | Completed, verified follow-up |
+| 14 | [`14_pyramidkv_custom_trec_colab.ipynb`](../experiments/track_a_failsafe_colab/14_pyramidkv_custom_trec_colab.ipynb) | Custom eviction and FullKV on the same inputs, with paired analysis | Completed, verified follow-up |
 
 All notebooks live under `experiments/track_a_failsafe_colab/`. The Notebook 09B
 source may not yet be in the local repository and should be preserved.
@@ -2036,7 +2141,10 @@ discarded/accepted decisions, and repair provenance.
 | Qwen full reference | 75 core | 300 core | 95 | 20 | 60 |
 | **Registered totals** | **460** | **600** | **195** | **20** | **60** |
 | Llama Notebook 12 follow-up | 50 | — | 50 | — | — |
-| **Totals including the follow-up** | **510** | **600** | **245** | **20** | **60** |
+| **Totals including Notebook 12** | **510** | **600** | **245** | **20** | **60** |
+
+The TREC follow-up added 800 prediction rows over 200 paired prompts and four
+configurations (Section 10.6).
 
 The earlier Llama power robustness analysis reintegrated 100 Llama traces (95 v5 +
 5 C1-W) without collecting new measurements. The cross-model synthesis joined
@@ -2227,6 +2335,14 @@ in Section IV-B. Identify the ten-block follow-up by its workload and session
 when presenting it alongside the registered v5 estimate. In the reviewer
 response, report the three paired estimates and their intervals under option
 3(b).
+
+For option 3(a), Section 10.6 supports wording that the custom and authors'
+PyramidKV paths both scored 65.5% on the same 200 LongBench TREC inputs on
+Llama 3.2-3B AWQ at nominal K=1,024 (paired difference 0.0 pp, 95% CI
+[−2.0, +2.0]). Specify the 4,096-token cap, the two FullKV scores, and the
+different AWQ backends when documenting the comparison. Describe this as
+validation on the study's 3B model. Exact replication of the published 8B
+score would require the original setup.
 
 ### 23.2 Proposal and literature update
 
